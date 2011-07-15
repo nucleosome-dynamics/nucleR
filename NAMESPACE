@@ -1,0 +1,17 @@
+importClassesFrom(IRanges, CompressedIRangesList, IRanges, IRangesList, RangedData, Rle, SimpleRleList)
+importClassesFrom(methods, data.frame, list, numeric)
+importClassesFrom(ShortRead, AlignedRead)
+importMethodsFrom(Biobase, exprs, pData, sampleNames)
+importMethodsFrom(GenomicRanges, strand)
+importMethodsFrom(IRanges, '%in%', as.data.frame, as.vector, cor, coverage, disjointBins, end, ifelse, levels, mean,
+                  nchar, nrow, order, paste, quantile, ranges, Rle, space, start, unique, unlist, which, width)
+importMethodsFrom(ShortRead, chromosome, lapply, position, sapply)
+importFrom(graphics, abline, legend, lines, plot, points, rect, text)
+importFrom(IRanges, IRanges, IRangesList, RangedData, RleList)
+importFrom(methods, "@<-")
+importFrom(ShortRead, sread)
+importFrom(stats, fft, pnorm, runif)
+
+exportMethods(export.bed, filterFFT, fragmentLenDetect, peakDetection, peakScoring, plotPeaks, processReads, controlCorrection)
+export(coverage.rpm, export.wig, processTilingArray, syntheticNucMap, pcKeepCompDetect)
+

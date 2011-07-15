@@ -1,0 +1,22 @@
+***** version 0.99.1 - 11 July 2011
++ Added pcKeepCompDetect (automatic calculation of fitted component selection for filterFFT)
++ Added controlCorrection (correction of coverage profiles to avoid methodology biases)
+. Correction of "multicore" library detection
+. Correction of a bug in the filterFFT in joining large sequences
+. filterFFT now takes as default pcKeepComp="auto"
+. pcKeepCompDetect and controlCorrection added to vignette
+
+***** version 0.99.0 - 28 june 2011
+. Minor changes to satisfy Bioconductor requirements
+
+***** version 0.2.1 - 27 april 2011
++ Added example code to all functions
+. Fixes in export.wig function
+
+***** version 0.2.0 - 18 april 2011
++ Added fragmentLenDetect (automatic calculation of sequenced fragments for single ended data)
++ Added syntheticNucMap (generation of random coverage maps)
+. Minor corrections in other functions
+
+**** version 0.1.3 - 02 february 2011
++ First public version

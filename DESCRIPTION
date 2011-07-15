@@ -1,0 +1,15 @@
+Package: nucleR
+Type: Package
+Title: Nucleosome positioning package for R 
+Version: 0.99.2
+Date: 2011-07-11
+Author: Oscar Flores
+Maintainer: Oscar Flores <oflores@mmb.pcb.ub.es>
+Description: Nucleosome positioning for Tiling Arrays and Next Generation Sequencing Experiments
+License: LGPL (>= 3)
+Imports: Biobase, GenomicRanges, graphics, IRanges, methods, ShortRead, stats
+Depends: methods, IRanges, ShortRead, Biobase
+Enhances: multicore
+LazyLoad: yes
+biocViews: ChIPseq, Microarray, Sequencing, Genetics, HighThroughputSequencing
+
