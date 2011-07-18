@@ -104,7 +104,7 @@ setMethod("filterFFT", signature(data="numeric"),
 		for(i in 1:length(ranges)) res[ranges[[i]]] = fft_ranges[[i]]
 		
 		if(is.na(defVal)) res[is.na(data)] = NA #Set to 0/NA what was 0/NA
-		else if (defVal == 0) res[data==0] = 0
+		else if (defVal == 0) res[data <= 0] = 0
 
 		return(res)
 })
