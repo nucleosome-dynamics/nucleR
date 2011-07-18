@@ -5,6 +5,10 @@ pcKeepCompDetect<-function(data, pc.min=0.01, pc.max=0.1, max.iter=20, verbose=F
 	#Sample data
 	samp = .sampleData(data, smpl.num, smpl.min.size, smpl.max.size, verbose=verbose)
 
+	#Original params
+	pc.min.input = pc.min
+	pc.max.input = pc.max
+
   #Calculates the correlation between fft and normal for a given pcKeepComp
   .meancor<-function(pc)
   {
@@ -31,7 +35,7 @@ pcKeepCompDetect<-function(data, pc.min=0.01, pc.max=0.1, max.iter=20, verbose=F
 
 	#Iterate
 	i = 0
-	while((abs(dv.best) > cor.tol) & (i < max.iter))
+	while((abs(dv.best) > cor.tol) & (i < max.iter) & (pc.best > pc.min.input) & (pc.best < pc.max.input) )
 	{
 		i = i + 1
 		if(verbose) cat("Iteration", i, ".  pcKeepComp=", pc.best, ".  Correlation=", dv.best+cor.target, "\n")
@@ -64,6 +68,9 @@ pcKeepCompDetect<-function(data, pc.min=0.01, pc.max=0.1, max.iter=20, verbose=F
 		#New best value update
 		if(abs(desv.new) < abs(dv.best)){ pc.best = pc.new; dv.best = desv.new}
 	}
+
+	if(pc.best > pc.max.input) pc.best=pc.max.input
+	if(pc.best < pc.min.input) pc.best=pc.min.input
 
 	return(pc.best)
 
