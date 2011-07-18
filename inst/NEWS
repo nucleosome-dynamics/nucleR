@@ -1,3 +1,9 @@
+***** version 0.99.2 - 18 July 2011
++ First version available in Bioconductor
++ CITATION file added
+. filterFFT now returns a NA or 0 value in the same regions as the input has it
+. pcKeepCompDetect now returns a value in the range pc.min:pc.max
+
 ***** version 0.99.1 - 11 July 2011
 + Added pcKeepCompDetect (automatic calculation of fitted component selection for filterFFT)
 + Added controlCorrection (correction of coverage profiles to avoid methodology biases)

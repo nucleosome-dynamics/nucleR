@@ -109,13 +109,13 @@ setMethod("filterFFT", signature(data="numeric"),
 		{
 			rtmp = IRanges(is.na(data))
 			rtmp = rtmp[width(rtmp) > 15]
-			lapply(rtmp, function(x) res[x] = NA)
+			for(i in 1:length(rtmp)) res[rtmp[[i]]] = NA
 		}
 		else if (defVal == 0)
 		{
 			rtmp = IRanges(data == 0)
 			rtmp = rtmp[width(rtmp) > 15]
-			lapply(rtmp, function(x) res[x] = 0)
+			for(i in 1:length(rtmp)) res[rtmp[[i]]] = 0
 			res[res<0] = 0
 		}
 
