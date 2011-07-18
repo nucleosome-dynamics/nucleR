@@ -102,6 +102,9 @@ setMethod("filterFFT", signature(data="numeric"),
 		fft_ranges = lapply(ranges, function(x) .fftRegion(data[x], pcKeepComp))
 		res = rep(defVal, length(data)) #Create a vector of default values and fill it
 		for(i in 1:length(ranges)) res[ranges[[i]]] = fft_ranges[[i]]
+		
+		if(is.na(defVal)) res[is.na(data)] = NA #Set to 0/NA what was 0/NA
+		else if (defVal == 0) res[data==0] = 0
 
 		return(res)
 })
