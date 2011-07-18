@@ -9,7 +9,7 @@ Description: Nucleosome positioning for Tiling Arrays and Next Generation Sequen
 License: LGPL (>= 3)
 Imports: Biobase, GenomicRanges, graphics, IRanges, methods, ShortRead, stats
 Depends: methods, IRanges, ShortRead, Biobase
-Enhances: multicore
+Enhances: multicore, htSeqTools
 LazyLoad: yes
 biocViews: ChIPseq, Microarray, Sequencing, Genetics, HighThroughputSequencing
 
