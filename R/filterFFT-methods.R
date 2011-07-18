@@ -103,8 +103,21 @@ setMethod("filterFFT", signature(data="numeric"),
 		res = rep(defVal, length(data)) #Create a vector of default values and fill it
 		for(i in 1:length(ranges)) res[ranges[[i]]] = fft_ranges[[i]]
 		
-		if(is.na(defVal)) res[is.na(data)] = NA #Set to 0/NA what was 0/NA
-		else if (defVal == 0) res[data <= 0] = 0
+		#Set to default values the positions that have them in the input
+		#(remove strange periodicities from large uncovered regions)
+		if(is.na(defVal)) 
+		{
+			rtmp = IRanges(is.na(data))
+			rtmp = rtmp[width(rtmp) > 15]
+			lapply(rtmp, function(x) res[rtmp] = NA)
+		}
+		else if (defVal == 0)
+		{
+			rtmp = IRanges(data == 0)
+			rtmp = rtmp[width(rtmp) > 15]
+			lapply(rtmp, function(x) res[rtmp] = 0)
+			res[res<0] = 0
+		}
 
 		return(res)
 })
