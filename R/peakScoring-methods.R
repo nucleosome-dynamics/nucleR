@@ -20,15 +20,16 @@ setMethod("peakScoring", signature(peaks="IRangesList"),
 	  mc.cores = .check.mc(mc.cores) 
 
 		if(mc.cores > 1) {
-			peaks_list = lapply(peaks, identity) #mclapply doesn't work with S4 classes
-			res = mclapply(peaks_list, peakScoring, data=data, threshold=threshold, dyad.length=dyad.length, mc.cores=mc.cores)  
+			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length), mc.cores=mc.cores)  
 		}else{
-			res = lapply(peaks, peakScoring, data=data, threshold=threshold, dyad.length=dyad.length)
+			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length))
 		}
+
+		names(res) = names(peaks)
 
 		#Result should be returned as a single RangedData object
     #Put the correct space in RangedData
-	  for(name in names(res)) space(res[[name]]) = name
+	  for(name in names(res)) names(res[[name]]) = name
 
     #Combine RangedData objects into single one
     temp = res[[1]]
