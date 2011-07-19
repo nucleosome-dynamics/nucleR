@@ -1,4 +1,7 @@
-***** version 0.99.2 - 18 July 2011
+***** version 0.99.3 - 19 July 2011
+. bug fixes
+
+***** version 0.99.2 - 17 July 2011
 + First version available in Bioconductor
 + CITATION file added
 . filterFFT now returns a NA or 0 value in the same regions as the input has it
