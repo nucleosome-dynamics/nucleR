@@ -3,7 +3,7 @@ Type: Package
 Title: Nucleosome positioning package for R 
 Version: 0.99.3
 Date: 2011-07-19
-Author: Oscar Flores
+Author: Oscar Flores, David Rossell
 Maintainer: Oscar Flores <oflores@mmb.pcb.ub.es>
 Description: Nucleosome positioning for Tiling Arrays and Next Generation Sequencing Experiments
 License: LGPL (>= 3)
