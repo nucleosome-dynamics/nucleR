@@ -67,7 +67,7 @@ setMethod("filterFFT", signature(data="numeric"),
 
 		#Partition the data for available values
 		ranges = IRanges(!is.na(data))
-		ranges = ranges[width(ranges) > 100] # Discard short regions
+		ranges = ranges[width(ranges) > 50] # Discard short regions
 		defVal = NA
 
 		#Split, instead of NAs, the large 0 rows
@@ -115,7 +115,7 @@ setMethod("filterFFT", signature(data="numeric"),
 		{
 			rtmp = IRanges(data == 0)
 			rtmp = rtmp[width(rtmp) > 15]
-			for(i in 1:length(rtmp)) res[rtmp[[i]]] = 0
+			if(length(rtmp) > 0) for(i in 1:length(rtmp)) res[rtmp[[i]]] = 0
 			res[res<0] = 0
 		}
 
