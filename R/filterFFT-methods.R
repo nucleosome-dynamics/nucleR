@@ -109,7 +109,7 @@ setMethod("filterFFT", signature(data="numeric"),
 		{
 			rtmp = IRanges(is.na(data))
 			rtmp = rtmp[width(rtmp) > 15]
-			for(i in 1:length(rtmp)) res[rtmp[[i]]] = NA
+			if(length(rtmp) > 0) for(i in 1:length(rtmp)) res[rtmp[[i]]] = NA
 		}
 		else if (defVal == 0)
 		{
