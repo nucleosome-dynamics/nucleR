@@ -1,3 +1,9 @@
+***** version 0.99.4 - 01 August 2011
++ "threshold" in peak calling now can be set using percentage or a direct coverage value
+. export.wig now only uses maximum 4 decimals to avoid creating big size wig files
+. bugfixes in export.wig and export.bed
+. increased default threshold for pcKeepCompDetect (old value was too restrictive)
+
 ***** version 0.99.3 - 19 July 2011
 . bug fixes
 

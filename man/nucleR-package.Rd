@@ -71,12 +71,12 @@ Maintainer: Oscar Flores <oflores@mmb.pcb.ub.es>
 
 	#Now it's time to call for peaks, first just as points
 	#See that the score is only a measure of the height of the peak
-	peaks = peakDetection(cover_clean, threshold=0.25, score=TRUE)
-	plotPeaks(peaks[[1]], cover_clean[[1]], threshold=0.25)
+	peaks = peakDetection(cover_clean, threshold="25\%", score=TRUE)
+	plotPeaks(peaks[[1]], cover_clean[[1]], threshold="25\%")
 
 	#Do the same as previously, but now we will create the nucleosome calls:
-	peaks = peakDetection(cover_clean, width=147, threshold=0.25, score=TRUE)
-	plotPeaks(peaks, cover_clean[[1]], threshold=0.25)
+	peaks = peakDetection(cover_clean, width=147, threshold="25\%", score=TRUE)
+	plotPeaks(peaks, cover_clean[[1]], threshold="25\%")
 
 	#This is all. From here, you can filter, merge or work with the nucleosome
 	#calls using standard IRanges functions and R/Bioconductor manipulation

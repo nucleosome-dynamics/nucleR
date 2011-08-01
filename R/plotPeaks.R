@@ -3,6 +3,12 @@ setMethod("plotPeaks", signature(peaks="numeric"),
 		 xlab="position", type="l", col.points="red", thr.lty=1, thr.lwd=1, thr.col="darkred",
 		 scor.col=col.points, scor.font=2, scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2, ...) {
 
+    #Calculate the ranges in threshold and get the coverage
+    if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshold is given as a string with percentage, convert it
+    {
+     threshold = quantile(data, as.numeric(sub("%","", threshold))/100, na.rm=TRUE)
+    }
+
 	data = data[start:end]
 	names(data) = start:end
 
@@ -12,7 +18,7 @@ setMethod("plotPeaks", signature(peaks="numeric"),
 
 	plot(start:end, data, type=type, xlab=xlab, ...)
 	if(is.null(scores)) points(peaks, data[as.character(peaks)], col=col.points)
-	if(threshold != 0) abline(h=quantile(data, threshold, na.rm=TRUE), col=thr.col, lty=thr.lty, lwd=thr.lwd)
+	if(threshold != 0) abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
 
 	if(!is.null(scores))
 		 text(peaks, data[as.character(peaks)], labels=format(scores, digits=scor.digits), 
@@ -39,6 +45,12 @@ setMethod("plotPeaks", signature(peaks="IRanges"),
 		 rect.thick=2, rect.lwd=1, rect.border="black", 
      scor.col=col.points, scor.font=2, scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2, ...) {
 
+	  #Calculate the ranges in threshold and get the coverage
+	  if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshold is given as a string with percentage, convert it
+  	{
+	   threshold = quantile(data, as.numeric(sub("%","", threshold))/100, na.rm=TRUE)
+	  }
+
 		#Subset data
 		subset = which(start(peaks) >= start & end(peaks) <= end)
   	data = data[start:end]
@@ -64,7 +76,7 @@ setMethod("plotPeaks", signature(peaks="IRanges"),
 		#Plot lines and ranges
 		plot(start:end, data, type=type, xlab=xlab, ...)
 		rect(start(peaks), ybottom+pc, end(peaks), ybottom+pc*rect.thick, lwd=rect.lwd, col=col.points, border=rect.border)
-  	if(threshold != 0) abline(h=quantile(data, threshold, na.rm=TRUE), col=thr.col, lty=thr.lty, lwd=thr.lwd)
+  	if(threshold != 0) abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
 
 		#Add text
 		if(!is.null(scores))

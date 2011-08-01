@@ -1,5 +1,5 @@
 setMethod("peakScoring", signature(peaks="list"),
-	function(peaks, data, threshold=0.25, mc.cores=1) {
+	function(peaks, data, threshold="25%", mc.cores=1) {
 
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -14,7 +14,7 @@ setMethod("peakScoring", signature(peaks="list"),
 )
 
 setMethod("peakScoring", signature(peaks="IRangesList"),
-	function(peaks, data, threshold=0.25, dyad.length=38, mc.cores=1) {
+	function(peaks, data, threshold="25%", dyad.length=38, mc.cores=1) {
 
 	  #Check if multicore is supported or set to 1
 	  mc.cores = .check.mc(mc.cores) 
@@ -40,10 +40,17 @@ setMethod("peakScoring", signature(peaks="IRangesList"),
 )
 
 setMethod("peakScoring", signature(peaks="numeric"),
-	function(peaks, data, threshold=0.25) {
+	function(peaks, data, threshold="25%") {
 
-		mean = mean(data[!is.na(data) & data > quantile(data, threshold, na.rm=TRUE)], na.rm=TRUE)
-		sd   = sd(data[!is.na(data) & data > quantile(data, threshold, na.rm=TRUE)], na.rm=TRUE)
+		#Calculate the ranges in threshold and get the coverage
+		if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshdol is given as a string with percentage, convert it
+		{
+			threshold = quantile(data, as.numeric(sub("%","", threshold))/100, na.rm=TRUE)
+	  }
+
+
+		mean = mean(data[!is.na(data) & data > threshold], na.rm=TRUE)
+		sd   = sd(data[!is.na(data) & data > threshold], na.rm=TRUE)
 	
 		res = pnorm(data[peaks], mean=mean, sd=sd, lower.tail=TRUE)
 		return(data.frame(peak=peaks, score=res))
@@ -51,13 +58,19 @@ setMethod("peakScoring", signature(peaks="numeric"),
 )
 
 setMethod("peakScoring", signature(peaks="IRanges"),
-  function(peaks, data, threshold=0.25, dyad.length=38) {
+  function(peaks, data, threshold="25%", dyad.length=38) {
+
+    #Calculate the ranges in threshold and get the coverage
+    if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshdol is given as a string with percentage, convert it
+    {
+      threshold = quantile(data, as.numeric(sub("%","", threshold))/100, na.rm=TRUE)
+    }
 
 		#Hack for TA, that could have negative values in range calculations
 		if(min(data, na.rm=TRUE) < 0) data = data+abs(min(data, na.rm=TRUE))
 
-    mean = mean(data[data > quantile(data, threshold, na.rm=TRUE)], na.rm=TRUE)
-    sd   = sd(data[data > quantile(data, threshold, na.rm=TRUE)], na.rm=TRUE)
+    mean = mean(data[data > threshold], na.rm=TRUE)
+    sd   = sd(data[data > threshold], na.rm=TRUE)
 
 		#Calculate dyad range
 		dyad.middl = start(peaks) + floor(width(peaks)/2)

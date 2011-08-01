@@ -14,7 +14,7 @@ export.wig <- function(data, name, chrom="", filepath=name)
 	#Assign chromosome names
 	if(chrom == "")
 	{
-		if(is.null(names(data))) die("'chrom' parameter must be provided for unnamed objects")
+		if(is.null(names(data))) stop("'chrom' parameter must be provided for unnamed objects")
 		chrom = names(data)
 	}else{
 		names(data) = chrom
@@ -29,7 +29,7 @@ export.wig <- function(data, name, chrom="", filepath=name)
 		tryCatch({
 			cat(paste('track type=wiggle_0 name="', name, '"', sep=""), sep="\n")
 			cat(paste('fixedStep chrom=', chr, ' start=1 step=1', sep=""), sep="\n")
-			cat(values, sep="\n")
+			cat(format(values, nsmall=4), sep="\n")
 			sink()
 		}, error = function(e) {
 			sink()  #close the stream

@@ -315,19 +315,19 @@ cor(htseq_raw, htseq_fft, use="complete.obs")
 After noise removal, the calling for nucleosomes is easy to perform. In nucleosome positioning, in contrast with other similar experiments like ChIP, the problem for the peaks detection algorithms is deal with the presence of an irregular signal which causes lots of local maxima (i.e., peaks due to noise inside a real peak). Here, we avoid this problem applying the FFT filter, allowing the detection of peaks in a simple but efficient way just looking for changes in the trend of the profile. This is implemented in the \texttt{peakDetection} function and results can be represented with the function \texttt{plotPeaks}:
 
 <<peaks>>=
-peaks = peakDetection(htseq_fft, threshold=0.25, score=FALSE)
+peaks = peakDetection(htseq_fft, threshold="25%", score=FALSE)
 peaks
 @
 
 <<plotpeak>>=
-plotPeaks(peaks, htseq_fft, threshold=0.25)
+plotPeaks(peaks, htseq_fft, threshold="25%")
 @
 
 \begin{figure}[h]
 \centering
 <<figpeak, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(peaks, htseq_fft, threshold=0.25, yaxt="n", ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", ylab="coverage")
 @
 \caption{\label{fig:figpeak}
   Output of \texttt{plotPeaks} function. Peaks are spotted in red and and detection threshold marked with an horitzontal line.
@@ -343,7 +343,7 @@ The \emph{sharpness} is a measure of how fuzzy is a nucleosome. If a peak is ver
 Scores can be calculated with the \texttt{peakScoring} function or directly with the argument \texttt{score=TRUE} in \texttt{peakDetection}.
 
 <<peaks2>>=
-peaks = peakDetection(htseq_fft, threshold=0.25, score=TRUE)
+peaks = peakDetection(htseq_fft, threshold="25%", score=TRUE)
 head(peaks)
 @
 
@@ -351,7 +351,7 @@ head(peaks)
 \centering
 <<figpeak2, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(peaks, htseq_fft, threshold=0.25, yaxt="n", xlim=c(1,4000), ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), ylab="coverage")
 @
 \caption{\label{fig:figpeak2}
  \texttt{plotPeaks} function with \texttt{score=TRUE}.
@@ -361,7 +361,7 @@ plotPeaks(peaks, htseq_fft, threshold=0.25, yaxt="n", xlim=c(1,4000), ylab="cove
 The scores in Figure \ref{fig:figpeak2} only account for the punctual height of the peak. As said previously, this measure can be improved by accounting the fuzzyness of a nucleosome call (the sharpness of the peak). This requires a way to account for longer range peaks, which can be obtained with the \texttt{width} argument. In this way one can convert the identified nucleosome dyads to whole nucleosome length ranges and account for its degree of fuzzyness:
 
 <<peaks3>>=
-peaks = peakDetection(htseq_fft, threshold=0.25, score=TRUE, width=140)
+peaks = peakDetection(htseq_fft, threshold="25%", score=TRUE, width=140)
 head(peaks)
 @
 
@@ -369,7 +369,7 @@ head(peaks)
 \centering
 <<figpeak3, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(peaks, htseq_fft, threshold=0.25, yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=2.5, ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=2.5, ylab="coverage")
 @
 \caption{\label{fig:figpeak3}
   \texttt{plotPeaks} output with \texttt{score=TRUE} and \texttt{width=140}.
@@ -393,7 +393,7 @@ head(red_class)
 \centering
 <<figranges, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(red_calls, htseq_fft, threshold=0.25, yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=3, ylab="coverage")
+plotPeaks(red_calls, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=3, ylab="coverage")
 @
 \caption{\label{fig:figranges}
   Simple example of ranges manipulation to plot fuzzy nucleosomes

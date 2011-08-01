@@ -1,5 +1,5 @@
 setMethod("peakDetection", signature(data="list"),
-	function(data, threshold=0.25, width=1, score=TRUE, mc.cores=1){
+	function(data, threshold="25%", width=1, score=TRUE, mc.cores=1){
 
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -42,7 +42,7 @@ setMethod("peakDetection", signature(data="list"),
 )
 
 setMethod("peakDetection", signature(data="numeric"),
-	function(data, threshold=0.25, width=1, score=TRUE, mc.cores=1) {
+	function(data, threshold="25%", width=1, score=TRUE, mc.cores=1) {
 
 	if(width < 1) stop("'width' attribute should be greater than 1")
 
@@ -50,7 +50,12 @@ setMethod("peakDetection", signature(data="numeric"),
   mc.cores = .check.mc(mc.cores) 
 
 	#Calculate the ranges in threshold and get the coverage
-	ranges = IRanges(!is.na(data) & data > quantile(data, threshold, na.rm=TRUE))
+	if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshdol is given as a string with percentage, convert it
+	{
+	 threshold = quantile(data, as.numeric(sub("%","", threshold))/100, na.rm=TRUE)
+	}
+
+	ranges = IRanges(!is.na(data) & data > threshold)
 	covers = lapply(ranges, function(x) data[x])
 
 	#For each range, look for changes of trend and keep the starting position of trend change

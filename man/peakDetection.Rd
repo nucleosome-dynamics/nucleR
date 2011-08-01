@@ -11,15 +11,15 @@
 	It's recommended to smooth the input with \code{filterFFT} prior the detection.	
 }
 \usage{
-\S4method{peakDetection}{list}(data, threshold=0.25, width=1, score=TRUE, mc.cores=1)
-\S4method{peakDetection}{numeric}(data, threshold=0.25, width=1, score=TRUE, mc.cores=1)
+\S4method{peakDetection}{list}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
+\S4method{peakDetection}{numeric}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
 }
 \arguments{
   \item{data}{
 	Input numeric values, or a list of them
 }
 	\item{threshold}{
-	Percentile of \code{data} above from the peaks will be detected.
+	Threshold value from which the peaks will be selected. Can be given as a percentage string (i.e., \code{"25\%"} will use the value in the 1st quantile of \code{data}) or as an absolute coverage numeric value (i.e., \code{20} will not look for peaks in regions without less than 20 reads (or reads per milion)).
 }
 	\item{width}{
 	If a positive integer > 1 is given, the peaks are returned as a range of the given width centered in the local maximum. Useful for nucleosome calling from a coverage peak in the dyad.
@@ -62,10 +62,10 @@
 	cover_fft = filterFFT(cover)
 	
 	#Detect and plot peaks (up a bit the threshold for accounting synthetic data)
-	peaks = peakDetection(cover_fft, threshold=0.4, score=TRUE)
-	plotPeaks(peaks, cover_fft, threshold=0.4, start=10000, end=15000)
+	peaks = peakDetection(cover_fft, threshold="40\%", score=TRUE)
+	plotPeaks(peaks, cover_fft, threshold="40\%", start=10000, end=15000)
 
 	#Now use ranges version, which accounts for fuzziness when scoring
-  peaks = peakDetection(cover_fft, threshold=0.4, score=TRUE, width=147)
-  plotPeaks(peaks, cover_fft, threshold=0.4, start=10000, end=15000)
+  peaks = peakDetection(cover_fft, threshold="40\%", score=TRUE, width=147)
+  plotPeaks(peaks, cover_fft, threshold="40\%", start=10000, end=15000)
 }

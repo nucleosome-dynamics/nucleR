@@ -11,10 +11,10 @@
 	Scores peaks detected with function \code{peakDetection} according the height and the sharpness of the peak. This function can be called automatically from \code{peakDetection} if \code{score=TRUE}.
 }
 \usage{
-	\S4method{peakScoring}{numeric}(peaks, data, threshold=0.25)	
-	\S4method{peakScoring}{list}(peaks, data, threshold=0.25, mc.cores=1)
-	\S4method{peakScoring}{IRanges}(peaks, data, threshold=0.25, dyad.length=38)
-	\S4method{peakScoring}{IRangesList}(peaks, data, threshold=0.25, dyad.length=38, mc.cores=1)
+	\S4method{peakScoring}{numeric}(peaks, data, threshold="25\%")	
+	\S4method{peakScoring}{list}(peaks, data, threshold="25\%", mc.cores=1)
+	\S4method{peakScoring}{IRanges}(peaks, data, threshold="25\%", dyad.length=38)
+	\S4method{peakScoring}{IRangesList}(peaks, data, threshold="25\%", dyad.length=38, mc.cores=1)
 }
 \arguments{
   \item{peaks}{
@@ -25,7 +25,7 @@
 	Data of nucleosome coverage or intensites.
 }
 	\item{threshold}{
-	The non-default \code{threshold} previously used in \code{peakDetection} function, if applicable.
+	The non-default \code{threshold} previously used in \code{peakDetection} function, if applicable. Can be given as a percentage string (i.e., \code{"25\%"} will use the value in the 1st quantile of \code{data}) or as an absolute coverage numeric value (i.e., \code{20} will not look for peaks in regions without less than 20 reads (or reads per milion)).
 }
 	\item{dyad.length}{
 	How many bases account in the nucleosome dyad for sharpness description. If working with NGS data, works best with the reads width value for single-ended data or the \code{trim} value given to the \code{processReads} function.

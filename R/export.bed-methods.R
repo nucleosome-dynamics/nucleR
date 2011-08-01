@@ -1,4 +1,4 @@
-.export.bed <-function(df, name, description="", filename)
+.export.bed <-function(df, name, description=name, filename)
 {
 	hasScore = "score" %in% names(df)
   tscore = ifelse(hasScore, "useScore=0", "useScore=1")
@@ -19,7 +19,7 @@
 }
 
 setMethod("export.bed", signature(ranges="IRanges"),
-	function(ranges, score=NULL, chrom, name, description="", filepath=name){
+	function(ranges, score=NULL, chrom, name, description=name, filepath=name){
 
 	dd = as.data.frame(ranges)
 	dd$chrom = chrom
@@ -32,12 +32,12 @@ setMethod("export.bed", signature(ranges="IRanges"),
 )
 
 setMethod("export.bed", signature(ranges="CompressedIRangesList"),
-  function(ranges, score=NULL, name, description="", filepath=name, splitByChrom=TRUE){
+  function(ranges, score=NULL, name, description=name, filepath=name, splitByChrom=TRUE){
 	
 	if(splitByChrom)
 	{
 		for(chr in names(ranges)) export.bed(ranges=ranges[[chr]], score=score[[chr]], chrom=chr,
-			 name=name, description=description, filepath=filepath)
+			 name=name, description=description, filepath=filepath, splitByChrom=FALSE)
 	}
 	else
 	{
@@ -53,12 +53,12 @@ setMethod("export.bed", signature(ranges="CompressedIRangesList"),
 )
 
 setMethod("export.bed", signature(ranges="RangedData"),
-	function(ranges, score=NULL, name, description="", filepath=name, splitByChrom=TRUE){
+	function(ranges, score=NULL, name, description=name, filepath=name, splitByChrom=TRUE){
 
   if(splitByChrom)
   {
     for(chr in names(ranges)) export.bed(ranges=ranges[chr], chrom=chr, name=name,
-				description=description, filepath=paste(filepath, chr, sep="."))
+				description=description, filepath=paste(filepath, chr, sep="."), splitByChrom=FALSE)
   }
   else
   {

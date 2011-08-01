@@ -79,9 +79,9 @@ plotPeaks(peaks, data, ...)
   cover_fft = filterFFT(cover)
 
   #Detect peaks
-  peaks = peakDetection(cover_fft, threshold=0.4, score=TRUE, width=140)
+  peaks = peakDetection(cover_fft, threshold="40\%", score=TRUE, width=140)
 
 	#Plot peaks and coverage profile (show only a window)
-  plotPeaks(peaks, cover_fft, threshold=0.4, start=1000, end=6000)
+  plotPeaks(peaks, cover_fft, threshold="40\%", start=1000, end=6000)
 }
 

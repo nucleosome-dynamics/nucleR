@@ -1,6 +1,6 @@
 #One shot version
 pcKeepCompDetect<-function(data, pc.min=0.01, pc.max=0.1, max.iter=20, verbose=FALSE,
-               cor.target=0.999, cor.tol=1e-4, smpl.num=25, smpl.min.size=2^10, smpl.max.size=2^14)
+               cor.target=0.98, cor.tol=1e-3, smpl.num=25, smpl.min.size=2^10, smpl.max.size=2^14)
 {
 	#Sample data
 	samp = .sampleData(data, smpl.num, smpl.min.size, smpl.max.size, verbose=verbose)
