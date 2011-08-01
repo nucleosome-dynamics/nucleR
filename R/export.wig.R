@@ -1,7 +1,7 @@
 export.wig <- function(data, name, chrom="", filepath=name)
 {
 	#Convert any list shaped object to simple list (list, RleList, UncompressedRleList...)
-	if(grepl(class(data), "list", ignore.case=TRUE))
+	if(grepl("list", class(data), ignore.case=TRUE))
 	{
 		data = lapply(data, identity)
 	}
