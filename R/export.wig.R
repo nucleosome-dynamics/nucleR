@@ -25,14 +25,15 @@ export.wig <- function(data, name, chrom="", filepath=name)
 		file = paste(filepath, chr, "wig", sep=".")
 		values = as.vector(data[[chr]])
 
-	  sink(file)
+	  out = file(description=file, open="wt", blocking=FALSE)
+		
 		tryCatch({
-			cat(paste('track type=wiggle_0 name="', name, '"', sep=""), sep="\n")
-			cat(paste('fixedStep chrom=', chr, ' start=1 step=1', sep=""), sep="\n")
-			cat(format(values, nsmall=4), sep="\n")
-			sink()
+			cat(paste('track type=wiggle_0 name="', name, '"', sep=""), sep="\n", file=out, append=FALSE)
+			cat(paste('fixedStep chrom=', chr, ' start=1 step=1', sep=""), sep="\n", file=out, append=TRUE)
+			cat(format(values, nsmall=4), sep="\n", file=out, append=TRUE)
+			close(out)	
 		}, error = function(e) {
-			sink()  #close the stream
+			close(out)  #close the stream
 			stop(e)
 		})
 	}
