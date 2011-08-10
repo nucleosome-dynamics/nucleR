@@ -11,9 +11,9 @@
 	Export ranges in BED format, compatible with UCSC genome browser, IGB, and others
 }
 \usage{
-\S4method{export.bed}{IRanges}(ranges, score=NULL, chrom, name, description=name, filepath=name)
-\S4method{export.bed}{CompressedIRangesList}(ranges, score=NULL, name, description=name, filepath=name, splitByChrom=TRUE)
-\S4method{export.bed}{RangedData}(ranges, score=NULL, name, description=name, filepath=name, splitByChrom=TRUE)
+\S4method{export.bed}{IRanges}(ranges, score=NULL, chrom, name, desc=name, filepath=name)
+\S4method{export.bed}{CompressedIRangesList}(ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE)
+\S4method{export.bed}{RangedData}(ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE)
 }
 \arguments{
   \item{ranges}{
@@ -28,7 +28,7 @@
   \item{name}{
 	Name of the track
 }
-  \item{description}{
+  \item{desc}{
 	Description of the track
 }
 	\item{filepath}{

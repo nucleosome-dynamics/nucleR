@@ -1,4 +1,4 @@
-setGeneric("export.bed", function(ranges, score=NULL, chrom, name, description, filepath=name, splitByChrom=TRUE)  standardGeneric("export.bed"))
+setGeneric("export.bed", function(ranges, score=NULL, chrom, name, desc=name, filepath=name, splitByChrom=TRUE)  standardGeneric("export.bed"))
 setGeneric("filterFFT", function(data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE, ...) standardGeneric("filterFFT"))
 setGeneric("fragmentLenDetect", function(reads, samples=1000, window=5000, min.shift=1, max.shift=200, mc.cores=1) standardGeneric("fragmentLenDetect"))
 setGeneric("peakDetection", function(data, threshold=0.25, width=1, score=TRUE, mc.cores=1) standardGeneric("peakDetection"))
