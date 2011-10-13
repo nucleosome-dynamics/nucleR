@@ -1,5 +1,5 @@
 setMethod("fragmentLenDetect", signature(reads="AlignedRead"), 
-	function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1) {	
+	function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE) {	
 
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -39,20 +39,22 @@ setMethod("fragmentLenDetect", signature(reads="AlignedRead"),
 
 	if(mc.cores > 1)
 	{
-		res = round(mean(unlist(mclapply(1:nrow(dd), function(x) shiftPos(x), mc.cores=32))))
+		shift = round(mean(unlist(mclapply(1:nrow(dd), function(x) shiftPos(x), mc.cores=mc.cores))))
 	}else{
-		res = round(mean(unlist(lapply(1:nrow(dd), function(x) shiftPos(x)))))
+		shift = round(mean(unlist(lapply(1:nrow(dd), function(x) shiftPos(x)))))
 	}
-		
-	#Fragment length is the shift + the length of the read
-	fragLen = res + width(reads[1])
 
-	return(fragLen)
+    #Fragment length is the shift * 2 + the length of the read
+    fragLen = shift * 2 + width(reads)[1]
+
+    if(as.shift) return(shift)
+    else return(fragLen)
+		
 }
 )
 
 setMethod("fragmentLenDetect", signature(reads="RangedData"),
-  function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1) {
+  function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE) {
   
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -95,14 +97,15 @@ setMethod("fragmentLenDetect", signature(reads="RangedData"),
 
     if(mc.cores > 1)
     {
-      res = round(mean(unlist(mclapply(1:nrow(dd), function(x) shiftPos(x), mc.cores=32))))
+      shift = round(mean(unlist(mclapply(1:nrow(dd), function(x) shiftPos(x), mc.cores=mc.cores))))
     }else{ 
-      res = round(mean(unlist(lapply(1:nrow(dd), function(x) shiftPos(x)))))
+      shift = round(mean(unlist(lapply(1:nrow(dd), function(x) shiftPos(x)))))
     }
 
-    #Fragment length is the shift + the length of the read
-    fragLen = res + width(reads)[1]
+    #Fragment length is the shift * 2 + the length of the read
+		fragLen = shift * 2 + width(reads)[1]
 
-    return(fragLen)
+		if(as.shift) return(shift)
+		else return(fragLen)
   }
 )

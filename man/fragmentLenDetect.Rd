@@ -9,8 +9,8 @@
 	When using single-ended sequencing, the resulting partial sequences map only in one strand, causing a bias in the coverage profile if not corrected. The only way to correct this is knowing the average size of the real fragments. \code{nucleR} uses this information when preprocessing single-ended sequences. You can provide this information by your own (usually a 147bp length is a good aproximation) or you can use this method to automatically guess the size of the inserts. 
 }
 \usage{
-\S4method{fragmentLenDetect}{AlignedRead}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1)
-\S4method{fragmentLenDetect}{RangedData}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1)
+\S4method{fragmentLenDetect}{AlignedRead}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE)
+\S4method{fragmentLenDetect}{RangedData}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE)
 }
 \arguments{
   \item{reads}{
@@ -25,6 +25,9 @@
 	\item{min.shift, max.shift}{
 	Minimum and maximum shift to apply on the strands to detect the optimal fragment size. If the range is too big, the performance decreases.
 }
+	\item{as.shift}{
+	If TRUE, returns the shift needed to align the middle of the reads in opposite strand. If FALSE, returns the mean inferred fragment length.
+}
   \item{mc.cores}{
 	If multicore support, maximum number of cores allowed to use.
 }
@@ -35,7 +38,7 @@
 	The final returned length is the best shift detected plus the width of the reads. You can increase the performance of this function by reducing the \code{samples} value and/or narrowing the shift range. The \code{window} size has almost no impact on the performance, despite a to small value can give biased results.
 }
 \value{
-	Inferred mean lenght of the inserts
+	Inferred mean lenght of the inserts by default, or shift needed to align strands if \code{as.shift=TRUE}
 }
 \author{
   Oscar Flores \email{oflores@mmb.pcb.ub.es}

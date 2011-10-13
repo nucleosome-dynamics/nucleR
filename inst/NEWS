@@ -1,3 +1,8 @@
+***** version 0.99.5 - 13 October 2011
+. Bug fix in the fragmentLenDetect which was returning wrong values, processReads could also be affected by this bug
++ processReads: Added custom parameters pass for fragmentLenDetect if fragmentLen=NULL
++ fragmentLenDetect: Added parameter as.shift to allow shift value return instead of the fragment length (the one by default)
+
 ***** version 0.99.4 - 01 August 2011
 + "threshold" in peak calling now can be set using percentage or a direct coverage value
 . export.wig now only uses maximum 4 decimals to avoid creating big size wig files

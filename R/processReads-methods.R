@@ -1,5 +1,5 @@
 setMethod("processReads", signature(data="AlignedRead"), 
-	function(data, type="single", fragmentLen, trim) {	
+	function(data, type="single", fragmentLen, trim, ...) {	
 		
 		require("ShortRead")
 		if(missing(fragmentLen))
@@ -7,7 +7,7 @@ setMethod("processReads", signature(data="AlignedRead"),
 			if(type=="single")
 			{
 				warning(" * fragmentLen not provided for strand correction, infering automatically...")
-				fragmentLen=fragmentLenDetect(data)
+				fragmentLen=fragmentLenDetect(data, ...)
 				message(paste(" * fragmentLen =", fragmentLen))
 			}else{
 				fragmentLen=Inf	#Don't remove anything
@@ -67,14 +67,14 @@ setMethod("processReads", signature(data="AlignedRead"),
 
 
 setMethod("processReads", signature(data="RangedData"),
-  function(data, type="single", fragmentLen, trim) {
+  function(data, type="single", fragmentLen, trim, ...) {
 
     if(missing(fragmentLen))
     {
       if(type=="single")
       {
         warning(" * fragmentLen not provided for strand correction, infering automatically...")
-        fragmentLen=fragmentLenDetect(data)
+        fragmentLen=fragmentLenDetect(data,...)
         message(paste(" * fragmentLen =", fragmentLen))
       }else{
         fragmentLen=Inf #Don't remove anything

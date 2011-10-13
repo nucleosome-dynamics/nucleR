@@ -11,8 +11,8 @@ sources and a basic manipulation of them. The tasks includes the correction
 of strand-specific single-end reads and the trimming of reads to a given length. 
 }
 \usage{
-\S4method{processReads}{AlignedRead}(data, type = "single", fragmentLen, trim)
-\S4method{processReads}{RangedData}(data, type = "single", fragmentLen, trim)
+\S4method{processReads}{AlignedRead}(data, type = "single", fragmentLen, trim, ...)
+\S4method{processReads}{RangedData}(data, type = "single", fragmentLen, trim, ...)
 }
 \arguments{
   \item{data}{
@@ -26,6 +26,9 @@ of strand-specific single-end reads and the trimming of reads to a given length.
 }
   \item{trim}{
 	Length to trim the reads (or extend them if \code{trim} > read length)
+}
+	\item{\dots}{
+	Other parameters passed to \code{fragmentLenDetect} if no fixed \code{fragmentLen} is given.
 }
 }
 \details{
