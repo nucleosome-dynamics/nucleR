@@ -9,8 +9,8 @@
 	When using single-ended sequencing, the resulting partial sequences map only in one strand, causing a bias in the coverage profile if not corrected. The only way to correct this is knowing the average size of the real fragments. \code{nucleR} uses this information when preprocessing single-ended sequences. You can provide this information by your own (usually a 147bp length is a good aproximation) or you can use this method to automatically guess the size of the inserts. 
 }
 \usage{
-\S4method{fragmentLenDetect}{AlignedRead}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE)
-\S4method{fragmentLenDetect}{RangedData}(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE)
+\S4method{fragmentLenDetect}{AlignedRead}(reads, samples=1000, window=1000, min.shift=1, max.shift=100, mc.cores=1, as.shift=FALSE)
+\S4method{fragmentLenDetect}{RangedData}(reads, samples=1000, window=1000, min.shift=1, max.shift=100, mc.cores=1, as.shift=FALSE)
 }
 \arguments{
   \item{reads}{

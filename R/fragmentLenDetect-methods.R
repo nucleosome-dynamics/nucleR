@@ -1,5 +1,5 @@
 setMethod("fragmentLenDetect", signature(reads="AlignedRead"), 
-	function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE) {	
+	function(reads, samples=1000, window=1000, min.shift=1, max.shift=100, mc.cores=1, as.shift=FALSE) {	
 
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -31,6 +31,10 @@ setMethod("fragmentLenDetect", signature(reads="AlignedRead"),
 		x = sapply(min.shift:max.shift, function(s) cor(cpos[1:(window+1-s)], cneg[s:window]))
 		res = which(x == max(x))[1]
 
+    #We only shifted the negative strand, but in real case both strands will be shifted the half of this amount
+    res = res / 2
+
+
 		#Discard NAs
 		if(is.na(res) | !is.numeric(res)) return(numeric(0))
 
@@ -54,7 +58,7 @@ setMethod("fragmentLenDetect", signature(reads="AlignedRead"),
 )
 
 setMethod("fragmentLenDetect", signature(reads="RangedData"),
-  function(reads, samples=1000, window=1000, min.shift=1, max.shift=200, mc.cores=1, as.shift=FALSE) {
+  function(reads, samples=1000, window=1000, min.shift=1, max.shift=100, mc.cores=1, as.shift=FALSE) {
   
   #Check if multicore is supported or set to 1
   mc.cores = .check.mc(mc.cores) 
@@ -87,7 +91,10 @@ setMethod("fragmentLenDetect", signature(reads="RangedData"),
       cneg[is.na(cneg)] = 0
 
       x = sapply(min.shift:max.shift, function(s) cor(cpos[1:(window+1-s)], cneg[s:window]))
-      res = which(x == max(x))[1]
+      res = which(x == max(x, na.rm=TRUE))[1]
+	
+			#We only shifted the negative strand, but in real case both strands will be shifted the half of this amount
+			res = res / 2
 
       #Discard NAs
       if(is.na(res) | !is.numeric(res)) return(numeric(0))
