@@ -13,8 +13,8 @@
 \usage{
 	\S4method{peakScoring}{numeric}(peaks, data, threshold="25\%")	
 	\S4method{peakScoring}{list}(peaks, data, threshold="25\%", mc.cores=1)
-	\S4method{peakScoring}{IRanges}(peaks, data, threshold="25\%", dyad.length=38)
-	\S4method{peakScoring}{IRangesList}(peaks, data, threshold="25\%", dyad.length=38, mc.cores=1)
+	\S4method{peakScoring}{IRanges}(peaks, data, threshold="25\%", weigth.widht=1, weigth.height=1, dyad.length=38)
+	\S4method{peakScoring}{IRangesList}(peaks, data, threshold="25\%", weigth.widht=1, weigth.height=1, dyad.length=38, mc.cores=1)
 }
 \arguments{
   \item{peaks}{
@@ -30,6 +30,9 @@
 	\item{dyad.length}{
 	How many bases account in the nucleosome dyad for sharpness description. If working with NGS data, works best with the reads width value for single-ended data or the \code{trim} value given to the \code{processReads} function.
 }
+	\item{weigth.height, weigth.widht}{
+	If the score is a range, the height and the widht score (coverage and fuzzynes) can be defined with different weigths with these parameters. See details.
+}
   \item{mc.cores}{
 	If input is a \code{list} or \code{IRangeList}, and multiple cores support is available, the maximum number of cores for parallel processing
 }
@@ -42,7 +45,9 @@
 	The width score is a mesure of how sharp is a peak. With a NGS coverage in mind, a perfect phased (well-positioned) nucleosome is this that starts and ends exactly in the same place many times. The shape of this ideal peak will be a rectangular shape of the lenght of the read. A wider top of a peak could indicate fuzzyness. The parameter \code{dyad.length} tells how long should be the "flat" region of an ideal peak. The optimum value for this parameter is the lenght of the read in single-ended data or the \code{trim} value of the function \code{processReads}. For Tiling Array, the default value should be fine.
 	This score is obtained calculating the ratio between the mean of the nucleosome scope (the one provided by range in the elements of \code{peaks}) and the \code{dyad.length} central bases. This value is normalized between 0 and 1.
 
-	For punctual, single points peaks (provided by \code{numeric} vector or list as \code{peaks} attribute) the score returned is the height score. For range \code{peaks} the product between heigh and width score is returned.
+	For punctual, single points peaks (provided by \code{numeric} vector or list as \code{peaks} attribute) the score returned is the height score. 
+
+	For range \code{peaks} the weighted sum of the heigth and width scores is used. This is: \code{((score.heigh * weigth.height) / sum.wei) + ((score.width * weigth.widht) / sum wei)}. Note that you can query for only one score by weting its weight to 1 and the other to 0.
 }
 \value{
 	In the case of \code{numeric} input, the value returned is a \code{data.frame} containing a 'peak' and a 'score' column. If the input is a \code{list}, the result will be a \code{list} of \code{data.frame}.

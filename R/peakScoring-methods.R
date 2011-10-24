@@ -14,15 +14,15 @@ setMethod("peakScoring", signature(peaks="list"),
 )
 
 setMethod("peakScoring", signature(peaks="IRangesList"),
-	function(peaks, data, threshold="25%", dyad.length=38, mc.cores=1) {
+	function(peaks, data, threshold="25%", weigth.widht=1, weigth.height=1, dyad.length=38, mc.cores=1) {
 
 	  #Check if multicore is supported or set to 1
 	  mc.cores = .check.mc(mc.cores) 
 
 		if(mc.cores > 1) {
-			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length), mc.cores=mc.cores)  
+			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weigth.widht=weigth.widht, weigth.height=weigth.height), mc.cores=mc.cores)  
 		}else{
-			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length))
+			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weigth.widht=weigth.widht, weigth.height=weigth.height))
 		}
 
 		names(res) = names(peaks)
@@ -58,7 +58,7 @@ setMethod("peakScoring", signature(peaks="numeric"),
 )
 
 setMethod("peakScoring", signature(peaks="IRanges"),
-  function(peaks, data, threshold="25%", dyad.length=38) {
+  function(peaks, data, threshold="25%", weigth.widht=1, weigth.height=1, dyad.length=38) {
 
     #Calculate the ranges in threshold and get the coverage
     if(!is.numeric(threshold)) if(grep("%", threshold) == 1) #If threshdol is given as a string with percentage, convert it
@@ -89,7 +89,9 @@ setMethod("peakScoring", signature(peaks="IRanges"),
 		scor.width = scor.width / max(scor.width)
 	
 		#Final score
-		scor.final = scor.heigh * scor.width
+		sum.wei = weigth.height + weigth.widht
+		scor.final = ((scor.heigh * weigth.height) / sum.wei) + ((scor.width * weigth.widht) / sum.wei)
+		
 
     return(RangedData(peaks, score=scor.final))
   }
