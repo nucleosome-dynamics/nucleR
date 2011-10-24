@@ -13,8 +13,8 @@
 \usage{
 	\S4method{peakScoring}{numeric}(peaks, data, threshold="25\%")	
 	\S4method{peakScoring}{list}(peaks, data, threshold="25\%", mc.cores=1)
-	\S4method{peakScoring}{IRanges}(peaks, data, threshold="25\%", weigth.widht=1, weigth.height=1, dyad.length=38)
-	\S4method{peakScoring}{IRangesList}(peaks, data, threshold="25\%", weigth.widht=1, weigth.height=1, dyad.length=38, mc.cores=1)
+	\S4method{peakScoring}{IRanges}(peaks, data, threshold="25\%", weight.width=1, weight.height=1, dyad.length=38)
+	\S4method{peakScoring}{IRangesList}(peaks, data, threshold="25\%", weight.width=1, weight.height=1, dyad.length=38, mc.cores=1)
 }
 \arguments{
   \item{peaks}{
@@ -30,7 +30,7 @@
 	\item{dyad.length}{
 	How many bases account in the nucleosome dyad for sharpness description. If working with NGS data, works best with the reads width value for single-ended data or the \code{trim} value given to the \code{processReads} function.
 }
-	\item{weigth.height, weigth.widht}{
+	\item{weight.height, weight.width}{
 	If the score is a range, the height and the widht score (coverage and fuzzynes) can be defined with different weigths with these parameters. See details.
 }
   \item{mc.cores}{
