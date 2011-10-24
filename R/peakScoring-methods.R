@@ -20,9 +20,9 @@ setMethod("peakScoring", signature(peaks="IRangesList"),
 	  mc.cores = .check.mc(mc.cores) 
 
 		if(mc.cores > 1) {
-			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weigth.widht=weigth.widht, weigth.height=weigth.height), mc.cores=mc.cores)  
+			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height), mc.cores=mc.cores)  
 		}else{
-			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weigth.widht=weigth.widht, weigth.height=weigth.height))
+			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height))
 		}
 
 		names(res) = names(peaks)
