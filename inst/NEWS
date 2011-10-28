@@ -1,3 +1,6 @@
+***** version 0.99.7 - 27 October 2011 (v.1.0RC2 for BioC 2.9)
+. Improved performance (CPU and memory need) of fragmentLenDetect for large (human-ENCODE) datasets.
+
 ***** version 0.99.6 - 24 October 2011 (v.1.0RC for BioC 2.9) 
 . Changed the score system in peakScoring for ranged data. Now different weigths for width and height score can be specified and the weighted sum of the scores is returned, instead the direct product of them.
 

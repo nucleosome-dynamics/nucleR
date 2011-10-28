@@ -6,7 +6,7 @@ setMethod("processReads", signature(data="AlignedRead"),
 		{
 			if(type=="single")
 			{
-				warning(" * fragmentLen not provided for strand correction, infering automatically...")
+				message(" * fragmentLen not provided for strand correction, infering automatically...")
 				fragmentLen=fragmentLenDetect(data, ...)
 				message(paste(" * fragmentLen =", fragmentLen))
 			}else{
@@ -73,7 +73,7 @@ setMethod("processReads", signature(data="RangedData"),
     {
       if(type=="single")
       {
-        warning(" * fragmentLen not provided for strand correction, infering automatically...")
+        message(" * fragmentLen not provided for strand correction, infering automatically...")
         fragmentLen=fragmentLenDetect(data,...)
         message(paste(" * fragmentLen =", fragmentLen))
       }else{

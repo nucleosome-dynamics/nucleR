@@ -52,7 +52,7 @@
 	sim = RangedData(c(pos, neg), strand=c(rep("+", length(pos)), rep("-", length(neg))))
 
 	#Detect fragment lenght (we know by construction it is really 147)
-	fragmentLenDetect(sim, min.shift=50, max.shift=150, samples=50)
+	fragmentLenDetect(sim, samples=50)
 
 	#The function restrict the sampling to speed up the example
 }

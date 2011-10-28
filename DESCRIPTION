@@ -1,8 +1,8 @@
 Package: nucleR
 Type: Package
 Title: Nucleosome positioning package for R 
-Version: 0.99.6
-Date: 2011-10-24
+Version: 0.99.7
+Date: 2011-10-27
 Author: Oscar Flores, David Rossell
 Maintainer: Oscar Flores <oflores@mmb.pcb.ub.es>
 Description: Nucleosome positioning for Tiling Arrays and Next Generation Sequencing Experiments
