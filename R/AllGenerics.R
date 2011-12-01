@@ -24,3 +24,6 @@ setGeneric("controlCorrection", function(exp, ctr, ...) standardGeneric("control
 	return(mc.cores)
 }
 
+# Simple function for returning the middle point of a RangedData (normal mid doesn't work there)
+.mid <- function(x) return(floor((start(x)+end(x)) / 2))
+

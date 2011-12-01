@@ -18,7 +18,7 @@ plotPeaks(peaks, data, ...)
 		end=length(data),dyn.pos=TRUE, xlab="position", type="l", col.points="red",
 		thr.lty=1,	thr.lwd="1", thr.col="darkred", rect.thick=2, rect.lwd=1,
 		rect.border="black", scor.col=col.points, scor.font=2, scor.adj=c(0.5,0),
-		scor.cex=0.75, scor.digits=2,...)
+		scor.cex=0.75, scor.digits=2, indiv.scores=TRUE, ...)
 \S4method{plotPeaks}{numeric}(peaks, data, threshold=0, scores=NULL, start=1,
     end=length(data), xlab="position", type="l", col.points="red",
     thr.lty=1,  thr.lwd="1", thr.col="darkred", scor.col=col.points, scor.font=2,
@@ -54,6 +54,9 @@ plotPeaks(peaks, data, ...)
 }
 	\item{scor.col, scor.font, scor.adj, scor.cex, scor.digits}{
 	Default values for \code{text} representation for score numbers, if available.
+}
+	\item{indiv.scores}{
+	Show or hide individual scores for width and height in brakets besides the mixed score
 }
   \item{\dots}{
 	Other parameters passed to \code{\link{plot}} function

@@ -17,6 +17,18 @@ setMethod("processReads", signature(data="AlignedRead"),
 		################################################################################
 		if(type=="single")
 		{
+      #Special case for trim==fragmentLength
+      if(!missing(trim))
+			{
+				if(trim==fragmentLen)
+	      {
+  	      start=position(data)
+    	    start[strand(data)=="-"] = position(data) + nchar(sread(data)) 
+      	  res = RangedData(ranges=IRanges(start=start, width=fragmentLen), space=as.character(chromosome(data)))
+	        return(res)
+  	    }
+			}
+
 			#If no trim restriction, use whole read length, else use trim length
 			sr_len = nchar(sread(data))
 			if(!missing(trim)) sr_len = trim
@@ -84,6 +96,18 @@ setMethod("processReads", signature(data="RangedData"),
     ################################################################################
     if(type=="single")
     {
+			#Special case for trim==fragmentLength
+			if(!missing(trim))
+			{
+				if(trim==fragmentLen)
+				{
+					start=start(data)
+					start[data$strand=="-"] = end(data)[data$strand=="-"] - fragmentLen
+					res = RangedData(ranges=IRanges(start=start, width=fragmentLen), space=space(data))
+					return(res)
+				}
+			}
+
       #If no trim restriction, use whole read length, else use trim length
 			sr_len = width(data)
 			if(!missing(trim)) sr_len = trim

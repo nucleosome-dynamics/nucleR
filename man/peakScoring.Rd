@@ -8,7 +8,7 @@
 	Peak scoring function
 }
 \description{
-	Scores peaks detected with function \code{peakDetection} according the height and the sharpness of the peak. This function can be called automatically from \code{peakDetection} if \code{score=TRUE}.
+	Scores peaks detected with function \code{peakDetection} according the height and the sharpness (width) of the peak. This function can be called automatically from \code{peakDetection} if \code{score=TRUE}.
 }
 \usage{
 	\S4method{peakScoring}{numeric}(peaks, data, threshold="25\%")	
@@ -40,19 +40,19 @@
 \details{
 	This function scores each previously identified peak according its height and sharpness. 
 
-	The height score tells how large is a peak, higher means more coverage or intensity, so better positioned nucleosome. This score is obtained by checking the observed peak value in a Normal distribution with the mean and sd of \code{data}. This value is between 0 and 1.
+	The height score (\code{score_h}) tells how large is a peak, higher means more coverage or intensity, so better positioned nucleosome. This score is obtained by checking the observed peak value in a Normal distribution with the mean and sd of \code{data}. This value is between 0 and 1.
 
-	The width score is a mesure of how sharp is a peak. With a NGS coverage in mind, a perfect phased (well-positioned) nucleosome is this that starts and ends exactly in the same place many times. The shape of this ideal peak will be a rectangular shape of the lenght of the read. A wider top of a peak could indicate fuzzyness. The parameter \code{dyad.length} tells how long should be the "flat" region of an ideal peak. The optimum value for this parameter is the lenght of the read in single-ended data or the \code{trim} value of the function \code{processReads}. For Tiling Array, the default value should be fine.
+	The width score (\code{score_w}) is a mesure of how sharp is a peak. With a NGS coverage in mind, a perfect phased (well-positioned) nucleosome is this that starts and ends exactly in the same place many times. The shape of this ideal peak will be a rectangular shape of the lenght of the read. A wider top of a peak could indicate fuzzyness. The parameter \code{dyad.length} tells how long should be the "flat" region of an ideal peak. The optimum value for this parameter is the lenght of the read in single-ended data or the \code{trim} value of the function \code{processReads}. For Tiling Array, the default value should be fine.
 	This score is obtained calculating the ratio between the mean of the nucleosome scope (the one provided by range in the elements of \code{peaks}) and the \code{dyad.length} central bases. This value is normalized between 0 and 1.
 
 	For punctual, single points peaks (provided by \code{numeric} vector or list as \code{peaks} attribute) the score returned is the height score. 
 
-	For range \code{peaks} the weighted sum of the heigth and width scores is used. This is: \code{((score.heigh * weigth.height) / sum.wei) + ((score.width * weigth.widht) / sum wei)}. Note that you can query for only one score by weting its weight to 1 and the other to 0.
+	For range \code{peaks} the weighted sum of the heigth and width scores is used. This is: \code{((score_h * weigth.height) / sum.wei) + ((score_w * weigth.widht) / sum.wei)}. Note that you can query for only one score by weting its weight to 1 and the other to 0.
 }
 \value{
 	In the case of \code{numeric} input, the value returned is a \code{data.frame} containing a 'peak' and a 'score' column. If the input is a \code{list}, the result will be a \code{list} of \code{data.frame}.
 
-	If input is a \code{IRanges} or \code{IRangesList}, the result will be a RangedData object with one or multiple spaces respectively and a data column with the score.
+	If input is a \code{IRanges} or \code{IRangesList}, the result will be a RangedData object with one or multiple spaces respectively and a 3 data column with the mixed, width and heigh score.
 }
 \author{
 	Oscar Flores \email{oflores@mmb.cpb.ub.es}

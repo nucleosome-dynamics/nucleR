@@ -14,5 +14,5 @@ importFrom(ShortRead, sread)
 importFrom(stats, fft, pnorm, runif)
 
 exportMethods(export.bed, filterFFT, fragmentLenDetect, peakDetection, peakScoring, plotPeaks, processReads, controlCorrection)
-export(coverage.rpm, export.wig, processTilingArray, syntheticNucMap, pcKeepCompDetect)
+export(coverage.rpm, export.wig, processTilingArray, syntheticNucMap, pcKeepCompDetect, mergeCalls)
 

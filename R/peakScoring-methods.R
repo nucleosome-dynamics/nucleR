@@ -20,9 +20,11 @@ setMethod("peakScoring", signature(peaks="IRangesList"),
 	  mc.cores = .check.mc(mc.cores) 
 
 		if(mc.cores > 1) {
-			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height), mc.cores=mc.cores)  
+			res = mclapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold,
+						dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height), mc.cores=mc.cores)  
 		}else{
-			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height))
+			res = lapply(names(peaks), function(x) peakScoring(peaks=peaks[[x]], data=data[[x]], threshold=threshold, 
+						dyad.length=dyad.length, weight.width=weight.width, weight.height=weight.height))
 		}
 
 		names(res) = names(peaks)
@@ -32,8 +34,7 @@ setMethod("peakScoring", signature(peaks="IRangesList"),
 	  for(name in names(res)) names(res[[name]]) = name
 
     #Combine RangedData objects into single one
-    temp = res[[1]]
-    for(i in 2:length(res)) temp = c(temp, res[[i]])
+		temp = do.call(c, unname(res))
 
     return(temp)
 	}
@@ -91,7 +92,8 @@ setMethod("peakScoring", signature(peaks="IRanges"),
 		#Final score
 		sum.wei = weight.width + weight.height
 		scor.final = ((scor.heigh * weight.height) / sum.wei) + ((scor.width * weight.width) / sum.wei)
-
-    return(RangedData(peaks, score=scor.final))
+		
+		#Return everything or just merged score
+		return(RangedData(peaks, score=scor.final, score_w=scor.width, score_h=scor.heigh))
   }
 )
