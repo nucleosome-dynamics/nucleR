@@ -7,11 +7,17 @@
 	Calculates the coverage values from a \code{RangedData} object (or anything with a defined \code{coverage} function associated) and returns the coverage normalized to reads per million, allowing the comparison of experiments with a different absolut number of reads.
 }
 \usage{
-coverage.rpm(data)
+coverage.rpm(data, scale=1e6, ...)
 }
 \arguments{
   \item{data}{
 	\code{RangedData} (or compatible) with the reads information
+}
+	\item{scale}{
+	By default, a million (1e6), but you could change this value for abnormal high or low amount of reads
+}
+	\item{\dots}{
+	Additional arguments to be passed to \code{coverage} function
 }
 }
 \value{

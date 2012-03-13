@@ -7,7 +7,7 @@ Automatic merging of overlapped nucleosome calls
 	This function joints close nucleosome calls into one larger, fuzzy nucleosome.
 }
 \usage{
-mergeCalls(calls, dyad.dist=70, discard.low=0.2, mc.cores=1)
+mergeCalls(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose=TRUE)
 }
 \arguments{
   \item{calls}{
@@ -21,6 +21,9 @@ mergeCalls(calls, dyad.dist=70, discard.low=0.2, mc.cores=1)
 }
   \item{mc.cores}{
 	Number of cores available to parallel data processing. 
+}
+	\item{verbose}{
+	Show progress info?
 }
 }
 \details{

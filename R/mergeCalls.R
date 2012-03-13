@@ -1,57 +1,89 @@
-mergeCalls <- function(calls, dyad.dist=70, discard.low=0.2, mc.cores=1)
+mergeCalls <- function(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose=TRUE)
 {
-	res = lapply(calls, .mergeSpace, dyad.dist, discard.low=discard.low, mc.cores=mc.cores)
+	res = lapply(calls, .mergeSpace, dyad.dist, discard.low=discard.low, mc.cores=mc.cores, verbose=verbose)
 	return(do.call(c, unname(res)))
 }
 
-.mergeSpace <-function(calls, dyad.dist, discard.low, mc.cores)
+.mergeSpace <-function(calls, dyad.dist, discard.low, mc.cores, verbose)
 {
+	if(verbose) message("* Starting space: ", names(calls))
+
 	mc.cores = .check.mc(mc.cores)
 
 	#Set only one state
 	calls$nmerge = 1
 
-	#Calculate distace between middles (only upper diagonal)
-	dists = sapply(.mid(calls), function(x) abs(.mid(calls) - x))
-	dists[lower.tri(dists, diag=TRUE)] = NA
+	#Efficient call to find overlaps
+	if(verbose) message(" - Finding overlapped reads")
+	ovlps = findOverlaps(calls, minoverlap=dyad.dist, type="any",
+											 select="all", ignoreSelf=TRUE, ignoreRedundant=TRUE)
 
-	#Elements closer than the thresdhold
-	tomerge = which(dists < dyad.dist, arr.ind=TRUE)
+	#Select those reads wich are overlapped (by construction with the n+1 read)
+	hits = queryHits(ovlps[[1]])
+	selhits = unique(sort(c(hits, hits+1))) #This is the rownumber of ALL the overlapped reads
 
-	#This returs the call to merge with the following "n"
-	merger = IRanges(1:max(tomerge) %in% tomerge[,1])
+  #Make a list of the id of those reads wich are overlapped and with
+  #how many following reads they are overlapped
+  red = reduce(IRanges(start=hits, width=1))
 
-	#Create a matrix with [,1] = start call   [,2] = number of following calls to merge
-	merger_mat = matrix(c(start(merger), width(merger)), ncol=2, byrow=FALSE)
+	#Make list of "grouping" calls
+	#So [[1]] = 23, 24   means that the first "merged" call is the overlap of rows (calls) 23 and 24
+	if(verbose) message(" - Constructing merge list")
+	xs = mclapply(1:length(red), function(i) seq.int(from=start(red[i]), length.out=width(red[i])+1),
+								mc.cores=mc.cores)
 
-	#Joins two or more calls given and index of the before matrix	
-	.joinCallsMat <- function(idx)
+	#This saves a lot of time later, just create vectors
+	dfcalls = as.data.frame(calls)
+	df_start   = dfcalls$start
+	df_end     = dfcalls$end
+	df_score   = dfcalls$score
+	df_score_w = dfcalls$score_w
+	df_score_h = dfcalls$score_h
+
+	if(verbose) message(" - Merging calls")
+	#Join function
+	.join <- function(xi)
 	{
-		start = merger_mat[idx,1]
-		end = merger_mat[idx,1] + merger_mat[idx,2]
-		cr0 = calls[start:end,]
-		cr = cr0[cr0$score_h > discard.low,] #Discard low peaks in fuzzy (force separation)
-		if(nrow(cr) == 0) cr = cr0 #If all peaks discarded, use all instead
-		tmp = data.frame(as.data.frame(reduce(ranges(cr)[[1]])), as.list(colMeans(as.data.frame(values(cr)[[1]]))))
-		tmp$nmerge = nrow(cr)
-		return(tmp)
-	}
-	
-	#Apply in parallel
-	if(mc.cores > 1)
-	{
-		tmp = mclapply(1:nrow(merger_mat), .joinCallsMat, mc.cores=mc.cores)
-	}else{
-		tmp = lapply(1:nrow(merger_mat), .joinCallsMat) 
-	}
-	
-	#Join and add the space name
-	tmp2 = do.call("rbind", tmp)
-	tmp2$space = levels(space(calls))
+			#This is the heigth selection, to avoid low nucleosomes be merged with big ones
+			x = xi[which(df_score_h[xi] > discard.low)]
+			if(length(x) == 0) x = xi
 
+			start   = min(df_start[x])
+			end     = max(df_end[x])
+			score   = mean(df_score[x])
+			score_w = mean(df_score_w[x])
+			score_h = mean(df_score_h[x])
+			nmerge = length(x)
+			return(c(start, end, score, score_w, score_h, nmerge))
+	}
+
+  #Apply in parallel by precalculated groups
+  if(mc.cores > 1)
+  {
+    res = mclapply(xs, .join, mc.cores=mc.cores)
+  }else{
+    res = lapply(xs, .join)
+  }
+
+	if(verbose) message (" - Formatting results")
+	#Join the results as a dataframe
+	resdf = data.frame(matrix(unlist(res), ncol=6, byrow=TRUE))
+  names(resdf) = c("start", "end", "score", "score_w", "score_h", "nmerge")
+
+	#Add other derivate data and order according what expects RangedData(...) call
+	resdf$space = names(ovlps)
+	resdf$width = resdf$end - resdf$start
+	order = c("space", "start", "end", "width", "score", "score_w", "score_h", "nmerge")
+	fuz = resdf[,order]
+	
 	#Select WP nucleosomes
-	wp = as.data.frame(calls[-as.vector(tomerge),])
+	wp = as.data.frame(calls[-selhits,])
+
+	#Join and order (the last maybe is not needed, but is nice)
+	all = rbind(wp, fuz)
+	all = all[order(all$start),]
 
 	#Return all of them
-	return(RangedData(rbind(wp, tmp2)))
+	if(verbose) message(" - Done (", nrow(wp), " non-overlapped | ", nrow(fuz), " merged calls)")
+	return(RangedData(all))
 }
