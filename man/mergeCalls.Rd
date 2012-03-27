@@ -7,14 +7,14 @@ Automatic merging of overlapped nucleosome calls
 	This function joints close nucleosome calls into one larger, fuzzy nucleosome.
 }
 \usage{
-mergeCalls(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose=TRUE)
+mergeCalls(calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
 }
 \arguments{
   \item{calls}{
 	\code{RangedData} with scored and ranged nucleosome calls from \code{peakScoring} or \code{peakDetection(..., score=TRUE)}.
 }
-	\item{dyad.dist}{
-	Maximum distance dyad-to-dyad from which the peaks will be joined
+	\item{min.overlap}{
+	Minimum overlap between two reads for merge them
 }
   \item{discard.low}{
 	Discard low covered calls (i.e. calls with \code{score_h < discard.low} will be discarded)
@@ -27,7 +27,7 @@ mergeCalls(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose=TRUE)
 }
 }
 \details{
-	This functions looks for close (normally overlapped) calls and join those with their dyads separated less than \code{dyad.dist}. More than two reads can be joined in one single call.
+	This functions looks for overlapped calls and join those with more than \code{min.overlap} bases overlapped. More than two reads can be joined in one single call if all of them are overlapped at least that distance with almost another read in the range.
 	
 	Joining is performed in chain, so if nucleosome call A is close to B and B is close to C, the final call will comprise the range A-B-C. The resulting scores (mixed, width, height) of the final joined call will be the average value of the individual scores.
 

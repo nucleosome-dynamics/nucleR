@@ -1,3 +1,7 @@
+***** version 1.2.2 - 23 March 2012
+. 'mergeCalls' now uses the parameter 'min.overlap' instead of 'dyad.dist' for being coherent with the countOverlap calls from IRanges
+. 'peakDetection' crashed when no values below threshold were available
+
 ***** version 1.2.1 - 01 March 2012
 . Fixed memory usage and speed of function 'mergeCalls' 
 . Added scale factor and other parameters to 'coverage.rpm'

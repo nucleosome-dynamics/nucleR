@@ -56,6 +56,8 @@ setMethod("peakDetection", signature(data="numeric"),
 	}
 
 	ranges = IRanges(!is.na(data) & data > threshold)
+	if(length(ranges) == 0) return(NULL)
+
 	covers = lapply(ranges, function(x) data[x])
 
 	#For each range, look for changes of trend and keep the starting position of trend change

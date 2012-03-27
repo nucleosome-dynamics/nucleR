@@ -1,10 +1,10 @@
-mergeCalls <- function(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose=TRUE)
+mergeCalls <- function(calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
 {
-	res = lapply(calls, .mergeSpace, dyad.dist, discard.low=discard.low, mc.cores=mc.cores, verbose=verbose)
+	res = lapply(calls, .mergeSpace, min.overlap, discard.low=discard.low, mc.cores=mc.cores, verbose=verbose)
 	return(do.call(c, unname(res)))
 }
 
-.mergeSpace <-function(calls, dyad.dist, discard.low, mc.cores, verbose)
+.mergeSpace <-function(calls, min.overlap, discard.low, mc.cores, verbose)
 {
 	if(verbose) message("* Starting space: ", names(calls))
 
@@ -15,7 +15,7 @@ mergeCalls <- function(calls, dyad.dist=70, discard.low=0.2, mc.cores=1, verbose
 
 	#Efficient call to find overlaps
 	if(verbose) message(" - Finding overlapped reads")
-	ovlps = findOverlaps(calls, minoverlap=dyad.dist, type="any",
+	ovlps = findOverlaps(calls, minoverlap=min.overlap, type="any",
 											 select="all", ignoreSelf=TRUE, ignoreRedundant=TRUE)
 
 	#Select those reads wich are overlapped (by construction with the n+1 read)
