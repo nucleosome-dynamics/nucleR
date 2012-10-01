@@ -12,11 +12,11 @@ setGeneric("controlCorrection", function(exp, ctr, ...) standardGeneric("control
 {
   if(mc.cores > 1)
   {
-    succ.mc = 'multicore' %in% loadedNamespaces()
-    if(!succ.mc) succ.mc = library("multicore", logical.return=TRUE)
+    succ.mc = 'parallel' %in% loadedNamespaces()
+    if(!succ.mc) succ.mc = library("parallel", logical.return=TRUE)
     if(!succ.mc)
     {
-      warning("'multicore' library not available, switching to mc.cores=1")
+      warning("'parallel' library not available, switching to mc.cores=1")
       mc.cores=1
     }
   }

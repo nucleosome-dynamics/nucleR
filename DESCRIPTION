@@ -8,9 +8,7 @@ Maintainer: Oscar Flores <oflores@mmb.pcb.ub.es>
 Description: Nucleosome positioning for Tiling Arrays and Next Generation Sequencing Experiments
 License: LGPL (>= 3)
 Depends: methods, BiocGenerics (>= 0.1.0), IRanges (>= 1.13.5), Biobase (>= 2.15.1), ShortRead, parallel
-#Depends: methods, IRanges, Biobase, ShortRead
 Imports: methods, BiocGenerics, IRanges, Biobase, ShortRead, GenomicRanges, stats
-#Imports: methods, IRanges, Biobase, ShortRead, GenomicRanges, stats
 Enhances: htSeqTools
 LazyLoad: yes
 biocViews: ChIPseq, Microarray, Sequencing, Genetics, HighThroughputSequencing

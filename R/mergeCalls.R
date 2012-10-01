@@ -22,6 +22,9 @@ mergeCalls <- function(calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbo
 	hits = queryHits(ovlps[[1]])
 	selhits = unique(sort(c(hits, hits+1))) #This is the rownumber of ALL the overlapped reads
 
+	#No overlaped reads
+	if(length(selhits) == 0) return(calls)
+
   #Make a list of the id of those reads wich are overlapped and with
   #how many following reads they are overlapped
   red = reduce(IRanges(start=hits, width=1))
