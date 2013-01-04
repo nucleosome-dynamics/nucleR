@@ -7,7 +7,6 @@ importMethodsFrom(IRanges, '%in%', as.data.frame, as.vector, cor, coverage, disj
                   nchar, nrow, order, paste, quantile, ranges, Rle, space, start, unique, unlist, which, width)
 importMethodsFrom(ShortRead, chromosome, lapply, position, sapply)
 importFrom(graphics, abline, legend, lines, plot, points, rect, text)
-importFrom(methods, "@<-")
 importFrom(BiocGenerics, order, paste)
 importFrom(IRanges, IRanges, IRangesList, RangedData, RleList)
 importFrom(ShortRead, sread)
