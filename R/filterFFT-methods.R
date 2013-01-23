@@ -80,22 +80,46 @@ setMethod("filterFFT", signature(data="numeric"),
 			defVal = 0
 		}
 		
+		.pad2power2<-function(x)
+		{
+      pad = rep(0, 2^ceiling(log2(length(x))) - length(x))
+			return(c(x, pad))
+		}
+	
 		#Define FFT by regions for avoid large amount of memory and drop in performance
 		.fftRegion<-function(data2, pcKeepComp)
 		{
-			#FFT works best with lengths power of 2
-			if(length(data2) > (2^19)+(2^17)-5000) #This is ~650,000
+			#Make windows overlapped 5000bp
+			ran = IRanges(start=seq(from=1, to=length(data2), by=(2^19)-5000), width=2^19)
+			end(ran[length(ran)]) = length(data2) #Last range has the lenght till the end of data
+			
+			#If this gives only one range, return the fft directly
+			if(length(ran) == 1) return(.filterFFT(.pad2power2(data2), pcKeepComp)[1:end(ran[1])])
+
+			#If last range is shorter than 5000, extend the last-1 (we know now we have >1 ranges)
+			if(width(ran)[length(ran)] < 5000)
 			{
-				res1 = .filterFFT(data2[1:(2^19)], pcKeepComp)
-				res2 = .fftRegion(data2[((2^19)-4999):length(data2)], pcKeepComp) #Recursive call
-				res = c(res1[1:((2^19)-2500)], res2[2501:length(res2)])
-			} else {
-				#This is a trick, append 0 till nearest power of 2 length
-				#It doesn't affect too much the periodicity and increase dramatically the speed
-				pad = rep(0, 2^ceiling(log2(length(data2))) - length(data2))
-				res = .filterFFT(c(data2, pad), pcKeepComp)
-				res = res[1:length(data2)]
+				end(ran[length(ran)-1]) = end(ran[length(ran)]); #Extend
+				ran = ran[1:(length(ran)-1)] #Remove last range
 			}
+
+			#Iterative case
+			res = NULL
+			while(length(ran) > 1) #While not last range
+			{
+				tmp = .filterFFT(data2[start(ran[1]):end(ran[1])], pcKeepComp)
+				if(is.null(res)){ res = tmp;
+				}else{ res = c(res[1:(length(res)-2500)], tmp[2501:length(tmp)]) }
+				ran = ran[2:length(ran)]
+			}
+
+			#Last range
+			tmp = .filterFFT(.pad2power2(data2[start(ran[1]):end(ran[1])]), pcKeepComp)[1:width(ran[1])]
+
+			#If res not set, set it; otherwise append (by construction is larger than 5000bp)	
+			if(is.null(res)){ res =  tmp
+			}else{ res = c(res[1:(length(res)-2500)], tmp[2501:length(tmp)]) }
+			
 			return(res)
 		}
 
