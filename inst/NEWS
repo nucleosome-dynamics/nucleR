@@ -1,3 +1,9 @@
+***** version 1.7.2 - 23 January 2013
+. Changed filterFFT-methods.R. Now filtering of regions is performed in iterative loop rather than with a recursive call. This improves dramatically the memory usage of long non-splitted regions.
+
+***** version 1.5.0 - 01 October 2012
+. changed from multicore to parallel package
+
 ***** version 1.2.2 - 23 March 2012
 . 'mergeCalls' now uses the parameter 'min.overlap' instead of 'dyad.dist' for being coherent with the countOverlap calls from IRanges
 . 'peakDetection' crashed when no values below threshold were available
