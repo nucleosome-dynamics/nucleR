@@ -4,7 +4,12 @@ coverage.rpm <- function(data, scale=1e6, ...)
 	cov = coverage(data, ...)
 
 	#Change rle values to rpm. More efficient
-	rle = RleList(lapply(cov, function(x) { x@values=(x@values/nrow(data))*scale; return(x) }))
+	rle = RleList(lapply(cov, 
+                          function(x) {
+                              x@values=(x@values/nrow(data))*scale
+                              return(x) 
+                          }), 
+                      compress=FALSE)
 
 	return(rle)
 }

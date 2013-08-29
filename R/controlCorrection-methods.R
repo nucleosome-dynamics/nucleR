@@ -20,7 +20,7 @@ setMethod("controlCorrection", signature(exp="SimpleRleList"), function(exp, ctr
 	}
 
 	names(res) = names(exp)
-	return(RleList(res))
+	return(RleList(res, compress=FALSE))
 })
 
 ################
