@@ -1,0 +1,18 @@
+import(methods)
+import(BiocGenerics)
+import(S4Vectors)
+importClassesFrom(IRanges, CompressedIRangesList, IRanges, IRangesList, RangedData, SimpleRleList)
+importClassesFrom(ShortRead, AlignedRead)
+importMethodsFrom(Biobase, exprs, pData, sampleNames)
+importMethodsFrom(GenomicRanges, strand)
+importMethodsFrom(IRanges, as.data.frame, as.vector, cor, coverage, disjointBins, end, mean,
+                  nchar, nrow, order, quantile, ranges, space, start, unique, unlist, which, width)
+importMethodsFrom(ShortRead, chromosome, lapply, position, sapply)
+importFrom(graphics, abline, legend, lines, plot, points, rect, text)
+importFrom(IRanges, IRanges, IRangesList, RangedData, RleList)
+importFrom(ShortRead, sread)
+importFrom(stats, fft, pnorm, runif)
+
+exportMethods(export.bed, filterFFT, fragmentLenDetect, peakDetection, peakScoring, plotPeaks, processReads, controlCorrection)
+export(coverage.rpm, export.wig, processTilingArray, syntheticNucMap, pcKeepCompDetect, mergeCalls)
+
