@@ -1,6 +1,5 @@
 import(methods)
 import(BiocGenerics)
-import(S4Vectors)
 importClassesFrom(IRanges, CompressedIRangesList, IRanges, IRangesList, RangedData, SimpleRleList)
 importClassesFrom(ShortRead, AlignedRead)
 importMethodsFrom(Biobase, exprs, pData, sampleNames)
