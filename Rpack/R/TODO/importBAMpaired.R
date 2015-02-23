@@ -2,131 +2,134 @@ library(multicore)
 library(ShortRead)
 library(Rsamtools)
 
-#VARS
-INPUT_DIR="01_bowtie"
-OUTPUT_DIR="02_reads"
-CORES=8   #Each core will process 1 BAM file, beware of the disk access
-
-system(paste("mkdir", OUTPUT_DIR))
-
-############################################################################################
-
-#Binary conversion 
-int2base <- function(x, b=2){
-        xi <- as.integer(x)
-        if(any(is.na(xi) | ((x-xi)!=0))) print(list(ERROR="x not integer", x=x))
-        N <- length(x)
-        xMax <- max(x)
-        ndigits <- (floor(logb(xMax, base=2))+1)
-        Base.b <- array(NA, dim=c(N, ndigits))
-        for(i in 1:ndigits){#i <- 1 
-                Base.b[, ndigits-i+1] <- (x %% b)
-                x <- (x %/% b)
-        }
-        if(N ==1) Base.b[1, ] else Base.b
+int2base <- function(x, b = 2)
+{   # Binary conversion
+    xi <- as.integer(x)
+    if (any(is.na(xi) | ((x - xi) != 0))) {
+        print(list(ERROR="x not integer", x=x))
+    }
+    N <- length(x)
+    xMax <- max(x)
+    ndigits <- floor(logb(xMax, base=2)) + 1
+    Base.b <- array(NA, dim=c(N, ndigits))
+    for(i in 1:ndigits) {
+        Base.b[, ndigits - i + 1] <- (x %% b)
+        x <- (x %/% b)
+    }
+    if (N == 1) {
+        Base.b[1, ]
+    } else {
+        Base.b
+    }
 }
 
-#SAM/BAM flag matrix
-bamFlagMatrix <- function(flags){
-  bin = int2base(flags)
-  n = ncol(bin)
-  colnames(bin) = c(rev(names(formals(scanBamFlag))[1:n]))
-  return(bin)
+bamFlagMatrix <- function(flags, file)
+{   # SAM/BAM flag matrix
+    message("** ", file, " -> Processing flags")
+    bin <- int2base(flags)
+    n <- ncol(bin)
+    colnames(bin) <- c(rev(names(formals(scanBamFlag))[1:n]))
+    bin
 }
 
-#SAM/BAM flag summary
-bamFlagSummary <- function(flags){
-  tab = table(flags)
-  fla = as.integer(names(tab))
-  bin = int2base(fla)
-  rownames(bin) = fla
-  bin = data.frame(bin)
-  bin$count = tab
-  n = ncol(bin)
-  names = c(rev(names(formals(scanBamFlag))[1:n-1]), "count")
-  names(bin) = names
-  return(bin[,c(n:1,n)])
+getPos <- function(flags, s, p)
+{   # Given a matrix of flags, a strand ('+' or '-') and a position
+    # ('1' or '2'), # return a vector of bools that fullfills the requirements
+
+    # a simple closure to keep things less verbose and repetitive
+    getFlag <- function(x) flags[, x]
+
+    is.pair <- getFlag("isPaired") & getFlag("isProperPair")
+
+    if (p == 1) {
+        is.position <- getFlag("isFirstMateRead")
+    } else if (p == 2) {
+        is.position <- getFlag("isSecondMateRead")
+    }
+
+    minStrand <- getFlag("isMinusStrand")
+
+    if ((p == 1 && s == "+") ||
+        (p == 2 && s == "-")) {
+        right.strand <- !minStrand
+    } else if ((p == 1 && s == "-") ||
+               (p == 2 && s == "+")) {
+        right.strand <- minStrand
+    }
+
+    is.pair & is.position & right.strand
 }
 
-#This is the main function to process one given file, allows paralelism
-process <- function(file)
-{
-	message("** ", file, " -> Reading")
-	#Read BAM file (only one access to disk, intended for Shared Memory)
-	what = c("qname", "flag", "rname", "strand", "pos", "qwidth", "mrnm", "mpos")
-	bam  = scanBam(file=file, param=ScanBamParam(what=what))[[1]] #Only read one file
-	
-  message("** ", file, " -> Processing flags")
-	#We will process the flags in R (an alternative is multiple scanBam calls...)
-	flags = bamFlagMatrix(bam$flag)
+checkConsistency <- function(reads1, reads2)
+    # Returns true if the reads positions are consistent
+    all(reads1$mpos == reads2$pos &
+        reads2$mpos == reads1$pos &
+        reads1$rname == reads2$rname)
 
-  message("** ", file, " -> Remove multiple matches")
-	#Remove multiple mappings
-	mmids = unique(bam$qname[flags[,"isPrimaryRead"]==1]) #isPrimaryRead=1 means the read is repeated...
-	mmids = which(bam$qname %in% mmids)
-	bam2   = lapply(bam, "[", -mmids)      #Remove repeated IDs from bam object and flags
-	flags = flags[-mmids,] 
+buildReads <- function(reads1, reads2, strand)
+{   # Given a strand, build the reads in GRanges format accordingly
+    if (strand == "+") {
+        ranges <- IRanges(start=reads1[["pos"]],
+                          end=reads2[["pos"]] + reads2[["qwidth"]] - 1)
+    } else if (strand == "-") {
+        ranges <- IRanges(start=reads2[["pos"]],
+                          end=reads1[["pos"]] + reads1[["qwidth"]] - 1)
+    }
+    names <- as.character(reads1$rname)
+    GRanges(seqnames=names, ranges=ranges)
+}
 
-	#######################################################################################
-	#Process + strand
-  message("** ", file, " -> Processing + strand")
-	pos_1 = flags[,"isPaired"] & flags[,"isProperPair"] & 
-					flags[,"isFirstMateRead"] & !flags[,"isMinusStrand"]
+processStrand <- function(flags, bam, strand, file)
+{   # Given a matrix of flags and bam information, process given flag
+    message("** ", file, " -> Processing ", strand, " strand")
 
-	pos_2 = flags[,"isPaired"] & flags[,"isProperPair"] & 
-          flags[,"isSecondMateRead"] & flags[,"isMinusStrand"]
+    pos1 <- getPos(flags, strand, 1)
+    pos2 <- getPos(flags, strand, 2)
 
-	reads1 = lapply(bam2, "[", pos_1) 
-	reads2 = lapply(bam2, "[", pos_2)
+    reads1 <- lapply(bam, "[", pos1)
+    reads2 <- lapply(bam, "[", pos2)
 
-	#Consistency check
-	test = reads1$mpos == reads2$pos & reads2$mpos == reads1$pos & reads1$rname == reads2$rname
-	if(!all(test)) stop("ERROR: Mate selection for + strand is invalid")
-	
-	#Create reads for the positive strand
-	pos_ranges = IRanges(start=reads1$pos, end=reads2$pos+reads2$qwidth-1)
-	pos_names  = as.character(reads1$rname)
+    if (!checkConsistency(reads1, reads2)) {
+        stop(paste("ERROR: Mate selection for", strand, "strand is invalid"))
+    }
 
-  #######################################################################################
-  #Process - strand
-  message("** ", file, " -> Processing - strand")
-  pos_1 = flags[,"isPaired"] & flags[,"isProperPair"] &
-          flags[,"isFirstMateRead"] & flags[,"isMinusStrand"]
+    buildReads(reads1, reads2, strand)
+}
 
-  pos_2 = flags[,"isPaired"] & flags[,"isProperPair"] &
-          flags[,"isSecondMateRead"] & !flags[,"isMinusStrand"]
+readBamFile <- function(file)
+{   # Read a BAM file (only one access to disk, intended for Shared Memory)
+    message("** ", file, "-> Reading")
+    what <- c("qname", "flag", "rname", "strand", "pos", "qwidth", "mrnm",
+              "mpos")
+    scanBam(file=file, param=ScanBamParam(what=what))[[1]]
+}
 
-  reads1 = lapply(bam2, "[", pos_1)
-  reads2 = lapply(bam2, "[", pos_2)
+removeRepeated <- function(bam, flags)
+{   # remove repeated reads (marked as isPrimaryRead == 1), there might be none
+    x <- "isPrimaryRead"
+    if (x %in% colnames(flags)) {
+        mmids <- bam[["qname"]] %in% unique(bam$qname[flags[, x] == 1])
+        mmpos <- which(bam[["qname"]] %in% mmids)
+        list(bam=lapply(bam, "[", -mmpos),
+             flags=flags[-mmpos, ])
+    } else {
+        list(bam=bam, flags=flags)
+    }
+}
 
-  #Consistency check
-  test = reads1$mpos == reads2$pos & reads2$mpos == reads1$pos & reads1$rname == reads2$rname
-  if(!all(test)) stop("ERROR: Mate selection for - strand is invalid")
-  
-  #Create reads for the positive strand
-	neg_ranges = IRanges(start=reads2$pos, end=reads1$pos+reads1$qwidth-1)
-	neg_names  = as.character(reads1$rname)
+processPairedEnd <- function(file)
+{   # Process a paired end Bam file
+    bam <- readBamFile(file)
+    flags <- bamFlagMatrix(bam$flag, file)
+    non.repeated <- removeRepeated(bam, flags)
+    with(non.repeated,
+         sort(c(processStrand(flags, bam, "+", file),
+                processStrand(flags, bam, "-", file))))
+}
 
+in.dir <- "/home/rilla/scratch/nucleosome_dynamics/bam_out"
+mc.cores <- 5
 
-	############ Join
-  message("** ", file, " -> Joining and sorting")
-	ranges = c(pos_ranges, neg_ranges)
-	ord = order(ranges)
-	ranges = ranges[ord]
-	spaces = c(pos_names, neg_names)
-	spaces = spaces[ord]
+exps <- dir(in.dir, pattern="bam$", full.names=TRUE)
 
-	reads = RangedData(space=spaces, ranges=ranges)
-
-	############ Save
-  message("** ", file, " -> Saving")
-	base = sub(".bam", "", basename(file))
-	save(reads, file=paste(OUTPUT_DIR, "/", base, ".RData", sep=""))
-}	
-
-#######################################################################
-#Main call
-
-#Get filenames and remove extension
-exps = dir(INPUT_DIR, pattern="bam$", full.names=TRUE) #loads all files ending with *.bam
-res = mclapply(exps, process, mc.cores=CORES)
+newreads <- processPairedEnd(exps[1])
