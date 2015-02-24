@@ -1,6 +1,6 @@
 setMethod(
     "processReads",
-    signature(data="AlignedRead"), 
+    signature(data="AlignedRead"),
     function(data, type="single", fragmentLen, trim, ...) {
 
         require("ShortRead")
@@ -16,7 +16,7 @@ setMethod(
         }
 
         #######################################################################
-        if (type=="single") {  # Special case for trim==fragmentLength
+        if (type == "single") {  # Special case for trim==fragmentLength
             if (!missing(trim)) {
                 if (trim == fragmentLen) {
                     start <- position(data)
