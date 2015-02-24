@@ -138,7 +138,7 @@
 .processSingleEnd <- function(file)
 {   # Process a single end Bam file
     bam.param <- ScanBamParam(what=c("rname", "pos", "qwidth", "strand"))
-    .buildGR(.filterNAs(scanBam(file, param=bam.param)[[1]]))
+    .buildGRSingle(.filterNAs(scanBam(file, param=bam.param)[[1]]))
 }
 
 readBAM <- function(file, type = "single", mc.cores = 1)
