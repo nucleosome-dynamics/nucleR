@@ -141,7 +141,7 @@
     .buildGR(.filterNAs(scanBam(file, param=bam.param)[[1]]))
 }
 
-readBam <- function(file, type = "single", mc.cores = 1)
+readBAM <- function(file, type = "single", mc.cores = 1)
 {   # Read from a single or pair-end BAM file
     if (type == "single") {
         f <- .processSingleEnd
