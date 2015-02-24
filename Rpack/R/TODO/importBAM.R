@@ -1,8 +1,4 @@
-library(multicore)
-library(ShortRead)
-library(Rsamtools)
-
-int2base <- function(x, b = 2)
+.int2base <- function(x, b = 2)
 {   # Binary conversion
     xi <- as.integer(x)
     if (any(is.na(xi) | ((x - xi) != 0))) {
@@ -23,16 +19,16 @@ int2base <- function(x, b = 2)
     }
 }
 
-bamFlagMatrix <- function(flags, file)
+.bamFlagMatrix <- function(flags, file)
 {   # SAM/BAM flag matrix
     message("** ", file, " -> Processing flags")
-    bin <- int2base(flags)
+    bin <- .int2base(flags)
     n <- ncol(bin)
     colnames(bin) <- c(rev(names(formals(scanBamFlag))[1:n]))
     bin
 }
 
-getPos <- function(flags, s, p)
+.getPos <- function(flags, s, p)
 {   # Given a matrix of flags, a strand ('+' or '-') and a position
     # ('1' or '2'), # return a vector of bools that fullfills the requirements
 
@@ -60,13 +56,13 @@ getPos <- function(flags, s, p)
     is.pair & is.position & right.strand
 }
 
-checkConsistency <- function(reads1, reads2)
+.checkConsistency <- function(reads1, reads2)
     # Returns true if the reads positions are consistent
     all(reads1$mpos == reads2$pos &
         reads2$mpos == reads1$pos &
         reads1$rname == reads2$rname)
 
-buildReadsPaired <- function(reads1, reads2, strand)
+.buildReadsPaired <- function(reads1, reads2, strand)
 {   # Given a strand, build the reads in GRanges format accordingly
     if (strand == "+") {
         ranges <- IRanges(start=reads1[["pos"]],
@@ -79,24 +75,24 @@ buildReadsPaired <- function(reads1, reads2, strand)
     GRanges(seqnames=names, ranges=ranges)
 }
 
-processStrand <- function(flags, bam, strand, file)
+.processStrand <- function(flags, bam, strand, file)
 {   # Given a matrix of flags and bam information, process given flag
     message("** ", file, " -> Processing ", strand, " strand")
 
-    pos1 <- getPos(flags, strand, 1)
-    pos2 <- getPos(flags, strand, 2)
+    pos1 <- .getPos(flags, strand, 1)
+    pos2 <- .getPos(flags, strand, 2)
 
     reads1 <- lapply(bam, "[", pos1)
     reads2 <- lapply(bam, "[", pos2)
 
-    if (!checkConsistency(reads1, reads2)) {
+    if (!.checkConsistency(reads1, reads2)) {
         stop(paste("ERROR: Mate selection for", strand, "strand is invalid"))
     }
 
-    buildReadsPaired(reads1, reads2, strand)
+    .buildReadsPaired(reads1, reads2, strand)
 }
 
-readBamFile <- function(file)
+.readBamFile <- function(file)
 {   # Read a BAM file (only one access to disk, intended for Shared Memory)
     message("** ", file, "-> Reading")
     what <- c("qname", "flag", "rname", "strand", "pos", "qwidth", "mrnm",
@@ -104,7 +100,7 @@ readBamFile <- function(file)
     scanBam(file=file, param=ScanBamParam(what=what))[[1]]
 }
 
-removeRepeated <- function(bam, flags)
+.removeRepeated <- function(bam, flags)
 {   # remove repeated reads (marked as isPrimaryRead == 1), there might be none
     x <- "isPrimaryRead"
     if (x %in% colnames(flags)) {
@@ -117,40 +113,40 @@ removeRepeated <- function(bam, flags)
     }
 }
 
-filterNAs <- function(xs)
+.filterNAs <- function(xs)
     # Remove the vectors with a NA value in a list comming the loading
     #a BAM file
     lapply(xs, function(x) x[!is.na(x)])
 
-buildGRSingle <- function(xs)
+.buildGRSingle <- function(xs)
     # Convert a list of vectors comming from scanBam into a GRanges object
     with(xs,
          GRanges(seqnames=rname,
                  ranges=IRanges(start=pos, width=qwidth),
                  strand=strand))
 
-processPairedEnd <- function(file)
+.processPairedEnd <- function(file)
 {   # Process a paired end Bam file
-    bam <- readBamFile(file)
-    flags <- bamFlagMatrix(bam$flag, file)
-    non.repeated <- removeRepeated(bam, flags)
+    bam <- .readBamFile(file)
+    flags <- .bamFlagMatrix(bam$flag, file)
+    non.repeated <- .removeRepeated(bam, flags)
     with(non.repeated,
-         sort(c(processStrand(flags, bam, "+", file),
-                processStrand(flags, bam, "-", file))))
+         sort(c(.processStrand(flags, bam, "+", file),
+                .processStrand(flags, bam, "-", file))))
 }
 
-processSingleEnd <- function(file)
+.processSingleEnd <- function(file)
 {   # Process a single end Bam file
     bam.param <- ScanBamParam(what=c("rname", "pos", "qwidth", "strand"))
-    buildGR(filterNAs(scanBam(file, param=bam.param)[[1]]))
+    .buildGR(.filterNAs(scanBam(file, param=bam.param)[[1]]))
 }
 
 readBam <- function(file, type = "single", mc.cores = 1)
 {   # Read from a single or pair-end BAM file
     if (type == "single") {
-        f <- processSingleEnd
+        f <- .processSingleEnd
     } else if (type == "paired") {
-        f <- processPairedEnd
+        f <- .processPairedEnd
     } else {
         stop(paste("type must be 'single' for single-ended data or",
                    "'paired' for paired-ended"))
