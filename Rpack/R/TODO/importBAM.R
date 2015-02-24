@@ -66,7 +66,7 @@ checkConsistency <- function(reads1, reads2)
         reads2$mpos == reads1$pos &
         reads1$rname == reads2$rname)
 
-buildReads <- function(reads1, reads2, strand)
+buildReadsPaired <- function(reads1, reads2, strand)
 {   # Given a strand, build the reads in GRanges format accordingly
     if (strand == "+") {
         ranges <- IRanges(start=reads1[["pos"]],
@@ -93,7 +93,7 @@ processStrand <- function(flags, bam, strand, file)
         stop(paste("ERROR: Mate selection for", strand, "strand is invalid"))
     }
 
-    buildReads(reads1, reads2, strand)
+    buildReadsPaired(reads1, reads2, strand)
 }
 
 readBamFile <- function(file)
@@ -110,12 +110,24 @@ removeRepeated <- function(bam, flags)
     if (x %in% colnames(flags)) {
         mmids <- bam[["qname"]] %in% unique(bam$qname[flags[, x] == 1])
         mmpos <- which(bam[["qname"]] %in% mmids)
-        list(bam=lapply(bam, "[", -mmpos),
-             flags=flags[-mmpos, ])
+        list(bam=lapply(bam, "[", - mmpos),
+             flags=flags[ - mmpos, ])
     } else {
         list(bam=bam, flags=flags)
     }
 }
+
+filterNAs <- function(xs)
+    # Remove the vectors with a NA value in a list comming the loading
+    #a BAM file
+    lapply(xs, function(x) x[!is.na(x)])
+
+buildGRSingle <- function(xs)
+    # Convert a list of vectors comming from scanBam into a GRanges object
+    with(xs,
+         GRanges(seqnames=rname,
+                 ranges=IRanges(start=pos, width=qwidth),
+                 strand=strand))
 
 processPairedEnd <- function(file)
 {   # Process a paired end Bam file
@@ -127,9 +139,26 @@ processPairedEnd <- function(file)
                 processStrand(flags, bam, "-", file))))
 }
 
-in.dir <- "/home/rilla/scratch/nucleosome_dynamics/bam_out"
-mc.cores <- 5
+processSingleEnd <- function(file)
+{   # Process a single end Bam file
+    bam.param <- ScanBamParam(what=c("rname", "pos", "qwidth", "strand"))
+    buildGR(filterNAs(scanBam(file, param=bam.param)[[1]]))
+}
 
-exps <- dir(in.dir, pattern="bam$", full.names=TRUE)
+readBam <- function(file, type = "single", mc.cores = 1)
+{   # Read from a single or pair-end BAM file
+    if (type == "single") {
+        f <- processSingleEnd
+    } else if (type == "paired") {
+        f <- processPairedEnd
+    } else {
+        stop(paste("type must be 'single' for single-ended data or",
+                   "'paired' for paired-ended"))
+    }
 
-newreads <- processPairedEnd(exps[1])
+    if (mc.cores >= 1) {
+        mclapply(file, f, mc.cores=mc.cores)
+    } else {
+        lapply(file, f)
+    }
+}
