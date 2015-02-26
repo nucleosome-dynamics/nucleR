@@ -8,7 +8,7 @@ setMethod(
             if (type == "single") {
                 message(" * fragmentLen not provided for strand correction, ",
                         ", infering automatically...")
-                fragmentLen <- ragmentLenDetect(data, ...)
+                fragmentLen <- fragmentLenDetect(data, ...)
                 message(paste(" * fragmentLen =", fragmentLen))
             } else {
                 fragmentLen <- Inf  # Don't remove anything
@@ -123,7 +123,7 @@ setMethod(
             # If no trim restriction, use whole read length,
             # else use trim length
             sr_len <- width(data)
-            if(!missing(trim)) {
+            if (!missing(trim)) {
                 sr_len <- trim
             }
 
@@ -145,7 +145,7 @@ setMethod(
                               space=space(data))
 
         #######################################################################
-        } else if(type=="paired") {
+        } else if (type=="paired") {
             data <- data[width(data) < fragmentLen, ]
             sr_len <- width(data)
 
