@@ -13,25 +13,12 @@ setMethod(
             stop("names should be equal in both datasets")
         }
 
-        mc.cores <- .check.mc(mc.cores)
-
-        if (mc.cores > 1) {
-            expt <- lapply(exp, identity)
-            ctrt <- lapply(ctr, identity)
-            res <- mclapply(
-                names(exp),
-                function(chr)
-                    controlCorrection(expt[[chr]], ctrt[[chr]]),
-                mc.cores=mc.cores
-            )
-        } else {
-            res <- lapply(
-                names(exp),
-                function(chr)
-                    controlCorrection(exp[[chr]], ctr[[chr]])
-            )
-        }
-
+        res <- .xlapply(
+            names(exp),
+            function(chr)
+                controlCorrection(exp[[chr]], ctr[[chr]]),
+            mc.cores=mc.cores
+        )
         names(res) <- names(exp)
         return(RleList(res, compress=FALSE))
     }
@@ -64,23 +51,12 @@ setMethod(
             stop("names should be equal in both datasets")
         }
 
-        mc.cores <- .check.mc(mc.cores)
-
-        if(mc.cores > 1) {
-            res <- mclapply(
-                names(exp),
-                function(chr)
-                    controlCorrection(exp[[chr]], ctr[[chr]]),
-                mc.cores=mc.cores
-            )
-        } else {
-            res <- lapply(
-                names(exp),
-                function(chr)
-                    controlCorrection(exp[[chr]], ctr[[chr]])
-            )
-        }
-
+        res <- .xlapply(
+            names(exp),
+            function(chr)
+                controlCorrection(exp[[chr]], ctr[[chr]]),
+            mc.cores=mc.cores,
+        )
         names(res) <- names(exp)
         return(res)
     }
