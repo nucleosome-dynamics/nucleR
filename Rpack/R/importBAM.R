@@ -152,9 +152,5 @@ readBAM <- function(file, type = "single", mc.cores = 1)
                    "'paired' for paired-ended"))
     }
 
-    if (mc.cores >= 1) {
-        mclapply(file, f, mc.cores=mc.cores)
-    } else {
-        lapply(file, f)
-    }
+    .xlapply(file, f, mc.cores=mc.cores)
 }

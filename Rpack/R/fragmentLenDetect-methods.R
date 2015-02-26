@@ -4,9 +4,6 @@ setMethod(
     function(reads, samples = 1000, window = 1000, min.shift = 1,
              max.shift = 100, mc.cores = 1, as.shift = FALSE) {
 
-        # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores) 
-
         # Randomly select regions in the available chromosome bounds
         chrSample <- as.character(sample(chromosome(reads), samples))
         chrsLen <- sapply(
@@ -70,20 +67,9 @@ setMethod(
             return(res + min.shift - 1)
         }
 
-        if(mc.cores > 1) {
-            shift <- round(mean(unlist(mclapply(
-                1:nrow(dd),
-                function(x)
-                    shiftPos(x),
-                mc.cores=mc.cores
-            ))))
-        } else {
-            shift <- round(mean(unlist(lapply(
-                1:nrow(dd),
-                function(x)
-                    shiftPos(x)
-            ))))
-        }
+        shift <- round(mean(unlist(.xlapply(1:nrow(dd),
+                                            shiftPos,
+                                            mc.cores=mc.cores))))
 
         #Fragment length is the shift * 2 + the length of the read
         fragLen <- shift * 2 + width(reads)[1]
@@ -103,9 +89,6 @@ setMethod(
     function(reads, samples=1000, window=1000, min.shift=1, max.shift=100,
              mc.cores=1, as.shift=FALSE) {
 
-        # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores) 
-
         # Calculate the whole coverage here saves cpu and memory later for big
         # genomes. This improves a lot the performance on big genomes if the
         # sampling value is big. For small datasets could be less efficient than
@@ -121,11 +104,7 @@ setMethod(
             return(list(pos=cp, neg=cn))
         }
 
-        if (mc.cores > 1) {
-            cover <- mclapply(names(reads), .doCover, mc.cores=mc.cores)
-        } else {
-            cover <- lapply(names(reads), .doCover)
-        }
+        cover <- .xlapply(names(reads), .doCover, mc.cores=mc.cores)
         names(cover) <- names(reads)
 
         # Randomly select regions in the available chromosome bounds
@@ -180,20 +159,10 @@ setMethod(
             return(res + min.shift - 1)
         }
 
-        if (mc.cores > 1) {
-            shift <- round(mean(unlist(mclapply(
-                1:nrow(dd),
-                function(x)
-                    shiftPos(x), mc.cores=mc.cores)),
-                na.rm=TRUE)
-            )
-        } else {
-            shift <- round(mean(unlist(lapply(
-                1:nrow(dd),
-                function(x)
-                    shiftPos(x))), na.rm=TRUE)
-            )
-        }
+        shift <- round(mean(unlist(.xlapply(1:nrow(dd),
+                                            shiftPos,
+                                            mc.cores=mc.cores,
+                                            na.rm=TRUE))))
 
         #Fragment length is the shift * 2 + the length of the read
         fragLen <- shift * 2 + width(reads)[1]

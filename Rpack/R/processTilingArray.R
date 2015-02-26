@@ -1,11 +1,7 @@
 processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
                                 mc.cores = 1, quiet = FALSE)
 {
-
     require("Biobase")
-
-    # Check if multicore is supported or set to 1
-    mc.cores <- .check.mc(mc.cores) 
 
     # Obtain annotation
     if (!quiet) {
@@ -86,22 +82,17 @@ processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
         message(chrs)
     }
 
-    if(mc.cores > 1) {
-        message(" * Inferring missed values (multicore version)")
-        res <- mclapply(chrs, .fillTheGap, mc.cores=mc.cores)
-    } else {
-        message(" * Inferring missed values (single core version): ")
-        res <- lapply(
-            chrs,
-            function(x){
-                if(!quiet) {
-                    message(paste("   ", x));
-                }
-                .fillTheGap(x)
+    message(" * Inferring missed values")
+    res <- .xlapply(
+        chrs,
+        function(x) {
+            if (!quiet) {
+                message(paste("   ", x));
             }
-        )
-    }
+            .fillTheGap(x)
+        },
+        mc.cores=mc.cores
+    )
 
     return(res)
 }
-

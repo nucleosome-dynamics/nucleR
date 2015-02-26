@@ -3,26 +3,15 @@ setMethod(
     signature(data="list"),
     function(data, threshold="25%", width=1, score=TRUE, mc.cores=1) {
 
-        # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores) 
+        res <- .xlapply(
+            data,
+            peakDetection,
+            threshold=threshold, width=width, score=score,
+            mc.cores=mc.cores
+        )
 
-        if(mc.cores > 1) {
-            res <- mclapply(
-                data,
-                peakDetection,
-                threshold=threshold, width=width, score=score,
-                mc.cores=mc.cores
-            )
-        } else {
-            res <- lapply(
-                data,
-                peakDetection,
-                threshold=threshold, width=width, score=score
-            )
-        }
-
-        #Process the result, case with ranges
-        if(width > 1) {
+        # Process the result, case with ranges
+        if (width > 1) {
             # res is a list of IRanges, conversion is direct
             if (score == FALSE) {
                 return(IRangesList(unlist(res)))
@@ -63,9 +52,6 @@ setMethod(
             stop("'width' attribute should be greater than 1")
         }
 
-        # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores)
-
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
@@ -87,30 +73,17 @@ setMethod(
 
         # For each range, look for changes of trend and keep the starting
         # position of trend change
-        if (mc.cores > 1) {
-            pea <- mclapply(
-                covers,
-                function(x)
-                    if (length(x) == 1) {
-                        1
-                    } else {
-                        start(IRanges(x[2:length(x)] <
-                                      x[1:(length(x) - 1)]))
-                    },
-                mc.cores=mc.cores
-            )
-        } else {
-            pea <- lapply(
-                covers,
-                function(x)
-                    if (length(x) == 1){
-                        1
-                    } else {
-                        start(IRanges(x[2:length(x)] <
-                                      x[1:(length(x) - 1)]))
-                    }
-            )
-        }
+        pea <- .xlapply(
+            covers,
+            function(x)
+                if (length(x) == 1) {
+                    1
+                } else {
+                    start(IRanges(x[2:length(x)] <
+                                  x[1:(lenth(x) - 1)]))
+                },
+            mc.cores=mc.cores
+        )
 
         # Some peaks can have only one trend, correct them
         unitrend <- which(sapply(pea, function(x) length(x) == 0))

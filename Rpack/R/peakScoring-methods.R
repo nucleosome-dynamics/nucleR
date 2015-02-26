@@ -1,18 +1,10 @@
 setMethod(
     "peakScoring",
     signature(peaks="list"),
-    function (peaks, data, threshold="25%", mc.cores=1) {
-
-        mc.cores <- .check.mc(mc.cores)
-
-        if (mc.cores > 1) {
-            res <- mclapply(peaks, peakScoring, data=data,
-                            threshold=threshold, mc.cores=mc.cores)
-        } else {
-            res <- lapply(peaks, peakScoring, data=data, threshold=threshold)
-        }
-        return(res)  # Return the list directly
-    }
+    function (peaks, data, threshold="25%", mc.cores=1)
+        # Return the list directly
+        .xlapply(peaks, peakScoring, data=data, threshold=threshold,
+                 mc.cores=mc.cores)
 )
 
 setMethod(
@@ -21,30 +13,15 @@ setMethod(
     function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
               dyad.length=38, mc.cores=1) {
 
-      # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores)
-
-        if (mc.cores > 1) {
-            res <- mclapply(
-                names(peaks),
-                function(x)
-                    peakScoring(peaks=peaks[[x]], data=data[[x]],
-                                threshold=threshold, dyad.length=dyad.length,
-                                weight.width=weight.width,
-                                weight.height=weight.height),
-                mc.cores=mc.cores
-            )
-        } else {
-            res <- lapply(
-                names(peaks),
-                function(x) peakScoring(peaks=peaks[[x]], data=data[[x]],
-                                        threshold=threshold,
-                                        dyad.length=dyad.length,
-                                        weight.width=weight.width,
-                                        weight.height=weight.height)
-            )
-        }
-
+        res <- .xlapply(
+            names(peaks),
+            function(x)
+                peakScoring(peaks=peaks[[x]], data=data[[x]],
+                            threshold=threshold, dyad.length=dyad.length,
+                            weight.width=weight.width,
+                            weight.height=weight.height),
+            mc.cores=mc.cores
+        )
         names(res) <- names(peaks)
 
         # Result should be returned as a single RangedData object
@@ -54,9 +31,7 @@ setMethod(
         }
 
         # Combine RangedData objects into single one
-        temp <- do.call(c, unname(res))
-
-        return(temp)
+        do.call(c, unname(res))
     }
 )
 
@@ -117,7 +92,7 @@ setMethod(
         sums.dyad  <- lapply(dyads, function(x) mean(data[x], na.rm=TRUE))
 
         # Score the heigh of the peak
-       scor.heigh <- pnorm(data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE)
+        scor.heigh <- pnorm(data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE)
 
         # Score the width (dispersion) of the peak
         scor.width <- unlist(sums.dyad) / unlist(sums.range)

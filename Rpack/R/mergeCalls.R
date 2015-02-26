@@ -49,7 +49,8 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
     if (verbose) {
         message(" - Constructing merge list")
     }
-    xs <- mclapply(
+
+    xs <- .xlapply(
         1:length(red),
         function(i)
             seq.int(from=start(red[i]), length.out=width(red[i]) + 1),
@@ -58,9 +59,9 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
 
     # This saves a lot of time later, just create vectors
     dfcalls <- as.data.frame(calls)
-    df_start   <- dfcalls$start
-    df_end     <- dfcalls$end
-    df_score   <- dfcalls$score
+    df_start <- dfcalls$start
+    df_end <- dfcalls$end
+    df_score <- dfcalls$score
     df_score_w <- dfcalls$score_w
     df_score_h <- dfcalls$score_h
 
@@ -76,21 +77,16 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
             x <- xi
         }
 
-        start   <- min(df_start[x])
-        end     <- max(df_end[x])
-        score   <- mean(df_score[x])
+        start <- min(df_start[x])
+        end <- max(df_end[x])
+        score <- mean(df_score[x])
         score_w <- mean(df_score_w[x])
         score_h <- mean(df_score_h[x])
         nmerge <- length(x)
         return(c(start, end, score, score_w, score_h, nmerge))
     }
 
-    #Apply in parallel by precalculated groups
-    if(mc.cores > 1) {
-        res <- mclapply(xs, .join, mc.cores=mc.cores)
-    } else {
-        res <- lapply(xs, .join)
-    }
+    res <- .xlapply(xs, .join, mc.cores=mc.cores)
 
     if (verbose) {
         message (" - Formatting results")

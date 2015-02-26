@@ -126,4 +126,3 @@ syntheticNucMap <- function(wp.num = 100, wp.del = 10, wp.var = 20,
 
     return(result)
 }
-

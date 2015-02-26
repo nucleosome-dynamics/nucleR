@@ -22,28 +22,17 @@ setMethod(
     function(data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE,
              mc.cores=1, ...) {
 
-        if(length(data) > 1 & showPowerSpec)
+        if (length(data) > 1 & showPowerSpec) {
             stop("showPowerSpec only can be applyied to lists of length = 1")
-
-        # Check if multicore is supported or set to 1
-        mc.cores <- .check.mc(mc.cores)
-
-        if (mc.cores > 1) {
-            return(mclapply(
-                data,
-                filterFFT,
-                pcKeepComp, showPowerSpec, useOptim,
-                mc.cores=mc.cores,
-                ...
-            ))
-        } else {
-            return(lapply(
-                data,
-                filterFFT,
-                pcKeepComp, showPowerSpec, useOptim,
-                ...
-            ))
         }
+
+        .xlapply(
+            data,
+            filterFFT,
+            pcKeepComp, showPowerSpec, useOptim,
+            mc.cores=mc.cores,
+            ...
+        )
     }
 )
 
@@ -70,7 +59,7 @@ setMethod(
             pcKeepComp <- pcKeepCompDetect(data, ...)
         }
 
-        if(showPowerSpec) {
+        if (showPowerSpec) {
             data[is.na(data)] <- 0
             upper <- min(250000, length(data))
             if (length(data) > 250000) {
@@ -95,7 +84,7 @@ setMethod(
         defVal <- NA
 
         # Split, instead of NAs, the large 0 rows
-        if(width(ranges[1]) == length(data)) {
+        if (width(ranges[1]) == length(data)) {
             r <- Rle(data == 0)
             r@values[r@values == TRUE & r@lengths > 500] <- "SPLIT"
             ranges <- IRanges(as.vector(r) != "SPLIT")
