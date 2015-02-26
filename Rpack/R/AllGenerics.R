@@ -41,25 +41,32 @@ setGeneric(
         standardGeneric("controlCorrection")
 )
 
-#Check if there's support for multicore or use only one
 .check.mc <- function(mc.cores)
-{
-    if(mc.cores > 1) {
-        succ.mc <- 'parallel' %in% loadedNamespaces()
-        if(!succ.mc) {
-            succ.mc <- library("parallel", logical.return=TRUE)
-        }
-        if(!succ.mc) {
-            warning("'parallel' library not available, switching to mc.cores=1")
-            mc.cores <- 1
-        }
-    }
+{   # Check if there's support foor multicore or use only one
+    lib <- 'parallel'
+    if (mc.cores > 1 &&
+        !lib %in% loadedNamespaces() &&
+        !library(lib, logical.return=TRUE)) {
 
-    return(mc.cores)
+        warning("'", lib, "' library not available, switching to mc.cores=1")
+        1
+    } else {
+        mc.cores
+    }
 }
 
-# Simple function for returning the middle point of a RangedData
-# (normal mid doesn't work there)
+.xlapply <- function(X, FUN, ..., mc.cores = 1)
+{   # Wrapper to choose between lapply and mclapply accordingly
+    actual.cores <- .check.mc(mc.cores)
 
+    if (actual.cores > 1) {
+        mclapply(X=X, FUN=FUN, ...=..., mc.cores=actual.cores)
+    } else {
+        lapply(X=X, FUN=FUN, ...=...)
+    }
+}
+
+# Simple function for returning the middle point of a RangedData or of a
+# GRanges (normal mid doesn't work there)
 .mid <- function(x)
     floor((start(x) + end(x)) / 2)
