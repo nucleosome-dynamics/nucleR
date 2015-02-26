@@ -1,6 +1,8 @@
+#!/usr/bin/env Rscript
+
 .export.bed <- function(df, name, desc, filename)
 {
-    asScore <- "score" %in% names(df)
+    hasScore <- "score" %in% names(df)
     tscore <- ifelse(hasScore, "useScore=1", "useScore=0")
 
     tdesc <- paste('description="', desc, '"', sep="")
@@ -48,7 +50,7 @@ setMethod(
     function (ranges, score=NULL, name, desc=name, filepath=name,
               splitByChrom=TRUE) {
 
-        if(splitByChrom) {
+        if (splitByChrom) {
             for(chr in names(ranges)) {
                 export.bed(ranges=ranges[[chr]], score=score[[chr]],
                            chrom=chr, name=name, desc=desc, filepath=filepath,
@@ -58,7 +60,7 @@ setMethod(
             dd <- as.data.frame(unlist(ranges))
             dd$chrom <- dd$names
             dd$score <- 1000
-            if(!is.null(score)) {
+            if (!is.null(score)) {
                 dd$score <- unlist(score)
             }
             dd$count <- seq(1, nrow(dd))
@@ -74,24 +76,41 @@ setMethod(
     function (ranges, score=NULL, name, desc=name, filepath=name,
               splitByChrom=TRUE) {
 
-        if(splitByChrom) {
+        if (splitByChrom) {
             for(chr in names(ranges)) {
                 export.bed(ranges=ranges[chr], chrom=chr, name=name, desc=desc,
                            filepath=paste(filepath, chr, sep="."),
                            splitByChrom=FALSE)
-          }
+            }
         } else {
-          dd <- as.data.frame(ranges)
-          dd$chrom <- dd$space
-          dd$count <- seq(1, nrow(dd))
+            dd <- as.data.frame(ranges)
+            dd$chrom <- dd$space
+            dd$count <- seq(1, nrow(dd))
 
-          .export.bed(df=dd, name=name, desc=desc, filename=filepath)
+            .export.bed(df=dd, name=name, desc=desc, filename=filepath)
         }
     }
 )
 
+setMethod(
+    "export.bed",
+    signature(ranges="GRanges"),
+    function (ranges, score=NULL, name, desc=name, filepath=name,
+              splitByChrom=TRUE) {
 
-#
-# this is a test
-#
+        if (splitByChrom) {
+            for(chr in IRanges::levels(seqnames(ranges))) {
+                export.bed(ranges[seqnames(ranges) == chr],
+                           chrom=chr, name=name, desc=desc,
+                           filepath=paste(filepath, chr, sep="."),
+                           splitByChrom=FALSE)
+            }
+        } else {
+            dd <- as.data.frame(ranges)
+            dd$chrom <- dd$seqnames
+            dd$count <- seq(1, nrow(dd))
 
+            .export.bed(df=dd, name=name, desc=desc, filename=filepath)
+        }
+    }
+)
