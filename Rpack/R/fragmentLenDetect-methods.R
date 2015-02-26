@@ -161,8 +161,8 @@ setMethod(
 
         shift <- round(mean(unlist(.xlapply(1:nrow(dd),
                                             shiftPos,
-                                            mc.cores=mc.cores,
-                                            na.rm=TRUE))))
+                                            mc.cores=mc.cores)),
+                            na.rm=TRUE))
 
         #Fragment length is the shift * 2 + the length of the read
         fragLen <- shift * 2 + width(reads)[1]
