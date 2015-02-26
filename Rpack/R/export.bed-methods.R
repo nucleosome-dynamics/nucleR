@@ -35,7 +35,7 @@ setMethod(
         dd$chrom <- chrom
         dd$score <- 1000
         if (!is.null(score)) {
-            dd$score <-floor(score * 1000)
+            dd$score <- floor(score * 1000)
         }
         dd$count <- seq(1, nrow(dd))
 
