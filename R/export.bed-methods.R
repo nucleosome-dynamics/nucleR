@@ -99,7 +99,8 @@ setMethod(
               splitByChrom=TRUE) {
 
         if (splitByChrom) {
-            for(chr in IRanges::levels(seqnames(ranges))) {
+            #for(chr in IRanges::levels(seqnames(ranges))) {
+            for(chr in levels(seqnames(ranges))) {
                 export.bed(ranges[seqnames(ranges) == chr],
                            chrom=chr, name=name, desc=desc,
                            filepath=paste(filepath, chr, sep="."),
