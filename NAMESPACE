@@ -7,7 +7,7 @@ importMethodsFrom(Biobase, exprs, pData, sampleNames)
 importMethodsFrom(GenomicRanges, strand, sort)
 importMethodsFrom(IRanges, as.data.frame, as.vector, cor, coverage,
                   disjointBins, end, mean, nchar, nrow, order, quantile,
-                  ranges, space, start, unique, unlist, which, width, levels)
+                  ranges, space, start, unique, unlist, which, width)
 importMethodsFrom(ShortRead, chromosome, lapply, position, sapply)
 importFrom(graphics, abline, legend, lines, plot, points, rect, text)
 importFrom(IRanges, IRanges, IRangesList, RangedData, RleList, findOverlaps,
