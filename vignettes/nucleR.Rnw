@@ -362,7 +362,7 @@ The scores in Figure \ref{fig:figpeak2} only account for the punctual height of 
 
 <<peaks3>>=
 peaks = peakDetection(htseq_fft, threshold="25%", score=TRUE, width=140)
-head(peaks)
+peaks
 @
 
 \begin{figure}[h]
@@ -386,7 +386,7 @@ The next example shows a simple way to merge those nucleosomes which are overlap
 nuc_calls = ranges(peaks[peaks$score > 0.1,])[[1]]
 red_calls = reduce(nuc_calls)
 red_class = RangedData(red_calls, isFuzzy=width(red_calls) > 140)
-head(red_class)
+red_class
 @
 
 \begin{figure}[h]
