@@ -131,8 +131,9 @@
     flags <- .bamFlagMatrix(bam$flag, file)
     non.repeated <- .removeRepeated(bam, flags)
     with(non.repeated,
-         GenomicRanges::sort(c(.processStrand(flags, bam, "+", file),
-                               .processStrand(flags, bam, "-", file))))
+         #GenomicRanges::sort(c(.processStrand(flags, bam, "+", file),
+         sort(c(.processStrand(flags, bam, "+", file),
+                .processStrand(flags, bam, "-", file))))
 }
 
 .processSingleEnd <- function(file)
