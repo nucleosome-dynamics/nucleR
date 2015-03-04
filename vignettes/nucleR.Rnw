@@ -1,78 +1,121 @@
 \documentclass[nogin,a4paper,11pt]{article}
 
-\usepackage{amsmath}    % need for subequations
-\usepackage{amssymb}    %useful mathematical symbols
-\usepackage{bm}         %needed for bold greek letters and math symbols
-\usepackage{graphicx}   % need for PS figures
-\usepackage{hyperref}   % use for hypertext links, including those to external documents and URLs
-\usepackage{natbib}    %number and author-year style referencing
-\usepackage{fullpage}  %full page support
+\usepackage{amsmath}  % need for subequations
+\usepackage{amssymb}  % useful mathematical symbols
+\usepackage{bm}  % needed for bold greek letters and math symbols
+\usepackage{graphicx}  % need for PS figures
+% use for hypertext links, including those to external documents and URLs
+\usepackage{hyperref}
+\usepackage{natbib}  % number and author-year style referencing
+\usepackage{fullpage}  % full page support
 \usepackage[small]{caption}
 
 \parskip 8pt
-\setlength{\abovecaptionskip}{-1ex} 
+\setlength{\abovecaptionskip}{-1ex}
 % \setlength{\belowcaptionskip}{2ex}
 
 \pagestyle{plain} % use if page numbers not wanted
 
-% \VignetteIndexEntry{Quick analysis of nucleosome positioning experiments}
-
 \begin{document}
 
-\title{Quick analysis of nucleosome positioning experiments \\ using the \textbf{nucleR} package}
-\author{Oscar Flores Guri \\
-\small{Institute for Research in Biomedicine \& Barcelona Supercomputing Center} \\
-\small{Joint Program on Computational Biology}}
+\title{
+    Quick analysis of nucleosome positioning experiments \\
+    using the \textbf{nucleR} package
+}
+\author{
+    Oscar Flores Guri \\
+    \small{
+        Institute for Research in Biomedicine \&
+        Barcelona Supercomputing Center
+    } \\
+    \small{
+        Joint Program on Computational Biology
+    }
+}
 %\date{}  %comment to include current date
 
 \maketitle
 
-
 \section{Introduction}
 \label{sec:intro}
 
-The \textsf{nucleR} package provides a high-level processing of genomic datasets focused in nucleosome positioning experiments, despite they should be also applicable to chromatin inmunoprecipitation (ChIP) experiments in general.
+The \textsf{nucleR} package provides a high-level processing of genomic
+datasets focused in nucleosome positioning experiments, despite they should
+be also applicable to chromatin inmunoprecipitation (ChIP) experiments in
+general.
 
-The aim of this package is not providing an all-in-one data analysis pipeline but complement those existing specialized libraries for low-level data importation and pre-processment into \textsf{R/Bioconductor} framework. 
+The aim of this package is not providing an all-in-one data analysis pipeline
+but complement those existing specialized libraries for low-level data
+importation and pre-processment into \textsf{R/Bioconductor} framework.
 
-\textsf{nucleR} works with data from the two main high-troughput technologies available nowadays for ChIP: Next Generation Sequencing/NGS (ChIP-seq) and Tiling Microarrays (ChIP-on-Chip).
+\textsf{nucleR} works with data from the two main high-troughput technologies
+available nowadays for ChIP: Next Generation Sequencing/NGS (ChIP-seq) and
+Tiling Microarrays (ChIP-on-Chip).
 
 This is a brief summary of the main functions:
 \begin{itemize}
-\item Data importation: \texttt{processReads}, \texttt{processTilingArray}
-\item Data transformation: \texttt{coverage.rpm}, \texttt{filterFFT}, \texttt{controlCorrection}
-\item Nucleosome calling: \texttt{peakDetection}, \texttt{peakScoring}
-\item Visualization: \texttt{plotPeaks}
-\item Data generation: \texttt{syntheticNucMap}
+  \item Data importation: \texttt{processReads}, \texttt{processTilingArray}
+  \item Data transformation: \texttt{coverage.rpm}, \texttt{filterFFT},
+        \texttt{controlCorrection}
+  \item Nucleosome calling: \texttt{peakDetection}, \texttt{peakScoring}
+  \item Visualization: \texttt{plotPeaks}
+  \item Data generation: \texttt{syntheticNucMap}
 \end{itemize}
 
-For more details about the functions and how to use them refer to the \textsf{nucleR} manual. 
+For more details about the functions and how to use them refer to the
+\textsf{nucleR} manual.
 
-This software was published in Bioinformatics Journal. See the paper for additional information.\cite{Flores2011}
+This software was published in Bioinformatics Journal. See the paper for
+additional information.\cite{Flores2011}
 
 \section{Reading data}
 \label{sec:reading}
 
-As mentioned previously, \textsf{nucleR} uses the pre-processed data of other lower level packages for data importation, supporting a few but common formats that should fulfill the requirements of most users..
+As mentioned previously, \textsf{nucleR} uses the pre-processed data of other
+lower level packages for data importation, supporting a few but common formats
+that should fulfill the requirements of most users.
 
-\texttt{ExpressionSet} from package \textsf{Biobase} \citep{Biobase} is used for Tiling Array experiments as described in \textsf{Starr} \cite{Starr} and other packages for the Tiling Array manipulation. This kind of experiments can be readed with the \texttt{processTilingArray} function.
+\texttt{ExpressionSet} from package \textsf{Biobase} \citep{Biobase} is used
+for Tiling Array experiments as described in \textsf{Starr} \cite{Starr} and
+other packages for the Tiling Array manipulation. This kind of experiments can
+be readed with the \texttt{processTilingArray} function.
 
- \texttt{AlignedRead} from package \textsf{ShortRead} \cite{ShortRead} is recommended for NGS, covering most of the state of the art sequencing technologies. Additionally, support for reads in \texttt{RangedData} format is also provided (a range per read with a \texttt{"strand"} column) .
+\texttt{AlignedRead} from package \textsf{ShortRead} \cite{ShortRead} is
+recommended for NGS, covering most of the state of the art sequencing
+technologies. Additionally, support for reads in \texttt{RangedData} format
+is also provided (a range per read with a \texttt{"strand"} column).
 
 \subsection{Reading Tiling Arrays}
 \label{sec:tiling}
 
-Tiling Arrays are a cheap and fast way to have low-resolution nucleosome coverage maps. They have been widely used in literature\cite{Yuan2005, Lee2007, Mavrich2008}, but complex statistical methods were needed for their processing \cite{Liu2007}.
+Tiling Arrays are a cheap and fast way to have low-resolution nucleosome
+coverage maps. They have been widely used in literature
+\cite{Yuan2005, Lee2007, Mavrich2008}, but complex statistical methods were
+needed for their processing \cite{Liu2007}.
 
-This kind of microarrays cover a part of the genome with certain spacing between probes which causes a drop in the resolution and originates some problems. The nucleosome calling from Tiling Array data required hard work on bioinformatics side and use of heavy and artificious statistical machinery such as Hidden Markov Models \cite{Yuan2005, Lee2007} or higher order Bayesian Networks \cite{Kuan2009}.
+This kind of microarrays cover a part of the genome with certain spacing
+between probes which causes a drop in the resolution and originates some
+problems. The nucleosome calling from Tiling Array data required hard work on
+bioinformatics side and use of heavy and artificious statistical machinery
+such as Hidden Markov Models \cite{Yuan2005, Lee2007} or higher order Bayesian
+Networks \cite{Kuan2009}.
 
-\textsf{nucleR} presents a new method based on a simple but effective peak calling method which achieves a great performance at low computing cost that will be presented in subsequent sections.
+\textsf{nucleR} presents a new method based on a simple but effective peak
+calling method which achieves a great performance at low computing cost that
+will be presented in subsequent sections.
 
-In order to standardize the data coming both from Tiling Arrays and NGS, the array fluorescence intensities (usually the ratio of the hybridization of nucleosomal and control sample) are converted to 1bp resolution by inferring the missed values from the neighboring probes. This is done by the function \texttt{processTilingArray}:
+In order to standardize the data coming both from Tiling Arrays and NGS, the
+array fluorescence intensities (usually the ratio of the hybridization of
+nucleosomal and control sample) are converted to 1bp resolution by inferring
+the missed values from the neighboring probes. This is done by the function
+\texttt{processTilingArray}:
 
 \texttt{processTilingArray(data, exprName, chrPattern, inferLen=50)}
 
-An example of a processed dataset is provided in this package. See the help page of \texttt{tilingArray\_preproc} for details on how it has been created. This object is a numeric vector covering the 8000 first positions of chromosome 1 in yeast (\textit{Saccharomices Cerevisiae} genome (SacCer1)).
+An example of a processed dataset is provided in this package. See the help
+page of \texttt{tilingArray\_preproc} for details on how it has been created.
+This object is a numeric vector covering the 8000 first positions of chromosome
+1 in yeast (\textit{Saccharomices Cerevisiae} genome (SacCer1)).
 
 <<loadTA>>=
 require(IRanges)
@@ -81,21 +124,42 @@ data(nucleosome_tiling)
 head(nucleosome_tiling, n=25)
 @
 
-This values represent the normalized fluorescence intensity from hybridized sample of nucleosomal DNA versus naked DNA obtained from \textsf{Starr}. The values can be either direct observations (if a probe was starting at that position) or a inferred value from neighboring probes. This data can be passed directly to the filtering functions, as described later in the section \ref{sec:peaks}.
+This values represent the normalized fluorescence intensity from hybridized
+sample of nucleosomal DNA versus naked DNA obtained from \textsf{Starr}. The
+values can be either direct observations (if a probe was starting at that
+position) or a inferred value from neighboring probes. This data can be passed
+directly to the filtering functions, as described later in the section
+\ref{sec:peaks}.
 
 
 \subsection{Next Generation Sequencing}
 \label{sec:NGS}
 
-NGS has become one of the most popular technique to map nucleosome in the genome in the last years \cite{Kaplan2009, Schones2008, Xi2010}. The drop of the costs of a genome wide sequencing together with the high resolution coverage maps obtained, made it the election of many scientists.
+NGS has become one of the most popular technique to map nucleosome in the
+genome in the last years \cite{Kaplan2009, Schones2008, Xi2010}. The drop of
+the costs of a genome wide sequencing together with the high resolution
+coverage maps obtained, made it the election of many scientists.
 
-The package \textsf{ShortRead} allows reading of the data coming from many sources (Bowtie, MAQ, Illumina pipeline...) and has become one of the most popular packages in \textsf{R/Bioconductor} for NGS data manipulation.
+The package \textsf{ShortRead} allows reading of the data coming from many
+sources (Bowtie, MAQ, Illumina pipeline...) and has become one of the most
+popular packages in \textsf{R/Bioconductor} for NGS data manipulation.
 
-A new \textsf{R} package, called \textsf{htSeqTools} \citep{htSeqTools}, has been recently created to perform preprocessing and quality assesment on NGS experiments. \textsf{nucleR} supports most of the output generated by the functions on that package and recommends its use for quality control and correction of common biases that affect NGS.
+A new \textsf{R} package, called \textsf{htSeqTools} \citep{htSeqTools}, has
+been recently created to perform preprocessing and quality assesment on NGS
+experiments. \textsf{nucleR} supports most of the output generated by the
+functions on that package and recommends its use for quality control and
+correction of common biases that affect NGS.
 
-\textsf{nucleR} handles \textsf{ShortRead} and \textsf{RangedData} data formats. The dataset \texttt{nucleosome\_htseq} includes some NGS reads obtained from a nucleosome positioning experiment also from yeast genome, following a protocol similar to the one described in \citep{Lee2007}.
+\textsf{nucleR} handles \textsf{ShortRead} and \textsf{RangedData} data
+formats. The dataset \texttt{nucleosome\_htseq} includes some NGS reads
+obtained from a nucleosome positioning experiment also from yeast genome,
+following a protocol similar to the one described in \citep{Lee2007}.
 
-The paired-end reads coming from Illumina Genome Analyzer II sequencer were mapped using Bowtie and imported into \textsf{R} using \textsf{ShortRead}. Paired ends where merged and sorted according the start position. Those in the first 8000bp of chromosome 1 where saved for this example. Further details are in the reference \cite{Deniz2011}:
+The paired-end reads coming from Illumina Genome Analyzer II sequencer were
+mapped using Bowtie and imported into \textsf{R} using \textsf{ShortRead}.
+Paired ends where merged and sorted according the start position. Those in the
+first 8000bp of chromosome 1 where saved for this example. Further details are
+in the reference \cite{Deniz2011}:
 
 <<import>>=
 data(nucleosome_htseq)
@@ -103,36 +167,60 @@ class(nucleosome_htseq)
 nucleosome_htseq
 @
 
-Now we will transform the reads to a normalized format. Moreover, as the data is paired-ended and we are only interested in mononucleosomes (which are typically 147bp), we will discard the reads with a length greater than 200bp, allowing margin for some underdigestion but discarding extra long reads. Note that the behaviour of \texttt{fragmentLen} is different for single-ended data, see the manual page of this function for detailed information. 
+Now we will transform the reads to a normalized format. Moreover, as the data
+is paired-ended and we are only interested in mononucleosomes (which are
+typically 147bp), we will discard the reads with a length greater than 200bp,
+allowing margin for some underdigestion but discarding extra long reads. Note
+that the behaviour of \texttt{fragmentLen} is different for single-ended data,
+see the manual page of this function for detailed information.
 
-As our final objective is identifying the nucleosome positions, and \textsf{nucleR} does it from the dyad, we will increase the sharpness of the dyads by removing some bases from the ends of each read. In the next example, we will create two new objects, one with the original paired-end reads and another one with the reads trimmed to the middle 40bp around the dyad (using the \texttt{trim} argument).
+As our final objective is identifying the nucleosome positions, and
+\textsf{nucleR} does it from the dyad, we will increase the sharpness of the
+dyads by removing some bases from the ends of each read. In the next example,
+we will create two new objects, one with the original paired-end reads and
+another one with the reads trimmed to the middle 40bp around the dyad (using
+the \texttt{trim} argument).
 
 <<processReads>>=
-#Process the paired end reads, but discard those with length > 200
-reads_pair = processReads(nucleosome_htseq, type="paired", fragmentLen=200)
+# Process the paired end reads, but discard those with length > 200
+reads_pair <- processReads(nucleosome_htseq, type="paired", fragmentLen=200)
 
-#Process the reads, but now trim each read to 40bp around the dyad
-reads_trim = processReads(nucleosome_htseq, type="paired", fragmentLen=200, trim=40)
+# Process the reads, but now trim each read to 40bp around the dyad
+reads_trim <- processReads(nucleosome_htseq, type="paired",
+                           fragmentLen=200, trim=40)
 @
 
-The next step is obtain the coverage (the count of how many reads are in each position). The standard \textsf{IRanges} package function \texttt{coverage} will work well here, but it is a common practice to normalize the coverage values according to the total number of short reads obtained in the NGS experiment. The common used unit is \emph{reads per milon} (r.p.m.) which is the coverage value divided by the total number of reads and multiplied per one milion. A quick and efficient way to do this with \textsf{nucleR} is the \texttt{coverage.rpm} function. \footnote{Note that conversion in the example dataset gives huge values. This is because r.p.m. expects a large number of reads, and this dataset is only a fraction of a whole one. Also take into account that reads from single-ended (or trimmed reads) and reads from paired-ended could have different mean value of coverage}
+The next step is obtain the coverage (the count of how many reads are in each
+position). The standard \textsf{IRanges} package function \texttt{coverage}
+will work well here, but it is a common practice to normalize the coverage
+values according to the total number of short reads obtained in the NGS
+experiment. The common used unit is \emph{reads per milon} (r.p.m.) which is
+the coverage value divided by the total number of reads and multiplied per one
+milion. A quick and efficient way to do this with \textsf{nucleR} is the
+\texttt{coverage.rpm} function. \footnote{Note that conversion in the example
+dataset gives huge values. This is because r.p.m. expects a large number of
+reads, and this dataset is only a fraction of a whole one. Also take into
+account that reads from single-ended (or trimmed reads) and reads from
+paired-ended could have different mean value of coverage}
 
 <<coverage>>=
-#Calculate the coverage, directly in reads per million (r.p.m)
-cover_pair = coverage.rpm(reads_pair)
-cover_trim = coverage.rpm(reads_trim)
+# Calculate the coverage, directly in reads per million (r.p.m)
+cover_pair <- coverage.rpm(reads_pair)
+cover_trim <- coverage.rpm(reads_trim)
 @
 
-In Figure \ref{fig:figcover} we can observe the effect of \texttt{trim} attribute plotting both coverages. Note that the coverages are normalized in the range 0--1:
+In Figure \ref{fig:figcover} we can observe the effect of \texttt{trim}
+attribute plotting both coverages. Note that the coverages are normalized in
+the range 0--1:
 
 <<figcover, results=hide, fig=TRUE, width=5, height=2, include=FALSE, echo=FALSE>>=
-#Compare both coverages
-t1 = as.vector(cover_pair[[1]])[1:2000]
-t2 = as.vector(cover_trim[[1]])[1:2000]
-t1 = (t1-min(t1))/max(t1-min(t1)) #Normalization 
-t2 = (t2-min(t2))/max(t2-min(t2)) #Normalization
-par(mar=c(5,4,1,1), cex=0.7)
-plot(t1, type="l", lwd="1", col="blue", ylab="norm. coverage", xlab="position",)
+# Compare both coverages
+t1 <- as.vector(cover_pair[[1]])[1:2000]
+t2 <- as.vector(cover_trim[[1]])[1:2000]
+t1 <- (t1 - min(t1)) / max(t1 - min(t1)) # Normalization
+t2 <- (t2 - min(t2)) / max(t2 - min(t2)) # Normalization
+par(mar=c(5, 4, 1, 1), cex=0.7)
+plot(t1, type="l", lwd="1", col="blue", ylab="norm. coverage", xlab="position")
 lines(t2, lwd="1", col="orange")
 @
 
@@ -141,65 +229,108 @@ lines(t2, lwd="1", col="orange")
 <<figcover, fig=TRUE,echo=FALSE, width=5, height=2>>=
 <<figcover>>
 @
-\caption{\label{fig:figcover} 
-	Variation in the sharpness of the peaks using \texttt{trim} attribute. In blue, the original coverage; in orange the trimmed version }
+\caption{
+    \label{fig:figcover}
+    Variation in the sharpness of the peaks using \texttt{trim} attribute.
+    In blue, the original coverage; in orange the trimmed version.
+}
 \end{figure}
 
 \subsection{MNase bias correction}
 \label{sec:MNase}
-The Microccocal Nuclease is a widely used enzyme that has been proved to have a biase for certain dinucleotide steps \cite{Deniz2011}. In this package we offer a quick way to inspect the effect of such artifact by correcting the profiles of nucleosomal DNA reads with a mock sample of naked DNA digested with MNase.
+The Microccocal Nuclease is a widely used enzyme that has been proved to have
+a biase for certain dinucleotide steps \cite{Deniz2011}. In this package we
+offer a quick way to inspect the effect of such artifact by correcting the
+profiles of nucleosomal DNA reads with a mock sample of naked DNA digested
+with MNase.
 
-The use of this function requires a paired-end control sample and a paired end or extended single-read nucleosomal DNA sample. A toy example generated using synthetic data can be found in Figure \ref{fig:figmnase}.
+The use of this function requires a paired-end control sample and a paired end
+or extended single-read nucleosomal DNA sample. A toy example generated using
+synthetic data can be found in Figure \ref{fig:figmnase}.
 
 <<mnase>>=
-#Toy example
-map = syntheticNucMap(as.ratio=TRUE, wp.num=50, fuz.num=25)
+# Toy example
+map <- syntheticNucMap(as.ratio=TRUE, wp.num=50, fuz.num=25)
 
-exp = coverage(map$syn.reads)
-ctr = coverage(map$ctr.reads)
+exp <- coverage(map$syn.reads)
+ctr <- coverage(map$ctr.reads)
 
-corrected = controlCorrection(exp, ctr)
+corrected <- controlCorrection(exp, ctr)
 @
 
 \begin{figure}[h]
 \centering
 <<figmnase, fig=TRUE, echo=FALSE, width=5, height=2>>=
-#Toy example
+# Toy example
 par(mar=c(5,4,1,1), cex=0.7)
 plot(exp, col="darkgrey", type="l", ylab="coverage", xlab="position")
 lines(corrected, col="darkblue", lty=2)
-legend("top", c("normal", "corrected"), hor=TRUE, bty="n", fill=c("darkgrey", "blue"))
+legend("top", c("normal", "corrected"), hor=TRUE, bty="n",
+       fill=c("darkgrey", "blue"))
 @
-\caption{\label{fig:figmnase}
-	Toy example of MNase biase correction. Random nucleosomal and control reads have been generated using \texttt{synteticNucMap} function and corrected using \texttt{controlCorrect}}
+\caption{
+    \label{fig:figmnase}
+    Toy example of MNase biase correction. Random nucleosomal and control
+    reads have been generated using \texttt{synteticNucMap} function and
+    corrected using \texttt{controlCorrect}.
+}
 \end{figure}
 
 \section{Signal Smoothing and Nucleosome Calling}
 \label{sec:peaks}
 
-In the previous sections we converted the experimental data from NGS or Tiling Arrays to a continous, 1bp resolution signal. In this section we will remove the noise present in the data and score the peaks identified, giving place to the nucleosome calls.
+In the previous sections we converted the experimental data from NGS or Tiling
+Arrays to a continous, 1bp resolution signal. In this section we will remove
+the noise present in the data and score the peaks identified, giving place to
+the nucleosome calls.
 
-Previously, in the literature, Hidden Markov Models, Support Vector Machines or other complex intelligent agents where used for this task \cite{Yuan2005, Lee2007, Kuan2009, Chen2010, Xi2010}. This was needed for dealing with the noise and uncertain characterization of the fuzzy positioning of the nucleosomes. 
+Previously, in the literature, Hidden Markov Models, Support Vector Machines
+or other complex intelligent agents where used for this task
+\cite{Yuan2005, Lee2007, Kuan2009, Chen2010, Xi2010}. This was needed for
+dealing with the noise and uncertain characterization of the fuzzy positioning
+of the nucleosomes.
 
-Despite this approach is a valid way to face the problem, the use of such artificious constructs is difficult to implement and sometimes requires a subjective modeling of the solution, constraining or at least conditioning the results observed.
+Despite this approach is a valid way to face the problem, the use of such
+artificious constructs is difficult to implement and sometimes requires a
+subjective modeling of the solution, constraining or at least conditioning the
+results observed.
 
-The method presented here proposes to \emph{keep it simple}, allowing the researcher to study the results he or she is interested \textit{a posteriori}. 
+The method presented here proposes to \emph{keep it simple}, allowing the
+researcher to study the results he or she is interested \textit{a posteriori}.
 
-\textsf{nucleR} aim is to evaluate where the nucleosomes are located and how accurate that position is. We can find a nucleosome read in virtually any place in the genome, but some positions will show a high concentration and will allow us to mark this nucleosome as \textbf{well-positioned} whereas other will be less phased giving place to \textbf{fuzzy} or \textbf{de-localized} nucleosomes \citep{Jiang2009}.
+\textsf{nucleR} aim is to evaluate where the nucleosomes are located and how
+accurate that position is. We can find a nucleosome read in virtually any
+place in the genome, but some positions will show a high concentration and
+will allow us to mark this nucleosome as \textbf{well-positioned} whereas
+other will be less phased giving place to \textbf{fuzzy} or
+\textbf{de-localized} nucleosomes \citep{Jiang2009}.
 
-We think it's better to provide a detailed but convenient identification of the relevant nucleosome regions and score them according to its grade of fuzziness. From our point of view, every researcher should make the final decision regarding filtering, merging or classifying the nucleosomes according its necessities, and \textsf{nucleR} is only a tool to help in this \textit{"dirty"} part of the research.
+We think it's better to provide a detailed but convenient identification of
+the relevant nucleosome regions and score them according to its grade of
+fuzziness. From our point of view, every researcher should make the final
+decision regarding filtering, merging or classifying the nucleosomes according
+its necessities, and \textsf{nucleR} is only a tool to help in this
+\textit{"dirty"} part of the research.
 
 \subsection{Noise removal}
 \label{sec:noise}
 
-NGS and specially Tiling Array data show a very noisy profile which complicates the process of the nucleosome detection from peaks in the signal. A common approach used in the literature is smooth the signal with a sliding window average and then use a Hidden Markov Model to calculate the probabilities of having one or another state.
+NGS and specially Tiling Array data show a very noisy profile which
+complicates the process of the nucleosome detection from peaks in the signal.
+A common approach used in the literature is smooth the signal with a sliding
+window average and then use a Hidden Markov Model to calculate the
+probabilities of having one or another state.
 
 <<fignoise, results=hide, fig=TRUE, width=6, height=1.5, include=FALSE, echo=FALSE>>=
 par(mar=c(5,4,1,1), mfcol=c(1,4), cex=0.4)
-plot(nucleosome_tiling[1:2000], type="l", main="original", ylim=c(-3,2), xlab="position", ylab="intensity")
-plot(filter(nucleosome_tiling[1:2000], c(rep(1,20))/20), type="l", main="sliding w. 20bp", ylim=c(-3,2), xlab="position", ylab="")
-plot(filter(nucleosome_tiling[1:2000], c(rep(1,50))/50), type="l", main="sliding w. 50bp", ylim=c(-3,2), xlab="position", ylab="")
-plot(filter(nucleosome_tiling[1:2000], c(rep(1,100))/100), type="l", main="sliding w. 100bp", ylim=c(-3,2), xlab="position", ylab="")
+plot(nucleosome_tiling[1:2000], type="l", main="original", ylim=c(-3,2),
+     xlab="position", ylab="intensity")
+plot(filter(nucleosome_tiling[1:2000], c(rep(1,20))/20), type="l",
+     main="sliding w. 20bp", ylim=c(-3,2), xlab="position", ylab="")
+plot(filter(nucleosome_tiling[1:2000], c(rep(1,50))/50), type="l",
+     main="sliding w. 50bp", ylim=c(-3,2), xlab="position", ylab="")
+plot(filter(nucleosome_tiling[1:2000], c(rep(1,100))/100), type="l",
+     main="sliding w. 100bp", ylim=c(-3,2), xlab="position", ylab="")
 @
 
 \begin{figure}[h]
@@ -207,34 +338,51 @@ plot(filter(nucleosome_tiling[1:2000], c(rep(1,100))/100), type="l", main="slidi
 <<fignoise, fig=TRUE,echo=FALSE, width=6, height=1.5>>=
 <<fignoise>>
 @
-\caption{\label{fig:fignoise}
-  Original intensities from tiling array experiment. Smoothing using a sliding window of variable length (0, 20, 50 and 100 bp) is presented. }
+\caption{
+    \label{fig:fignoise}
+    Original intensities from tiling array experiment. Smoothing using a
+    sliding window of variable length (0, 20, 50 and 100 bp) is presented.
+}
 \end{figure}
 
-	As can be seen in Figure \ref{fig:fignoise}, data needs some smoothing to be interpretable, but a simple sliding window average is not sufficient. Short windows allow too much noise but larger ones change the position and the shape of the peaks.
+As can be seen in Figure \ref{fig:fignoise}, data needs some smoothing to be
+interpretable, but a simple sliding window average is not sufficient. Short
+windows allow too much noise but larger ones change the position and the shape
+of the peaks.
 
-	\textsf{nucleR} proposes a method of filtering based on the Fourier Analysis of the signal and the selection of its principal components.
+\textsf{nucleR} proposes a method of filtering based on the Fourier Analysis
+of the signal and the selection of its principal components.
 
-	Any signal can be described as a function of individual periodic waves with different frequencies and the combination of them creates more complex signals. The noise in a signal can be described as a small, non periodic fluctuations, and can be easily identified and removed \citep{Smith1999}.
+Any signal can be described as a function of individual periodic waves with
+different frequencies and the combination of them creates more complex
+signals. The noise in a signal can be described as a small, non periodic
+fluctuations, and can be easily identified and removed \citep{Smith1999}.
 
-	\textsf{nucleR} uses this theory to transform the input data into the Fourier space using the Fast Fourier Transform (FFT). A FFT has a real and a imaginary component. The representation of the real component it's called the power spectrum of the signals and shows which are the frequencies that have more weight (power) in the signal. The low frequency components (so, very periodic) usually have a huge influence in the composite signal, but its rellevance drops as the frequency increases.
+\textsf{nucleR} uses this theory to transform the input data into the Fourier
+space using the Fast Fourier Transform (FFT). A FFT has a real and a imaginary
+component. The representation of the real component it's called the power
+spectrum of the signals and shows which are the frequencies that have more
+weight (power) in the signal. The low frequency components (so, very periodic)
+usually have a huge influence in the composite signal, but its rellevance
+drops as the frequency increases.
 
-	We can look at the power spectrum of the example dataset with the following command:
+We can look at the power spectrum of the example dataset with the following
+command:
 
 %Avoid warning of filterFFT for NAs
 %<<temp1, echo=FALSE>>=
 %nucleosome_tiling[is.na(nucleosome_tiling)] = 0
 %@
 
-%Show call, but generate figure later
+% Show call, but generate figure later
 <<fft, results=hide, fig=TRUE, width=5, height=2, include=FALSE, echo=TRUE>>=
 fft_ta = filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
 @
 
-%For plotting only
+% For plotting only
 <<figfft, results=hide, fig=TRUE, width=5, height=2, include=FALSE, echo=FALSE>>=
 par(mar=c(6,4,1,1), cex=0.7)
-fft_ta = filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
+fft_ta <- filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
 @
 
 \begin{figure}[h]
@@ -242,20 +390,45 @@ fft_ta = filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
 <<figfft, fig=TRUE,echo=FALSE, width=5, height=2>>=
 <<figfft>>
 @
-\caption{\label{fig:figfft}
-	Power spectrum of the example Tiling Array data, percentile 1 marked with a dashed line
+\caption{
+    \label{fig:figfft}
+    Power spectrum of the example Tiling Array data, percentile 1 marked with
+    a dashed line.
 }
 \end{figure}
 
-In the Figure \ref{fig:figfft} only the half of the components are plotted, as the spectrum is repeated symmetrically respect to its middle point. The first component (not shown in the plot), has period 1, and, in practice, is a count of the lenght of the signal, so it has a large value.
+In the Figure \ref{fig:figfft} only the half of the components are plotted, as
+the spectrum is repeated symmetrically respect to its middle point. The first
+component (not shown in the plot), has period 1, and, in practice, is a count
+of the lenght of the signal, so it has a large value.
 
-High frequency signals are usually echoes (repeating waves) of lower frequencies, i.e. a peak at 10 will be the sum of the pure frequence 10 plus the echo of the frequency 5 in its 2nd repetition. Echoes can be ignored without losing relevant information.
+High frequency signals are usually echoes (repeating waves) of lower
+frequencies, i.e. a peak at 10 will be the sum of the pure frequence 10 plus
+the echo of the frequency 5 in its 2nd repetition. Echoes can be ignored
+without losing relevant information.
 
-The approach \textsf{nucleR} follows is supposing that with just a small percentage of the components of the signal, the input signal can be recreated with a high precision, but without a significant amount of noise. We check empirically that with 1\% or 2\% of the components (this means account 1 or 2 components for each 100 positions of the genomic data) it's enough to recreate the signal with a very high correlation (>0.99). Tiling Array could require more smoothing (about 1\% should be fine) and NGS has less noise and more components can be selected for fitting better the data (about 2\%), See Figure \ref{fig:figfft} for the selected components in the example.
+The approach \textsf{nucleR} follows is supposing that with just a small
+percentage of the components of the signal, the input signal can be recreated
+with a high precision, but without a significant amount of noise. We check
+empirically that with 1\% or 2\% of the components (this means account 1 or 2
+components for each 100 positions of the genomic data) it's enough to recreate
+the signal with a very high correlation (>0.99). Tiling Array could require
+more smoothing (about 1\% should be fine) and NGS has less noise and more
+components can be selected for fitting better the data (about 2\%), See Figure
+\ref{fig:figfft} for the selected components in the example.
 
-In order to easy the choice of the \texttt{pcKeepComp} parameter, \textsf{nucleR} includes a function for automatic detection of a fitted value that provides a correlation between the original and the filtered profiles close to the one specified. See the manual page of \texttt{pcKeepCompDetect} for detailed information.
+In order to easy the choice of the \texttt{pcKeepComp} parameter,
+\textsf{nucleR} includes a function for automatic detection of a fitted value
+that provides a correlation between the original and the filtered profiles
+close to the one specified. See the manual page of \texttt{pcKeepCompDetect}
+for detailed information.
 
-In short, the cleaning process consists on converting the coverage/intensity values to the Fourier space, and knock-out (set to 0) the components greater than the given percentile in order to remove the noise from the profile. Then the inverse Fast Fourier Transform is applyied to recreate the filtered signal. In Figure \ref{fig:figfft3} the filtered signal is overlapped to the raw signal.
+In short, the cleaning process consists on converting the coverage/intensity
+values to the Fourier space, and knock-out (set to 0) the components greater
+than the given percentile in order to remove the noise from the profile. Then
+the inverse Fast Fourier Transform is applyied to recreate the filtered
+signal. In Figure \ref{fig:figfft3} the filtered signal is overlapped to the
+raw signal.
 
 %<<figfft2, results=hide, fig=TRUE, width=5, height=2, include=FALSE, echo=FALSE>>=
 %par(mar=c(3,3,1,1), cex=0.7)
@@ -273,18 +446,21 @@ In short, the cleaning process consists on converting the coverage/intensity val
 %}
 %\end{figure}
 
-The cleaning of the input has almost no effect on the position and shape of the peaks, mantaining a high correlation with the original signal but allowing achieve a great performance with a simple peak detection algorithm:
+The cleaning of the input has almost no effect on the position and shape of
+the peaks, mantaining a high correlation with the original signal but allowing
+achieve a great performance with a simple peak detection algorithm:
 
-%For plotting only
+% For plotting only
 <<figfft3, results=hide, fig=TRUE, width=5, height=4, include=FALSE, echo=FALSE>>=
-par(mar=c(5,4,1,1), mfcol=c(2,1), cex=0.7)
-tiling_raw = nucleosome_tiling[1:3000]
-tiling_fft = filterFFT(tiling_raw, pcKeepComp=0.01)
-htseq_raw = as.vector(cover_trim[[1]])[1:3000]
-htseq_fft = filterFFT(htseq_raw, pcKeepComp=0.02)
+par(mar=c(5, 4, 1, 1), mfcol=c(2, 1), cex=0.7)
+tiling_raw <- nucleosome_tiling[1:3000]
+tiling_fft <- filterFFT(tiling_raw, pcKeepComp=0.01)
+htseq_raw <- as.vector(cover_trim[[1]])[1:3000]
+htseq_fft <- filterFFT(htseq_raw, pcKeepComp=0.02)
 plot(tiling_raw, type="l", col="darkblue", lwd=3, ylab="intensity", xlab="")
 lines(tiling_fft, type="l", col="cyan")
-plot(htseq_raw, type="l", col="darkred", lwd=3, ylab="coverage", xlab="position")
+plot(htseq_raw, type="l", col="darkred", lwd=3, ylab="coverage",
+     xlab="position")
 lines(htseq_fft, type="l", col="pink")
 @
 
@@ -293,29 +469,38 @@ lines(htseq_fft, type="l", col="pink")
 <<figfft3, fig=TRUE, include=TRUE, echo=FALSE, width=5, height=4>>=
 <<figfft3>>
 @
-\caption{\label{fig:figfft3}
-	Filtering in Tiling Array (up, blue) (1\% comp.) and NGS (down, red) (2\%comp.)
+\caption{
+    \label{fig:figfft3}
+    Filtering in Tiling Array (up, blue) (1\% comp.) and NGS (down, red)
+    (2\%comp.)
 }
 \end{figure}
 
 <<corfft>>=
-tiling_raw = nucleosome_tiling
-tiling_fft = filterFFT(tiling_raw, pcKeepComp=0.01)
-htseq_raw = as.vector(cover_trim[[1]])
-htseq_fft = filterFFT(htseq_raw, pcKeepComp=0.02)
+tiling_raw <- nucleosome_tiling
+tiling_fft <- filterFFT(tiling_raw, pcKeepComp=0.01)
+htseq_raw <- as.vector(cover_trim[[1]])
+htseq_fft <- filterFFT(htseq_raw, pcKeepComp=0.02)
 
 cor(tiling_raw, tiling_fft, use="complete.obs")
 cor(htseq_raw, htseq_fft, use="complete.obs")
 @
 
-
 \subsection{Peak detection and Nucleosome Calling}
 \label{sec:calling}
 
-After noise removal, the calling for nucleosomes is easy to perform. In nucleosome positioning, in contrast with other similar experiments like ChIP, the problem for the peaks detection algorithms is deal with the presence of an irregular signal which causes lots of local maxima (i.e., peaks due to noise inside a real peak). Here, we avoid this problem applying the FFT filter, allowing the detection of peaks in a simple but efficient way just looking for changes in the trend of the profile. This is implemented in the \texttt{peakDetection} function and results can be represented with the function \texttt{plotPeaks}:
+After noise removal, the calling for nucleosomes is easy to perform. In
+nucleosome positioning, in contrast with other similar experiments like ChIP,
+the problem for the peaks detection algorithms is deal with the presence of an
+irregular signal which causes lots of local maxima (i.e., peaks due to noise
+inside a real peak). Here, we avoid this problem applying the FFT filter,
+allowing the detection of peaks in a simple but efficient way just looking for
+changes in the trend of the profile. This is implemented in the
+\texttt{peakDetection} function and results can be represented with the
+function \texttt{plotPeaks}:
 
 <<peaks>>=
-peaks = peakDetection(htseq_fft, threshold="25%", score=FALSE)
+peaks <- peakDetection(htseq_fft, threshold="25%", score=FALSE)
 peaks
 @
 
@@ -329,21 +514,33 @@ plotPeaks(peaks, htseq_fft, threshold="25%")
 par(cex=0.7, mar=c(5,4,1,1))
 plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", ylab="coverage")
 @
-\caption{\label{fig:figpeak}
-  Output of \texttt{plotPeaks} function. Peaks are spotted in red and and detection threshold marked with an horitzontal line.
+\caption{
+    \label{fig:figpeak}
+    Output of \texttt{plotPeaks} function. Peaks are spotted in red and and
+    detection threshold marked with an horitzontal line.
 }
 \end{figure}
 
-All the peaks above a threshold value are identified. Threshold can be set to 0 for detecting all the peaks, but this is not recommended as usually small fluctuations can apear in bottom part of the profile. This package also provides an automatic scoring of the peaks, which accounts for the two main features we are interested in: the height and the sharpness of the peak.
+All the peaks above a threshold value are identified. Threshold can be set to
+0 for detecting all the peaks, but this is not recommended as usually small
+fluctuations can apear in bottom part of the profile. This package also
+provides an automatic scoring of the peaks, which accounts for the two main
+features we are interested in: the height and the sharpness of the peak.
 
-The \emph{height} of a peak is a direct measure of the reads coverage in the peak position, but represented as a probability inside a Normal distribution.
+The \emph{height} of a peak is a direct measure of the reads coverage in the
+peak position, but represented as a probability inside a Normal distribution.
 
-The \emph{sharpness} is a measure of how fuzzy is a nucleosome. If a peak is very narrow and the surrounding regions are depleted, this is an indicator of a good positioned nucleosome, while wide peaks or peaks very close to each other are probably fuzzy nucleosomes (despite the coverage can be very high in this region).
+The \emph{sharpness} is a measure of how fuzzy is a nucleosome. If a peak is
+very narrow and the surrounding regions are depleted, this is an indicator of
+a good positioned nucleosome, while wide peaks or peaks very close to each
+other are probably fuzzy nucleosomes (despite the coverage can be very high
+in this region).
 
-Scores can be calculated with the \texttt{peakScoring} function or directly with the argument \texttt{score=TRUE} in \texttt{peakDetection}.
+Scores can be calculated with the \texttt{peakScoring} function or directly
+with the argument \texttt{score=TRUE} in \texttt{peakDetection}.
 
 <<peaks2>>=
-peaks = peakDetection(htseq_fft, threshold="25%", score=TRUE)
+peaks <- peakDetection(htseq_fft, threshold="25%", score=TRUE)
 head(peaks)
 @
 
@@ -351,17 +548,25 @@ head(peaks)
 \centering
 <<figpeak2, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000),
+          ylab="coverage")
 @
-\caption{\label{fig:figpeak2}
- \texttt{plotPeaks} function with \texttt{score=TRUE}.
+\caption{
+    \label{fig:figpeak2}
+    \texttt{plotPeaks} function with \texttt{score=TRUE}.
 }
 \end{figure}
 
-The scores in Figure \ref{fig:figpeak2} only account for the punctual height of the peak. As said previously, this measure can be improved by accounting the fuzzyness of a nucleosome call (the sharpness of the peak). This requires a way to account for longer range peaks, which can be obtained with the \texttt{width} argument. In this way one can convert the identified nucleosome dyads to whole nucleosome length ranges and account for its degree of fuzzyness:
+The scores in Figure \ref{fig:figpeak2} only account for the punctual height
+of the peak. As said previously, this measure can be improved by accounting
+the fuzzyness of a nucleosome call (the sharpness of the peak). This requires
+a way to account for longer range peaks, which can be obtained with the
+\texttt{width} argument. In this way one can convert the identified nucleosome
+dyads to whole nucleosome length ranges and account for its degree of
+fuzzyness:
 
 <<peaks3>>=
-peaks = peakDetection(htseq_fft, threshold="25%", score=TRUE, width=140)
+peaks <- peakDetection(htseq_fft, threshold="25%", score=TRUE, width=140)
 peaks
 @
 
@@ -369,23 +574,31 @@ peaks
 \centering
 <<figpeak3, fig=TRUE, include=TRUE, echo=FALSE, width=6, height=2>>=
 par(cex=0.7, mar=c(5,4,1,1))
-plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=2.5, ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000),
+          rect.lwd=0.5, rect.thick=2.5, ylab="coverage")
 @
-\caption{\label{fig:figpeak3}
-  \texttt{plotPeaks} output with \texttt{score=TRUE} and \texttt{width=140}.
+\caption{
+    \label{fig:figpeak3}
+    \texttt{plotPeaks} output with \texttt{score=TRUE} and \texttt{width=140}.
 }
 \end{figure}
 
-Note than in Figure \ref{fig:figpeak3} overlapped peaks in a width and tall region are penalized, meanwhile the peaks with surrounding depleted regions have a higher relative score. This is the approach recommended for working with nucleosome calls.
+Note than in Figure \ref{fig:figpeak3} overlapped peaks in a width and tall
+region are penalized, meanwhile the peaks with surrounding depleted regions
+have a higher relative score. This is the approach recommended for working
+with nucleosome calls.
 
-Nucleosome calls filtering, merging or classification can be performed with standard \textsf{IRanges} \cite{IRanges} functions, shuch as \texttt{reduce}, \texttt{findOverlaps} or \texttt{disjoint}.
+Nucleosome calls filtering, merging or classification can be performed with
+standard \textsf{IRanges} \cite{IRanges} functions, shuch as \texttt{reduce},
+\texttt{findOverlaps} or \texttt{disjoint}.
 
-The next example shows a simple way to merge those nucleosomes which are overlap accounting them as a fuzzy regions:
+The next example shows a simple way to merge those nucleosomes which are
+overlap accounting them as a fuzzy regions:
 
 <<ranges>>=
-nuc_calls = ranges(peaks[peaks$score > 0.1,])[[1]]
-red_calls = reduce(nuc_calls)
-red_class = RangedData(red_calls, isFuzzy=width(red_calls) > 140)
+nuc_calls <- ranges(peaks[peaks$score > 0.1,])[[1]]
+red_calls <- reduce(nuc_calls)
+red_class <- RangedData(red_calls, isFuzzy=width(red_calls) > 140)
 red_class
 @
 
@@ -395,42 +608,57 @@ red_class
 par(cex=0.7, mar=c(5,4,1,1))
 plotPeaks(red_calls, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000), rect.lwd=0.5, rect.thick=3, ylab="coverage")
 @
-\caption{\label{fig:figranges}
-  Simple example of ranges manipulation to plot fuzzy nucleosomes
+\caption{
+    \label{fig:figranges}
+    Simple example of ranges manipulation to plot fuzzy nucleosomes.
 }
 \end{figure}
-
-
 
 \section{Exporting data}
 \label{sec:exporting}
 
-\texttt{export.wig} and \texttt{export.bed} allow exportation of coverage/intensity values and nucleosome calls in a standard format which works on most of the genome browsers available today (like UCSC Genome Browser or Integrated Genome Browser).
+\texttt{export.wig} and \texttt{export.bed} allow exportation of
+coverage/intensity values and nucleosome calls in a standard format which
+works on most of the genome browsers available today (like UCSC Genome Browser
+or Integrated Genome Browser).
 
-\texttt{export.wig} creates WIG files wich are suitable for coverage/intensities, meanwhile \texttt{export.bed} creates BED files which contain ranges and scores information, suitable for calls.
-
+\texttt{export.wig} creates WIG files wich are suitable for
+coverage/intensities, meanwhile \texttt{export.bed} creates BED files which
+contain ranges and scores information, suitable for calls.
 
 \section{Generating synthetic maps}
 \label{sec:synthetic}
 
-\textsf{nucleR} includes a synthetic nucleosome map generator, which can be helpful in benchmarking or comparing data against a random map. \texttt{syntheticNucMap} function does that, allowing a full customization of the generated maps.
+\textsf{nucleR} includes a synthetic nucleosome map generator, which can be
+helpful in benchmarking or comparing data against a random map.
+\texttt{syntheticNucMap} function does that, allowing a full customization of
+the generated maps.
 
-When generating a map, the user can choose the number of the well-positioned and fuzzy nucleosome, as their variance or maximum number of reads. It also provides an option to calculate the ratio between the generated nucleosome map and a mock control of random reads (like a naked DNA randomly fragmented sample) to simulate hybridation data of Tiling Arrays.
+When generating a map, the user can choose the number of the well-positioned
+and fuzzy nucleosome, as their variance or maximum number of reads. It also
+provides an option to calculate the ratio between the generated nucleosome map
+and a mock control of random reads (like a naked DNA randomly fragmented
+sample) to simulate hybridation data of Tiling Arrays.
 
-The perfect information about the nucleosome dyads is returned by this function, together with the coverage or ratio profiles.
+The perfect information about the nucleosome dyads is returned by this
+function, together with the coverage or ratio profiles.
 
-See the man page of this function for detailed information about the different parameters and options.
+See the man page of this function for detailed information about the different
+parameters and options.
 
 <<syn, results=hide, fig=FALSE, include=FALSE, echo=TRUE>>=
 syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20, fuz.var=50,
- max.cover=20, nuc.len=147, lin.len=20, rnd.seed=1, as.ratio=TRUE, show.plot=TRUE)
+                max.cover=20, nuc.len=147, lin.len=20, rnd.seed=1,
+                as.ratio=TRUE, show.plot=TRUE)
 @
 
 
 <<figsyn, results=hide, fig=TRUE, width=6, height=2, include=FALSE, echo=FALSE>>=
 par(mar=c(5,4,1,1), cex=0.7)
-syn = syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20, fuz.var=50,
- max.cover=20, nuc.len=147, lin.len=20, rnd.seed=1, as.ratio=TRUE, show.plot=TRUE, ylab="", xlab="position")
+syn <- syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20,
+                       fuz.var=50, max.cover=20, nuc.len=147, lin.len=20,
+                       rnd.seed=1, as.ratio=TRUE, show.plot=TRUE, ylab="",
+                       xlab="position")
 @
 
 
@@ -439,8 +667,10 @@ syn = syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20, fuz.var=50,
 <<figsyn, fig=TRUE, echo=FALSE, width=6, height=2>>=
 <<figsyn>>
 @
-\caption{\label{fig:figsyn}
-	Example synthetic coverage map of 90 well-positioned (100-10) and 20 fuzzy nucleosomes.
+\caption{
+    \label{fig:figsyn}
+    Example synthetic coverage map of 90 well-positioned (100-10) and 20 fuzzy
+    nucleosomes.
 }
 \end{figure}
 
@@ -448,4 +678,3 @@ syn = syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20, fuz.var=50,
 \bibliography{references}
 
 \end{document}
-
