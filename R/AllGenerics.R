@@ -44,9 +44,7 @@ setGeneric(
 .check.mc <- function(mc.cores)
 {   # Check if there's support foor multicore or use only one
     lib <- 'parallel'
-    if (mc.cores > 1 &&
-        !lib %in% loadedNamespaces() &&
-        !library(lib, logical.return=TRUE)) {
+    if (mc.cores > 1 && !lib %in% loadedNamespaces()) {
 
         warning("'", lib, "' library not available, switching to mc.cores=1")
         1

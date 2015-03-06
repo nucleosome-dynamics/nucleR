@@ -1,7 +1,7 @@
 processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
                                 mc.cores = 1, quiet = FALSE)
 {
-    require("Biobase")
+    # require("Biobase")
 
     # Obtain annotation
     if (!quiet) {
