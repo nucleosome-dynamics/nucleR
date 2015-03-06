@@ -1,3 +1,5 @@
+%\VignetteIndexEntry{nucleR}
+
 \documentclass[nogin,a4paper,11pt]{article}
 
 \usepackage{amsmath}  % need for subequations

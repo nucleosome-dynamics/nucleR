@@ -3,7 +3,7 @@ setMethod(
     signature(data="AlignedRead"),
     function(data, type="single", fragmentLen, trim, ...) {
 
-        require("ShortRead")
+        # require("ShortRead")
         if (missing(fragmentLen)) {
             if (type == "single") {
                 message(" * fragmentLen not provided for strand correction, ",
