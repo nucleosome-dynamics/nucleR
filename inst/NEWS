@@ -1,3 +1,6 @@
+***** version 1.99.1 - 23 January 2013
+· Package updated to be used in Bioconductor 3.1
+
 ***** version 1.7.2 - 23 January 2013
 . Changed filterFFT-methods.R. Now filtering of regions is performed in iterative loop rather than with a recursive call. This improves dramatically the memory usage of long non-splitted regions.
 
