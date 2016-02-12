@@ -27,7 +27,7 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
         message(" - Finding overlapped reads")
     }
     ovlps <- findOverlaps(calls, minoverlap=min.overlap, type="any",
-                          select="all", ignoreSelf=TRUE, ignoreRedundant=TRUE)
+                          select="all", drop.self=TRUE, drop.redundant=TRUE)
 
     # Select those reads wich are overlapped (by construction with the n+1 read)
     hits <- queryHits(ovlps[[1]])
