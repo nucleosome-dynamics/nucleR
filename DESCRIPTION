@@ -1,14 +1,14 @@
 Package: nucleR
 Type: Package
 Title: Nucleosome positioning package for R
-Version: 2.3.1
-Date: 2016-02-11
+Version: 2.3.2
+Date: 2016-02-24
 Author: Oscar Flores, Ricard Illa
 Maintainer: Ricard Illa <ricard.illa@irbbarcelona.org>
 Description: Nucleosome positioning for Tiling Arrays and NGS experiments.
 License: LGPL (>= 3)
 Depends: ShortRead
-Imports: methods, BiocGenerics, IRanges (>= 2.5.27), Biobase, GenomicRanges (>= 1.23.16), Rsamtools, stats, graphics, parallel, S4Vectors
+Imports: methods, BiocGenerics, S4Vectors (>= 0.9.39), IRanges (>= 2.5.27), Biobase, GenomicRanges (>= 1.23.16), Rsamtools, stats, graphics, parallel
 Suggests:Starr
 LazyLoad: yes
 biocViews: ChIPSeq, Microarray, Sequencing, Genetics
