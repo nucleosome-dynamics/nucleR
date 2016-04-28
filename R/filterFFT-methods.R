@@ -155,7 +155,7 @@ setMethod(
         )
         # Create a vector of default values and fill it
         res <- rep(defVal, length(data))
-        for (i in 1:length(ranges)) {
+        for (i in seq_along(ranges)) {
             res[ranges[[i]]] <- fft_ranges[[i]]
         }
 
