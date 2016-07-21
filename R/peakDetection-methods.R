@@ -94,6 +94,7 @@ setMethod(
         res <- unlist(sapply(1:length(starts),
                              function(i) pea[[i]] + starts[[i]]))
 
+        res <- res[res <= length(data)]
         # the FFT coverage at the peak should be bigger than a given number
         # (by default, 2)
         res <- res[data[res] > min.cov]
