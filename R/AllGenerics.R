@@ -17,7 +17,7 @@ setGeneric(
 )
 setGeneric(
     "peakDetection",
-    function(data, threshold=0.25, width=1, score=TRUE, mc.cores=1)
+    function(data, threshold=0.25, width=1, score=TRUE, min.cov=2, mc.cores=1)
         standardGeneric("peakDetection")
 )
 setGeneric(
