@@ -3,8 +3,11 @@ setMethod(
     signature(peaks="list"),
     function (peaks, data, threshold="25%", mc.cores=1)
         # Return the list directly
-        .xlapply(peaks, peakScoring, data=data, threshold=threshold,
-                 mc.cores=mc.cores)
+        .xlapply(peaks,
+                 peakScoring,
+                 data      = data,
+                 threshold = threshold,
+                 mc.cores  = mc.cores)
 )
 
 setMethod(
@@ -13,15 +16,15 @@ setMethod(
     function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
               dyad.length=38, mc.cores=1) {
 
-        res <- .xlapply(
-            names(peaks),
-            function(x)
-                peakScoring(peaks=peaks[[x]], data=data[[x]],
-                            threshold=threshold, dyad.length=dyad.length,
-                            weight.width=weight.width,
-                            weight.height=weight.height),
-            mc.cores=mc.cores
-        )
+        res <- .xlapply(names(peaks),
+                        function(x)
+                            peakScoring(peaks         = peaks[[x]],
+                                        data          = data[[x]],
+                                        threshold     = threshold,
+                                        dyad.length   = dyad.length,
+                                        weight.width  = weight.width,
+                                        weight.height = weight.height),
+                        mc.cores=mc.cores)
         names(res) <- names(peaks)
 
         # Result should be returned as a single RangedData object
@@ -106,7 +109,9 @@ setMethod(
         # 2013-08-13 - New metrics, peak heigth and SD
 
         # Return everything or just merged score
-        return(RangedData(peaks, score=scor.final, score_w=scor.width,
-                          score_h=scor.heigh))
+        return(RangedData(peaks,
+                          score   = scor.final,
+                          score_w = scor.width,
+                          score_h = scor.heigh))
   }
 )
