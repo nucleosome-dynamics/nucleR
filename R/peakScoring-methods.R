@@ -30,7 +30,9 @@ setMethod(
         # Result should be returned as a single RangedData object
         # Put the correct space in RangedData
         for (name in names(res)) {
-            names(res[[name]]) <- name
+            if (nrow(res[[name]])) {
+                names(res[[name]]) <- name
+            }
         }
 
         # Combine RangedData objects into single one
