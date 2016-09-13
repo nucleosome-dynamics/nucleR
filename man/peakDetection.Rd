@@ -11,8 +11,8 @@
 	It's recommended to smooth the input with \code{filterFFT} prior the detection.	
 }
 \usage{
-\S4method{peakDetection}{list}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
-\S4method{peakDetection}{numeric}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
+\S4method{peakDetection}{list}(data, threshold="25\%", width=1, score=TRUE, min.cov=2, mc.cores=1)
+\S4method{peakDetection}{numeric}(data, threshold="25\%", width=1, score=TRUE, min.cov=2, mc.cores=1)
 }
 \arguments{
   \item{data}{
@@ -26,6 +26,9 @@
 }
 	\item{score}{	
 	If TRUE, the results will be scored using \code{peakScoring} function
+}
+	\item{min.cov}{	
+  Minimum coverage that a peak needs in order to be considered as a nucleosome call
 }
   \item{mc.cores}{
 	If \code{multicore} support, the number of cores available
