@@ -1,157 +1,106 @@
-.int2base <- function(x, b = 2)
-{   # Binary conversion
-    xi <- as.integer(x)
-    if (any(is.na(xi) | ((x - xi) != 0))) {
-        print(list(ERROR="x not integer", x=x))
+irLs2rd <- function(x)
+    # Convert a list of IRanges to a RangedData
+    RangedData(ranges=do.call(c, unname(x)),
+               space=rep(names(x),
+                         sapply(x, length)))
+
+sortReads <- function (reads)
+{
+    # Sort reads RangedData format. Sort them first by chromosome, then by
+    # start and then by end
+    sortChrs <- function (rans)
+        rans[order(names(rans))]
+    sortRans <- function (x) {
+        tmp <- x[sort.list(end(x))]
+        tmp[sort.list(start(tmp))]
     }
-    N <- length(x)
-    xMax <- max(x)
-    ndigits <- floor(logb(xMax, base=2)) + 1
-    Base.b <- array(NA, dim=c(N, ndigits))
-    for(i in 1:ndigits) {
-        Base.b[, ndigits - i + 1] <- (x %% b)
-        x <- (x %/% b)
-    }
-    if (N == 1) {
-        Base.b[1, ]
+    irLs2rd(lapply(sortChrs(ranges(reads)), sortRans))
+}
+
+vectorizedAll <- function(...)
+    # Helper function that behaves as a vectorized version of the function
+    # `all`
+    Reduce(`&`, list(...))
+
+.loadSingleBam <- function (exp)
+{
+    what <- c("pos", "qwidth", "strand", "rname")
+    bam <- scanBam(exp, param=ScanBamParam(what=what))[[1]]
+
+    non.na <- Reduce(`&`, lapply(bam, Negate(is.na)))
+    filtered.bam <- lapply(bam, `[`, non.na)
+
+    # IRanges
+    RangedData(space  = filtered.bam$rname,
+               ranges = IRanges(start = filtered.bam[["pos"]],
+                                width = filtered.bam[["qwidth"]]),
+               strand = filtered.bam[["strand"]])
+}
+
+.processStrand <- function (strand, bam)
+{
+    message(sprintf("processing strand %s", strand))
+
+    p1 <- ifelse(strand == "+", 99, 163)
+    p2 <- ifelse(strand == "+", 147, 83)
+
+    unsorted.reads1 <- bam[bam$flag == p1, ]
+    unsorted.reads2 <- bam[bam$flag == p2, ]
+
+    rownames(unsorted.reads1) <- as.vector(unsorted.reads1$qname)
+    rownames(unsorted.reads2) <- as.vector(unsorted.reads2$qname)
+
+    # Sort by the name of the reads. Assiming the paired reads will have the
+    # same name, this will keep the pairs in the same position
+    common <- intersect(rownames(unsorted.reads1), rownames(unsorted.reads2))
+
+    reads1 <- unsorted.reads1[common, ]
+    reads2 <- unsorted.reads2[common, ]
+
+    # Consistency check
+    test <- all(vectorizedAll(reads1$mpos  == reads2$pos,
+                              reads2$mpos  == reads1$pos,
+                              reads1$rname == reads2$rname))
+
+    if (!test) {
+        stop(sprintf("ERROR: Mate selection for %s strand is invalid",
+                     strand))
     } else {
-        Base.b
+        RangedData(space  = as.character(reads1$rname),
+                   ranges = IRanges(start = reads1$pos,
+                                    end   = reads2$pos + reads2$qwidth - 1))
     }
 }
 
-.bamFlagMatrix <- function(flags, file)
-{   # SAM/BAM flag matrix
-    message("** ", file, " -> Processing flags")
-    bin <- .int2base(flags)
-    n <- ncol(bin)
-    colnames(bin) <- c(rev(names(formals(scanBamFlag))[1:n]))
-    bin
-}
+.loadPairedBam <- function (file)
+{
+    message(sprintf("reading file %s", file))
 
-.getPos <- function(flags, s, p)
-{   # Given a matrix of flags, a strand ('+' or '-') and a position
-    # ('1' or '2'), # return a vector of bools that fullfills the requirements
-
-    # a simple closure to keep things less verbose and repetitive
-    getFlag <- function(x) flags[, x]
-
-    is.pair <- getFlag("isPaired") & getFlag("isProperPair")
-
-    if (p == 1) {
-        is.position <- getFlag("isFirstMateRead")
-    } else if (p == 2) {
-        is.position <- getFlag("isSecondMateRead")
-    }
-
-    minStrand <- getFlag("isMinusStrand")
-
-    if ((p == 1 && s == "+") ||
-        (p == 2 && s == "-")) {
-        right.strand <- !minStrand
-    } else if ((p == 1 && s == "-") ||
-               (p == 2 && s == "+")) {
-        right.strand <- minStrand
-    }
-
-    is.pair & is.position & right.strand
-}
-
-.checkConsistency <- function(reads1, reads2)
-    # Returns true if the reads positions are consistent
-    all(reads1$mpos == reads2$pos &
-        reads2$mpos == reads1$pos &
-        reads1$rname == reads2$rname)
-
-.buildReadsPaired <- function(reads1, reads2, strand)
-{   # Given a strand, build the reads in GRanges format accordingly
-    if (strand == "+") {
-        ranges <- IRanges(start=reads1[["pos"]],
-                          end=reads2[["pos"]] + reads2[["qwidth"]] - 1)
-    } else if (strand == "-") {
-        ranges <- IRanges(start=reads2[["pos"]],
-                          end=reads1[["pos"]] + reads1[["qwidth"]] - 1)
-    }
-    names <- as.character(reads1$rname)
-    GRanges(seqnames=names, ranges=ranges)
-}
-
-.processStrand <- function(flags, bam, strand, file)
-{   # Given a matrix of flags and bam information, process given flag
-    message("** ", file, " -> Processing ", strand, " strand")
-
-    pos1 <- .getPos(flags, strand, 1)
-    pos2 <- .getPos(flags, strand, 2)
-
-    reads1 <- lapply(bam, "[", pos1)
-    reads2 <- lapply(bam, "[", pos2)
-
-    if (!.checkConsistency(reads1, reads2)) {
-        stop(paste("ERROR: Mate selection for", strand, "strand is invalid"))
-    }
-
-    .buildReadsPaired(reads1, reads2, strand)
-}
-
-.readBamFile <- function(file)
-{   # Read a BAM file (only one access to disk, intended for Shared Memory)
-    message("** ", file, "-> Reading")
-    what <- c("qname", "flag", "rname", "strand", "pos", "qwidth", "mrnm",
+    what <- c("qname",
+              "flag",
+              "rname",
+              "strand",
+              "pos",
+              "qwidth",
+              "mrnm",
               "mpos")
-    scanBam(file=file, param=ScanBamParam(what=what))[[1]]
+    bam <- as.data.frame(scanBam(file=file, param=ScanBamParam(what=what))[[1]])
+
+    message("processing flags")
+    bam$flag <- bam$flag %% 256
+
+    # Process both strand and return the reads in sorted order
+    sortReads(rbind(.processStrand("+", bam),
+                    .processStrand("-", bam)))
 }
 
-.removeRepeated <- function(bam, flags)
-{   # remove repeated reads (marked as isPrimaryRead == 1), there might be none
-    x <- "isPrimaryRead"
-    if (x %in% colnames(flags)) {
-        mmids <- bam[["qname"]] %in% unique(bam$qname[flags[, x] == 1])
-        mmpos <- which(bam[["qname"]] %in% mmids)
-        list(bam=lapply(bam, "[", - mmpos),
-             flags=flags[ - mmpos, ])
-    } else {
-        list(bam=bam, flags=flags)
-    }
-}
-
-.filterNAs <- function(xs)
-    # Remove the vectors with a NA value in a list comming the loading
-    #a BAM file
-    lapply(xs, function(x) x[!is.na(x)])
-
-.buildGRSingle <- function(xs)
-    # Convert a list of vectors comming from scanBam into a GRanges object
-    with(xs,
-         GRanges(seqnames=rname,
-                 ranges=IRanges(start=pos, width=qwidth),
-                 strand=strand))
-
-.processPairedEnd <- function(file)
-{   # Process a paired end Bam file
-    bam <- .readBamFile(file)
-    flags <- .bamFlagMatrix(bam$flag, file)
-    non.repeated <- .removeRepeated(bam, flags)
-    with(non.repeated,
-         #GenomicRanges::sort(c(.processStrand(flags, bam, "+", file),
-         sort(c(.processStrand(flags, bam, "+", file),
-                .processStrand(flags, bam, "-", file))))
-}
-
-.processSingleEnd <- function(file)
-{   # Process a single end Bam file
-    bam.param <- ScanBamParam(what=c("rname", "pos", "qwidth", "strand"))
-    .buildGRSingle(.filterNAs(scanBam(file, param=bam.param)[[1]]))
-}
-
-readBAM <- function(file, type = "single", mc.cores = 1)
-{   # Read from a single or pair-end BAM file
+readBAM <- function (file, type="paired")
+{
     if (type == "single") {
-        f <- .processSingleEnd
+        .loadSingleBam(file)
     } else if (type == "paired") {
-        f <- .processPairedEnd
+        .loadPairedBam(file)
     } else {
-        stop(paste("type must be 'single' for single-ended data or",
-                   "'paired' for paired-ended"))
+        stop("type must be `single` or `paired`")
     }
-
-    .xlapply(file, f, mc.cores=mc.cores)
 }

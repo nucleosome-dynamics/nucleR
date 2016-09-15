@@ -9,7 +9,7 @@
     experiments.
 }
 \usage{
-  readBAM(file, type = "single", mc.cores = 1)
+  readBAM(file, type = "paired")
 }
 \arguments{
     \item{file}{
@@ -18,9 +18,6 @@
     \item{type}{
         Describes the type of reads. Values allowed are \code{single} for
         single-ended reads and \code{paired} for pair-ended.
-    }
-    \item{mc.cores}{
-        If \code{multicore} support, the number of cores available.
     }
 }
 \value{
