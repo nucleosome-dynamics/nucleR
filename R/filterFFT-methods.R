@@ -3,8 +3,11 @@ setMethod(
     signature(data="SimpleRleList"),
     function(data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE,
              mc.cores=1, ...) {
-        temp <- lapply(data, as.vector)
-        return(filterFFT(temp, pcKeepComp, showPowerSpec, useOptim, mc.cores,
+        return(filterFFT(lapply(data, as.vector),
+                         pcKeepComp,
+                         showPowerSpec,
+                         useOptim,
+                         mc.cores,
                          ...))
     }
 )
@@ -26,13 +29,13 @@ setMethod(
             stop("showPowerSpec only can be applyied to lists of length = 1")
         }
 
-        .xlapply(
-            data,
-            filterFFT,
-            pcKeepComp, showPowerSpec, useOptim,
-            mc.cores=mc.cores,
-            ...
-        )
+        .xlapply(data,
+                 filterFFT,
+                 pcKeepComp,
+                 showPowerSpec,
+                 useOptim,
+                 mc.cores=mc.cores,
+                 ...)
     }
 )
 

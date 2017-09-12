@@ -108,17 +108,17 @@ setMethod(
 
         #######################################################################
         if (type == "single") {  # Special case for trim==fragmentLength
-                if (!missing(trim)) {
-                    if (trim == fragmentLen) {
-                        start <- start(data)
-                        negStrand <- data$strand == "-"
-                        start[negStrand] <- end(data)[negStrand] - fragmentLen
-                        res <- RangedData(ranges=IRanges(start=start,
-                                                         width=fragmentLen),
-                                          space=space(data))
-                        return(res)
-                    }
+            if (!missing(trim)) {
+                if (trim == fragmentLen) {
+                    start <- start(data)
+                    negStrand <- data$strand == "-"
+                    start[negStrand] <- end(data)[negStrand] - fragmentLen
+                    res <- RangedData(ranges=IRanges(start=start,
+                                                     width=fragmentLen),
+                                      space=space(data))
+                    return(res)
                 }
+            }
 
             # If no trim restriction, use whole read length,
             # else use trim length

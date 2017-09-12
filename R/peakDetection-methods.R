@@ -14,34 +14,27 @@ setMethod(
 
         # Process the result, case with ranges
         if (width > 1) {
-            # res is a list of IRanges, conversion is direct
-            if (score == FALSE) {
-                return(IRangesList(unlist(res)))
-
-            # res is a list of RangedData
-            } else {
-                # Put the correct space in RangedData by changing range names
+            if (score) {
+                # res is a list of IRanges, conversion is direct
+                res <- res[!sapply(res, is.null)]
                 for (name in names(res)) {
-                    names(res[[name]]@ranges) <- name
+                    names(res[[name]]) <- name
                 }
-
                 # Combine RangedData objects into single one
-                if (length(res) > 1) {
-                    temp <- res[[1]]
-                    for (i in 2:length(res)) {
-                        temp <- c(temp, res[[i]])
-                    }
+                res <- do.call(c, unname(res))
+
+            } else {
+                # res is a list of RangedData
+                res <- unlist(res)
+                if (length(res)) {
+                    res <- IRangesList(res)
                 } else {
-                    temp <- res[[1]]
+                    res <- IRangesList()
                 }
-
-                return(temp)
             }
-
-        #Case without ranges, anyway return a list
-        } else {
-            return(res)
         }
+
+        return(res)
     }
 )
 
