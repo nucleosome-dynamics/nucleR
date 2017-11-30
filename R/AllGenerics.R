@@ -40,6 +40,11 @@ setGeneric(
     function(exp, ctr, ...)
         standardGeneric("controlCorrection")
 )
+setGeneric(
+    "coverage.rpm",
+    function (data, scale=1e6, ...)
+        standardGeneric("coverage.rpm")
+)
 
 .check.mc <- function(mc.cores)
 {   # Check if there's support foor multicore or use only one

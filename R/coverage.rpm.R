@@ -1,16 +1,17 @@
-coverage.rpm <- function(data, scale = 1e6, ...)
-{
-    # Use standard IRange coverage function
-    cov <- coverage(data, ...)
+setMethod(
+    "coverage.rpm",
+    signature(data="GRanges"),
+    function(data, scale=1e6, ...)
+        RleList(lapply(coverage(data, ...),
+                       function(x) x / length(data) * scale),
+                compress=FALSE)
+)
 
-    # Change rle values to rpm. More efficient
-    rle <- RleList(lapply(
-        cov,
-        function(x) {
-            x@values <- (x@values / nrow(data)) * scale
-            return(x)
-        }
-    ), compress=FALSE)
-
-    return(rle)
-}
+setMethod(
+    "coverage.rpm",
+    signature(data="RangedData"),
+    function(data, scale=1e6, ...)
+        RleList(lapply(coverage(data, ...),
+                       function(x) x / nrow(data) * scale),
+                compress=FALSE)
+)

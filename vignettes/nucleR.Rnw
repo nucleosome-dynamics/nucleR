@@ -121,6 +121,7 @@ This object is a numeric vector covering the 8000 first positions of chromosome
 
 <<loadTA>>=
 require(IRanges)
+require(GenomicRanges)
 library(nucleR)
 data(nucleosome_tiling)
 head(nucleosome_tiling, n=25)

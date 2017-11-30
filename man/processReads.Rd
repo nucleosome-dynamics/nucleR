@@ -2,6 +2,7 @@
 \alias{processReads}
 \alias{processReads,AlignedRead-method}
 \alias{processReads,RangedData-method}
+\alias{processReads,GRanges-method}
 \title{
 Process reads from High-Troughtput Sequencing experiments
 }

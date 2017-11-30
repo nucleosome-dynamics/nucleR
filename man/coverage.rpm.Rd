@@ -1,5 +1,7 @@
 \name{coverage.rpm}
 \alias{coverage.rpm}
+\alias{coverage.rpm,RangedData-method}
+\alias{coverage.rpm,GRanges-method}
 \title{
 	Coverage calculation and normalization to reads per million (rpm)
 }
