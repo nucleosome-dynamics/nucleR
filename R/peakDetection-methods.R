@@ -1,5 +1,5 @@
 setMethod(
-"peakDetection",
+    "peakDetection",
     signature(data="list"),
     function(data, threshold="25%", width=1, score=TRUE, min.cov=2,
              mc.cores=1) {
