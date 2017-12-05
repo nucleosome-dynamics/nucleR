@@ -11,13 +11,8 @@
 	It's recommended to smooth the input with \code{filterFFT} prior the detection.	
 }
 \usage{
-<<<<<<< HEAD
 \S4method{peakDetection}{list}(data, threshold="25\%", width=1, score=TRUE, min.cov=2, mc.cores=1)
 \S4method{peakDetection}{numeric}(data, threshold="25\%", width=1, score=TRUE, min.cov=2, mc.cores=1)
-=======
-\S4method{peakDetection}{list}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
-\S4method{peakDetection}{numeric}(data, threshold="25\%", width=1, score=TRUE, mc.cores=1)
->>>>>>> upstream/master
 }
 \arguments{
   \item{data}{
