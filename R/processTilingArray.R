@@ -36,11 +36,14 @@ processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
         dft <- dft[order(dft$pos), ]
 
         # Calculate parameters for seq function
-        dft$len <- (c(dft$pos[2:length(dft$pos)],
-                      dft$pos[length(dft$value)]) - dft$pos) + 1
+
+        v <- c(dft$pos[2:length(dft$pos)], dft$pos[length(dft$value)])
+        dft$len <- v - dft$pos + 1
         dft$from <- dft$value
-        dft$to <- c(dft$value[2:length(dft$value)],
-                    dft$value[length(dft$value)])
+        dft$to <- c(
+            dft$value[2:length(dft$value)],
+            dft$value[length(dft$value)]
+        )
 
         # Those values which are out of the gap range set them to a strange
         # value
@@ -54,9 +57,11 @@ processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
             data.matrix(dft),
             1,
             function(x)
-                seq(from=x[["from"]],
+                seq(
+                    from=x[["from"]],
                     to=x[["to"]],
-                    length.out=x[["len"]])[2:x[["len"]]]
+                    length.out=x[["len"]]
+                )[2:x[["len"]]]
         )
         out <- unlist(out)
         names(out) <- NULL

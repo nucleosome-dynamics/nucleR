@@ -1,8 +1,9 @@
 irLs2rd <- function(x)
     # Convert a list of IRanges to a RangedData
-    RangedData(ranges=do.call(c, unname(x)),
-               space=rep(names(x),
-                         sapply(x, length)))
+    RangedData(
+        ranges=do.call(c, unname(x)),
+        space=rep(names(x), sapply(x, length))
+    )
 
 sortReads <- function (reads)
 {
@@ -31,10 +32,14 @@ vectorizedAll <- function(...)
     filtered.bam <- lapply(bam, `[`, non.na)
 
     # IRanges
-    RangedData(space  = filtered.bam$rname,
-               ranges = IRanges(start = filtered.bam[["pos"]],
-                                width = filtered.bam[["qwidth"]]),
-               strand = filtered.bam[["strand"]])
+    RangedData(
+        space  = filtered.bam$rname,
+        ranges = IRanges(
+            start = filtered.bam[["pos"]],
+            width = filtered.bam[["qwidth"]]
+        ),
+        strand = filtered.bam[["strand"]]
+    )
 }
 
 .processStrand <- function (strand, bam)
@@ -58,17 +63,25 @@ vectorizedAll <- function(...)
     reads2 <- unsorted.reads2[common, ]
 
     # Consistency check
-    test <- all(vectorizedAll(reads1$mpos  == reads2$pos,
-                              reads2$mpos  == reads1$pos,
-                              reads1$rname == reads2$rname))
+    test <- all(vectorizedAll(
+        reads1$mpos  == reads2$pos,
+        reads2$mpos  == reads1$pos,
+        reads1$rname == reads2$rname
+    ))
 
     if (!test) {
-        stop(sprintf("ERROR: Mate selection for %s strand is invalid",
-                     strand))
+        stop(sprintf(
+            "ERROR: Mate selection for %s strand is invalid",
+            strand
+        ))
     } else {
-        RangedData(space  = as.character(reads1$rname),
-                   ranges = IRanges(start = reads1$pos,
-                                    end   = reads2$pos + reads2$qwidth - 1))
+        RangedData(
+            space  = as.character(reads1$rname),
+            ranges = IRanges(
+                start = reads1$pos,
+                end   = reads2$pos + reads2$qwidth - 1
+            )
+        )
     }
 }
 
@@ -76,22 +89,29 @@ vectorizedAll <- function(...)
 {
     message(sprintf("reading file %s", file))
 
-    what <- c("qname",
-              "flag",
-              "rname",
-              "strand",
-              "pos",
-              "qwidth",
-              "mrnm",
-              "mpos")
-    bam <- as.data.frame(scanBam(file=file, param=ScanBamParam(what=what))[[1]])
+    what <- c(
+        "qname",
+        "flag",
+        "rname",
+        "strand",
+        "pos",
+        "qwidth",
+        "mrnm",
+        "mpos"
+    )
+    bam <- as.data.frame(scanBam(
+        file=file,
+        param=ScanBamParam(what=what)
+    )[[1]])
 
     message("processing flags")
     bam$flag <- bam$flag %% 256
 
     # Process both strand and return the reads in sorted order
-    sortReads(rbind(.processStrand("+", bam),
-                    .processStrand("-", bam)))
+    sortReads(rbind(
+        .processStrand("+", bam),
+        .processStrand("-", bam)
+    ))
 }
 
 readBAM <- function (file, type="paired")

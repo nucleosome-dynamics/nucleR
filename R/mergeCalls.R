@@ -1,12 +1,14 @@
-mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
-                       mc.cores = 1, verbose = TRUE)
+mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
+                        mc.cores = 1, verbose = TRUE)
 {
-    res <- lapply(calls,
-                  .mergeSpace,
-                  min.overlap = min.overlap,
-                  discard.low = discard.low,
-                  mc.cores    = mc.cores,
-                  verbose     = verbose)
+    res <- lapply(
+        calls,
+        .mergeSpace,
+        min.overlap = min.overlap,
+        discard.low = discard.low,
+        mc.cores    = mc.cores,
+        verbose     = verbose
+    )
     return(do.call(c, unname(res)))
 }
 
@@ -25,10 +27,12 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
     if (verbose) {
         message(" - Finding overlapped reads")
     }
-    ovlps <- findOverlaps(calls,
-                          minoverlap = min.overlap,
-                          type       = "any",
-                          select     = "all")
+    ovlps <- findOverlaps(
+        calls,
+        minoverlap = min.overlap,
+        type       = "any",
+        select     = "all"
+    )
 
     # Select those reads wich are overlapped (by construction with the n+1 read)
     hits <- queryHits(ovlps[[1]])
@@ -51,10 +55,12 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
         message(" - Constructing merge list")
     }
 
-    xs <- mapply(function (x, y) seq.int(from=x, length.out=y),
-                 start(red),
-                 width(red) + 1,
-                 SIMPLIFY=FALSE)
+    xs <- mapply(
+        function (x, y) seq.int(from=x, length.out=y),
+        start(red),
+        width(red) + 1,
+        SIMPLIFY=FALSE
+    )
 
     # This saves a lot of time later, just create vectors
     dfcalls <- as.data.frame(calls)
@@ -82,7 +88,7 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
         score_w <- mean(df_score_w[x])
         score_h <- mean(df_score_h[x])
         nmerge <- length(x)
-        return(c(start, end, score, score_w, score_h, nmerge))
+        return (c(start, end, score, score_w, score_h, nmerge))
     }
 
     res <- .xlapply(xs, .join, mc.cores=mc.cores)
@@ -98,8 +104,16 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
     # RangedData(...) call
     resdf$space <- names(ovlps)
     resdf$width <- resdf$end - resdf$start
-    order <- c("space", "start", "end", "width", "score", "score_w",
-               "score_h", "nmerge")
+    order <- c(
+        "space",
+        "start",
+        "end",
+        "width",
+        "score",
+        "score_w",
+        "score_h",
+        "nmerge"
+    )
     fuz <- resdf[, order]
 
     # Select WP nucleosomes
@@ -111,11 +125,13 @@ mergeCalls <- function(calls, min.overlap = 50, discard.low = 0.2,
 
     # Return all of them
     if (verbose) {
-        message(" - Done (",
-                nrow(wp),
-                " non-overlapped | ",
-                nrow(fuz),
-                " merged calls)")
+        message(
+            " - Done (",
+            nrow(wp),
+            " non-overlapped | ",
+            nrow(fuz),
+            " merged calls)"
+        )
     }
     return(RangedData(all))
 }

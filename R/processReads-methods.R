@@ -1,13 +1,15 @@
 setMethod(
     "processReads",
     signature(data="AlignedRead"),
-    function(data, type="single", fragmentLen, trim, ...) {
+    function (data, type="single", fragmentLen, trim, ...) {
 
         # require("ShortRead")
         if (missing(fragmentLen)) {
             if (type == "single") {
-                message(" * fragmentLen not provided for strand correction, ",
-                        ", infering automatically...")
+                message(
+                    " * fragmentLen not provided for strand correction, ",
+                    ", infering automatically..."
+                )
                 fragmentLen <- fragmentLenDetect(data, ...)
                 message(paste(" * fragmentLen =", fragmentLen))
             } else {
@@ -21,11 +23,12 @@ setMethod(
                 if (trim == fragmentLen) {
                     start <- position(data)
                     start[strand(data) == "-"] <- position(data) +
-                                                  nchar(sread(data))
-                    res <- RangedData(ranges=IRanges(start=start,
-                                                     width=fragmentLen),
-                                      space=as.character(chromosome(data)))
-                    return(res)
+                        nchar(sread(data))
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=as.character(chromosome(data))
+                    )
+                    return (res)
                 }
             }
 
@@ -57,8 +60,10 @@ setMethod(
             correct[(strand == -1) & ((fragmentLen - sr_len) %% 2 == 1)] <- 1
 
             start <- position(data) + ((shift + correct) * strand)
-            res <- RangedData(ranges=IRanges(start=start, width=sr_len),
-                              space=as.character(chromosome(data)))
+            res <- RangedData(
+                ranges=IRanges(start=start, width=sr_len),
+                space=as.character(chromosome(data))
+            )
 
         #######################################################################
         } else if (type == "paired") {
@@ -76,24 +81,27 @@ setMethod(
             if (!missing(trim)) {
                 width <- trim
             }
-            res <- RangedData(ranges=IRanges(start=start,
-                                             width=width),
-                              space=space)
+            res <- RangedData(
+                ranges=IRanges(start=start, width=width),
+                space=space
+            )
 
         #######################################################################
         } else {
-            stop(paste("type must be 'single' for single-ended data or",
-                       "'paired' for paired-ended"))
+            stop(paste(
+                "type must be 'single' for single-ended data or 'paired' ",
+                "for paired-ended"
+            ))
         }
 
-        return(res)
+        return (res)
     }
 )
 
 setMethod(
     "processReads",
     signature(data="RangedData"),
-    function(data, type="single", fragmentLen, trim, ...) {
+    function (data, type="single", fragmentLen, trim, ...) {
 
         if (missing(fragmentLen)) {
             if (type == "single") {
@@ -113,10 +121,11 @@ setMethod(
                     start <- start(data)
                     negStrand <- data$strand == "-"
                     start[negStrand] <- end(data)[negStrand] - fragmentLen
-                    res <- RangedData(ranges=IRanges(start=start,
-                                                     width=fragmentLen),
-                                      space=space(data))
-                    return(res)
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=space(data)
+                    )
+                    return (res)
                 }
             }
 
@@ -140,9 +149,10 @@ setMethod(
             correct[(strand == -1) & ((fragmentLen - sr_len) %% 2 == 1)] <- 1
 
             start <- start(data) + ((shift + correct) * strand)
-            res <- RangedData(ranges=IRanges(start=start,
-                                             width=sr_len),
-                              space=space(data))
+            res <- RangedData(
+                ranges=IRanges(start=start, width=sr_len),
+                space=space(data)
+            )
 
         #######################################################################
         } else if (type=="paired") {
@@ -161,28 +171,33 @@ setMethod(
                 width <- trim
             }
 
-            res <- RangedData(ranges=IRanges(start=start,
-                                             width=width),
-                              space=space(data))
+            res <- RangedData(
+                ranges=IRanges(start=start, width=width),
+                space=space(data)
+            )
         #######################################################################
         } else {
-            stop(paste("type must be 'single' for single-ended data or",
-                       "'paired' for paired-ended"))
+            stop(paste(
+                "type must be 'single' for single-ended data or",
+                "'paired' for paired-ended")
+            )
         }
 
-        return(res)
+        return (res)
     }
 )
 
 setMethod(
     "processReads",
     signature(data="GRanges"),
-    function(data, type="single", fragmentLen, trim, ...) {
+    function (data, type="single", fragmentLen, trim, ...) {
 
         if (missing(fragmentLen)) {
             if (type == "single") {
-                message(" * fragmentLen not provided for strand correction, ",
-                        "infering automatically...")
+                message(
+                    " * fragmentLen not provided for strand correction, ",
+                    "infering automatically..."
+                )
                 fragmentLen <- fragmentLenDetect(data,...)
                 message(paste(" * fragmentLen =", fragmentLen))
             } else {
@@ -197,10 +212,11 @@ setMethod(
                     start <- start(data)
                     negStrand <- data$strand == "-"
                     start[negStrand] <- end(data)[negStrand] - fragmentLen
-                    res <- RangedData(ranges=IRanges(start=start,
-                                                     width=fragmentLen),
-                                      space=space(data))
-                    return(res)
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=space(data)
+                    )
+                    return (res)
                 }
             }
 
@@ -226,8 +242,10 @@ setMethod(
 
             start <- start(data) + ((shift+correct) * strand)
 
-            res <- GRanges(ranges=IRanges(start=start, width=sr_len),
-                           seqnames=seqnames(data))
+            res <- GRanges(
+                ranges=IRanges(start=start, width=sr_len),
+                seqnames=seqnames(data)
+            )
 
         #######################################################################
         } else if (type == "paired") {
@@ -246,14 +264,18 @@ setMethod(
                 width <- trim
             }
 
-            res <- GRanges(ranges=IRanges(start=start, width=width),
-                           seqnames=seqnames(data))
+            res <- GRanges(
+                ranges=IRanges(start=start, width=width),
+                seqnames=seqnames(data)
+            )
         #######################################################################
         } else {
-            stop(paste("type must be 'single' for single-ended data or",
-                       "'paired' for paired-ended"))
+            stop(paste(
+                "type must be 'single' for single-ended data or",
+                "'paired' for paired-ended"
+            ))
         }
 
-        return(res)
+        return (res)
     }
 )

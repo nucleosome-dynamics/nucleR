@@ -3,28 +3,34 @@ setMethod(
     signature(peaks="list"),
     function (peaks, data, threshold="25%", mc.cores=1)
         # Return the list directly
-        .xlapply(peaks,
-                 peakScoring,
-                 data      = data,
-                 threshold = threshold,
-                 mc.cores  = mc.cores)
+        .xlapply(
+            peaks,
+            peakScoring,
+            data      = data,
+            threshold = threshold,
+            mc.cores  = mc.cores
+        )
 )
 
 setMethod(
     "peakScoring",
     signature(peaks="IRangesList"),
     function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
-              dyad.length=38, mc.cores=1) {
+            dyad.length=38, mc.cores=1) {
 
-        res <- .xlapply(names(peaks),
-                        function(x)
-                            peakScoring(peaks         = peaks[[x]],
-                                        data          = data[[x]],
-                                        threshold     = threshold,
-                                        dyad.length   = dyad.length,
-                                        weight.width  = weight.width,
-                                        weight.height = weight.height),
-                        mc.cores=mc.cores)
+        res <- .xlapply(
+            names(peaks),
+            function(x)
+                peakScoring(
+                    peaks         = peaks[[x]],
+                    data          = data[[x]],
+                    threshold     = threshold,
+                    dyad.length   = dyad.length,
+                    weight.width  = weight.width,
+                    weight.height = weight.height
+                ),
+            mc.cores=mc.cores
+        )
         names(res) <- names(peaks)
 
         # Result should be returned as a single RangedData object
@@ -49,9 +55,11 @@ setMethod(
         if (!is.numeric(threshold)) {
             # If threshold is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-                threshold <- quantile(data,
-                                      as.numeric(sub("%", "", threshold)) / 100,
-                                      na.rm=TRUE)
+                threshold <- quantile(
+                    data,
+                    as.numeric(sub("%", "", threshold)) / 100,
+                    na.rm=TRUE
+                )
             }
         }
 
@@ -59,7 +67,7 @@ setMethod(
         sd <- sd(data[!is.na(data) & data > threshold], na.rm=TRUE)
 
         res <- pnorm(data[peaks], mean=mean, sd=sd, lower.tail=TRUE)
-        return(data.frame(peak=peaks, score=res))
+        return (data.frame(peak=peaks, score=res))
     }
 )
 
@@ -67,15 +75,17 @@ setMethod(
     "peakScoring",
     signature(peaks="IRanges"),
     function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
-              dyad.length=38) {
+            dyad.length=38) {
 
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-              threshold <- quantile(data,
-                                    as.numeric(sub("%", "", threshold)) / 100,
-                                    na.rm=TRUE)
+                threshold <- quantile(
+                    data,
+                    as.numeric(sub("%", "", threshold)) / 100,
+                    na.rm=TRUE
+                )
             }
         }
 
@@ -106,14 +116,14 @@ setMethod(
         #Final score
         sum.wei <- weight.width + weight.height
         scor.final <- ((scor.heigh * weight.height) / sum.wei) +
-                      ((scor.width * weight.width) / sum.wei)
-
-        # 2013-08-13 - New metrics, peak heigth and SD
+            ((scor.width * weight.width) / sum.wei)
 
         # Return everything or just merged score
-        return(RangedData(peaks,
-                          score   = scor.final,
-                          score_w = scor.width,
-                          score_h = scor.heigh))
-  }
+        return (RangedData(
+            peaks,
+            score   = scor.final,
+            score_w = scor.width,
+            score_h = scor.heigh
+        ))
+    }
 )

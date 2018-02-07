@@ -1,26 +1,35 @@
 import(methods)
 import(BiocGenerics)
-importClassesFrom(IRanges, CompressedIRangesList, IRanges, IRangesList,
-                  RangedData, SimpleRleList)
+importClassesFrom(
+    IRanges, CompressedIRangesList, IRanges, IRangesList, RangedData,
+    SimpleRleList
+)
 importClassesFrom(ShortRead, AlignedRead)
 importMethodsFrom(Biobase, exprs, pData, sampleNames)
 importMethodsFrom(GenomicRanges, strand, sort)
-importMethodsFrom(IRanges, as.data.frame, as.vector, cor, coverage,
-                  disjointBins, end, mean, nchar, nrow, order, quantile,
-                  ranges, space, start, unique, unlist, which, width)
+importMethodsFrom(
+    IRanges, as.data.frame, as.vector, cor, coverage, disjointBins, end, mean,
+    nchar, nrow, order, quantile, ranges, space, start, unique, unlist, which,
+    width
+)
 importMethodsFrom(ShortRead, chromosome, lapply, position, sapply)
 importFrom(parallel, mclapply)
 importFrom(graphics, abline, legend, lines, plot, points, rect, text)
-importFrom(IRanges, IRanges, IRangesList, RangedData, RleList, findOverlaps,
-           reduce)
+importFrom(
+    IRanges, IRanges, IRangesList, RangedData, RleList, findOverlaps, reduce
+)
 importFrom(GenomicRanges, GRanges)
 importFrom(ShortRead, sread)
 importFrom(stats, fft, pnorm, runif)
 importFrom(Rsamtools, scanBamFlag, ScanBamParam, scanBam)
 importFrom(S4Vectors, Rle, values, queryHits)
 importFrom(GenomeInfoDb, seqnames)
-exportMethods(export.bed, filterFFT, fragmentLenDetect, peakDetection,
-              peakScoring, plotPeaks, processReads, controlCorrection)
-export(coverage.rpm, export.wig, processTilingArray, syntheticNucMap,
-       pcKeepCompDetect, mergeCalls, readBAM)
+exportMethods(
+    export.bed, filterFFT, fragmentLenDetect, peakDetection, peakScoring,
+    plotPeaks, processReads, controlCorrection
+)
+export(
+    coverage.rpm, export.wig, processTilingArray, syntheticNucMap,
+    pcKeepCompDetect, mergeCalls, readBAM
+)
 

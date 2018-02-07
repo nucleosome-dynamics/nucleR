@@ -1,12 +1,17 @@
 # One shot version
-pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
-                             verbose = FALSE, cor.target = 0.98, cor.tol = 1e-3,
-                             smpl.num = 25, smpl.min.size = 2 ^ 10,
-                             smpl.max.size = 2 ^ 14)
+pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
+                            verbose = FALSE, cor.target = 0.98, cor.tol = 1e-3,
+                            smpl.num = 25, smpl.min.size = 2 ^ 10,
+                            smpl.max.size = 2 ^ 14)
 {
     # Sample data
-    samp <- .sampleData(data, smpl.num, smpl.min.size, smpl.max.size,
-                        verbose=verbose)
+    samp <- .sampleData(
+        data,
+        smpl.num,
+        smpl.min.size,
+        smpl.max.size,
+        verbose=verbose
+    )
 
     # Original params
     pc.min.input <- pc.min
@@ -41,19 +46,28 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
 
     # Iterate
     i <- 0
-    while ((abs(dv.best) > cor.tol) &
-           (i < max.iter) &
-           (pc.best > pc.min.input) &
-           (pc.best < pc.max.input)) {
+    while (
+        (abs(dv.best) > cor.tol) &
+        (i < max.iter) &
+        (pc.best > pc.min.input) &
+        (pc.best < pc.max.input)
+    ) {
         i <- i + 1
         if (verbose) {
-            cat("Iteration", i, ".  pcKeepComp=", pc.best, ".  Correlation=",
-                dv.best + cor.target, "\n")
+            cat(
+                "Iteration",
+                i,
+                ".  pcKeepComp=",
+                pc.best,
+                ".  Correlation=",
+                dv.best + cor.target,
+                "\n"
+            )
         }
 
         # Lineal interpolation of optimal value
         pc.new <- pc.min -
-                  (desv.min * ((pc.max - pc.min) / (desv.max - desv.min)))
+            (desv.min * ((pc.max - pc.min) / (desv.max - desv.min)))
         if (pc.new > 1) {
             pc.new <- 1
         } else if (pc.new < 0) {
@@ -104,7 +118,7 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
     return(pc.best)
 }
 
-.sampleData <- function(data, smpl.num, smpl.min.size, smpl.max.size,
+.sampleData <- function (data, smpl.num, smpl.min.size, smpl.max.size,
                         verbose = FALSE)
 {
     # Check coherency
@@ -137,8 +151,10 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
         # If the overall useful bases don't satisfy the criteria, return all
         if (tota < smpl.min.size * (smpl.num / 2)) {
             if (verbose) {
-                message("No enough covered bases to apply sampling. ",
-                        "Using all data")
+                message(
+                    "No enough covered bases to apply sampling. ",
+                    "Using all data"
+                )
             }
             res[[1]] <- data
         } else {
@@ -146,8 +162,12 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
                 message(" Selecting regions for sampling")
             }
             # Sampling with weighted probabilities according range's width
-            reps <- sample(1:length(rang), size=smpl.num, replace=TRUE,
-                           prob=width(rang) / tota)
+            reps <- sample(
+                1:length(rang),
+                size=smpl.num,
+                replace=TRUE,
+                prob=width(rang) / tota
+            )
 
             # Random selection of start points
             # In short, if a range has a width higher than smpl.max.size we
@@ -158,13 +178,14 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
             marg <- unlist(sapply(wids - smpl.max.size, max, 0))
             rnof <- unlist(sapply(
                 marg[marg > 0],
-                function(x)
-                    floor(runif(n=1, max=x, min=1))
+                function(x) floor(runif(n=1, max=x, min=1))
             ))
             marg[marg > 0] <- rnof
 
-            fina <- IRanges(start=start(rang[reps]) + marg,
-                            width=sapply(wids, min, smpl.max.size))
+            fina <- IRanges(
+                start=start(rang[reps]) + marg,
+                width=sapply(wids, min, smpl.max.size)
+            )
 
             res <- lapply(fina, function(x) data[x])
         }
@@ -174,4 +195,3 @@ pcKeepCompDetect <- function(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
     }
     return(res)
 }
-

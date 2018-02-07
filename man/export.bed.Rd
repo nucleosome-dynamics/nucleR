@@ -6,17 +6,25 @@
 \alias{export.bed,RangedData-method}
 \alias{export.bed,GRanges-method}
 \title{
-    Export ranges in BED format
+Export ranges in BED format
 }
 \description{
-    Export ranges in BED format, compatible with UCSC genome browser, IGB, and
-    others
+Export ranges in BED format, compatible with UCSC genome browser, IGB, and
+others.
 }
 \usage{
-    \S4method{export.bed}{IRanges}(ranges, score=NULL, chrom, name, desc=name, filepath=name)
-    \S4method{export.bed}{CompressedIRangesList}(ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE)
-    \S4method{export.bed}{RangedData}(ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE)
-    \S4method{export.bed}{GRanges}(ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE)
+\S4method{export.bed}{IRanges}(
+    ranges, score=NULL, chrom, name, desc=name, filepath=name
+)
+\S4method{export.bed}{CompressedIRangesList}(
+    ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE
+)
+\S4method{export.bed}{RangedData}(
+    ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE
+)
+\S4method{export.bed}{GRanges}(
+    ranges, score=NULL, name, desc=name, filepath=name, splitByChrom=TRUE
+)
 }
 \arguments{
     \item{ranges}{
@@ -57,20 +65,18 @@
 }
 \keyword{ file }
 \examples{
-    \dontrun{
-        # Generate random ranges with scores
-        ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
-        names(ran) <- "chrX"
+    # Generate random ranges with scores
+    ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
+    names(ran) <- "chrX"
 
-        # Export as bed file
-        export.bed(ran, name="test_track", description="Just a test track")
+    # Export as bed file
+    export.bed(ran, name="test_track", desc="Just a test track")
 
-        # If executed, this would create a file named "test_track.chrX.bed" with:
+    # If executed, this would create a file named "test_track.chrX.bed" with:
 
-        #    track name="test_track" description="Just a test track" useScore=0
-        # chrX    1 101 nucl1 0.01
-        # chrX    2 102 nucl2 0.02
-        # chrX    3 103 nucl3 0.03
-        # ...
-    }
+    #    track name="test_track" description="Just a test track" useScore=0
+    # chrX    1 101 nucl1 0.01
+    # chrX    2 102 nucl2 0.02
+    # chrX    3 103 nucl3 0.03
+    # ...
 }

@@ -1,16 +1,18 @@
 setMethod(
     "peakDetection",
     signature(data="list"),
-    function(data, threshold="25%", width=1, score=TRUE, min.cov=2,
-             mc.cores=1) {
+    function (data, threshold="25%", width=1, score=TRUE, min.cov=2,
+            mc.cores=1) {
 
-        res <- .xlapply(data,
-                        peakDetection,
-                        threshold = threshold,
-                        width     = width,
-                        score     = score,
-                        min.cov   = min.cov,
-                        mc.cores  = mc.cores)
+        res <- .xlapply(
+            data,
+            peakDetection,
+            threshold = threshold,
+            width     = width,
+            score     = score,
+            min.cov   = min.cov,
+            mc.cores  = mc.cores
+        )
 
         # Process the result, case with ranges
         if (width > 1) {
@@ -34,7 +36,7 @@ setMethod(
             }
         }
 
-        return(res)
+        return (res)
     }
 )
 
@@ -42,7 +44,7 @@ setMethod(
     "peakDetection",
     signature(data="numeric"),
     function (data, threshold="25%", width=1, score=TRUE, min.cov=2,
-              mc.cores=1) {
+            mc.cores=1) {
 
         if (width < 1) {
             stop("'width' attribute should be greater than 1")
@@ -51,10 +53,12 @@ setMethod(
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
-            if(grep("%", threshold) == 1) {
-                threshold <- quantile(data,
-                                      as.numeric(sub("%", "", threshold)) / 100,
-                                      na.rm=TRUE)
+            if (grep("%", threshold) == 1) {
+                threshold <- quantile(
+                    data,
+                    as.numeric(sub("%", "", threshold)) / 100,
+                    na.rm=TRUE
+                )
             }
         }
 
@@ -67,25 +71,34 @@ setMethod(
 
         # For each range, look for changes of trend and keep the starting
         # position of trend change
-        pea <- .xlapply(covers,
-                        function(x)
-                            if (length(x) == 1) {
-                                1
-                            } else {
-                                start(IRanges(x[2:length(x)] <
-                                              x[1:(length(x) - 1)]))
-                            },
-                        mc.cores=mc.cores)
+        pea <- .xlapply(
+            covers,
+            function(x) {
+                if (length(x) == 1) {
+                    1
+                } else {
+                    start(IRanges(
+                        x[2:length(x)] <
+                        x[1:(length(x) - 1)]
+                    ))
+                }
+            },
+            mc.cores=mc.cores
+        )
 
         # Some peaks can have only one trend, correct them
         unitrend <- which(sapply(pea, function(x) length(x) == 0))
-        pea[unitrend] <- sapply(covers[unitrend],
-                                function(x) which(x == max(x)))[1]
+        pea[unitrend] <- sapply(
+            covers[unitrend],
+            function(x) which(x == max(x))
+        )[1]
 
         # Add start offset to peaks relative to the start of the range
         starts <- start(ranges)
-        res <- unlist(sapply(1:length(starts),
-                             function(i) pea[[i]] + starts[[i]]))
+        res <- unlist(sapply(
+            1:length(starts),
+            function(i) pea[[i]] + starts[[i]]
+        ))
 
         res <- res[res <= length(data)]
         # the FFT coverage at the peak should be bigger than a given number
@@ -104,9 +117,9 @@ setMethod(
         }
 
         if (score) {
-            return(peakScoring(peaks=res, data=data, threshold=threshold))
+            return (peakScoring(peaks=res, data=data, threshold=threshold))
         } else {
-            return(res)
+            return (res)
         }
     }
 )

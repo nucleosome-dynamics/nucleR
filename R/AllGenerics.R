@@ -1,7 +1,7 @@
 setGeneric(
     "export.bed",
     function(ranges, score=NULL, chrom, name, desc=name, filepath=name,
-             splitByChrom=TRUE)
+            splitByChrom=TRUE)
         standardGeneric("export.bed")
 )
 setGeneric(
@@ -12,7 +12,7 @@ setGeneric(
 setGeneric(
     "fragmentLenDetect",
     function(reads, samples=1000, window=5000, min.shift=1, max.shift=100,
-             mc.cores=1, as.shift=FALSE)
+            mc.cores=1, as.shift=FALSE)
         standardGeneric("fragmentLenDetect")
 )
 setGeneric(

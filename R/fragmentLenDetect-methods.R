@@ -1,8 +1,8 @@
 setMethod(
     "fragmentLenDetect",
     signature(reads="AlignedRead"), 
-    function(reads, samples = 1000, window = 1000, min.shift = 1,
-             max.shift = 100, mc.cores = 1, as.shift = FALSE) {
+    function (reads, samples = 1000, window = 1000, min.shift = 1,
+            max.shift = 100, mc.cores = 1, as.shift = FALSE) {
 
         # Randomly select regions in the available chromosome bounds
         chrSample <- as.character(sample(chromosome(reads), samples))
@@ -16,15 +16,17 @@ setMethod(
 
         # For each sampled region, look for the shift with higher correlation
         # between strands
-        shiftPos <- function(i) {
+        shiftPos <- function (i) {
             chr <- as.character(dd[i, "chrSample"])
             sta <- as.numeric(dd[i, "position"])
             end <- sta + window
-            rea <- reads[chromosome(reads) == chr &
-                         position(reads) > sta &
-                         position(reads) < end]
+            rea <- reads[
+                chromosome(reads) == chr &
+                position(reads) > sta &
+                position(reads) < end
+            ]
             if (length(rea) == 0) {
-                return(numeric(0))  # Discard uncovered regions
+                return (numeric(0))  # Discard uncovered regions
             }
 
             cpos <- try(
@@ -86,8 +88,8 @@ setMethod(
 setMethod(
     "fragmentLenDetect",
     signature(reads="RangedData"),
-    function(reads, samples=1000, window=1000, min.shift=1, max.shift=100,
-             mc.cores=1, as.shift=FALSE) {
+    function (reads, samples=1000, window=1000, min.shift=1, max.shift=100,
+            mc.cores=1, as.shift=FALSE) {
 
         # Calculate the whole coverage here saves cpu and memory later for big
         # genomes. This improves a lot the performance on big genomes if the

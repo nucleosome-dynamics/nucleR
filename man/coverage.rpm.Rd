@@ -3,43 +3,46 @@
 \alias{coverage.rpm,RangedData-method}
 \alias{coverage.rpm,GRanges-method}
 \title{
-	Coverage calculation and normalization to reads per million (rpm)
+Coverage calculation and normalization to reads per million (rpm)
 }
 \description{
-	Calculates the coverage values from a \code{RangedData} object (or anything with a defined \code{coverage} function associated) and returns the coverage normalized to reads per million, allowing the comparison of experiments with a different absolut number of reads.
+Calculates the coverage values from a \code{RangedData} object (or anything
+with a defined \code{coverage} function associated) and returns the coverage
+normalized to reads per million, allowing the comparison of experiments with a
+different absolut number of reads.
 }
 \usage{
 coverage.rpm(data, scale=1e6, ...)
 }
 \arguments{
-  \item{data}{
-	\code{RangedData} (or compatible) with the reads information
+\item{data}{
+\code{RangedData} (or compatible) with the reads information
 }
-	\item{scale}{
-	By default, a million (1e6), but you could change this value for abnormal high or low amount of reads
+\item{scale}{
+By default, a million (1e6), but you could change this value for abnormal high
+or low amount of reads.
 }
-	\item{\dots}{
-	Additional arguments to be passed to \code{coverage} function
+\item{\dots}{
+Additional arguments to be passed to \code{coverage} function
 }
 }
 \value{
-	\code{RleList} object with the coverage objects
+\code{RleList} object with the coverage objects
 }
 \author{
-	Oscar Flores \email{oflores@mmb.pcb.ub.es}
+Oscar Flores \email{oflores@mmb.pcb.ub.es}
 }
 \seealso{
-	\code{\link{processReads}}, \code{\link{coverage}}
+\code{\link{processReads}}, \code{\link{coverage}}
 }
 \keyword{manip}
 \examples{
-	
-	#Load the example dataset and get the coverage
-	data(nucleosome_htseq)
-	cov = coverage.rpm(nucleosome_htseq)
+    #Load the example dataset and get the coverage
+    data(nucleosome_htseq)
+    cov = coverage.rpm(nucleosome_htseq)
 
-	print(cov)
+    print(cov)
 
-	#Plot it
-	plot(as.vector(cov[["chr1"]]), type="l", ylab="coverage", xlab="position")
+    #Plot it
+    plot(as.vector(cov[["chr1"]]), type="l", ylab="coverage", xlab="position")
 }

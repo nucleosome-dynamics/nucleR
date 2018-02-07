@@ -12,9 +12,14 @@
 
 
     .printLine <- function(start, end, chr, score, num)
-        cat(paste(chr, start, end, paste("nucl", as.numeric(num), sep=""),
-                  score, sep="\t"),
-            sep="\n")
+        cat(paste(
+            chr,
+            start,
+            end,
+            paste("nucl", as.numeric(num), sep=""),
+            score,
+            sep="\t"
+        ), sep="\n")
 
     sink(paste(filename, "bed", sep="."))
     cat(header, sep="\n")
@@ -22,7 +27,13 @@
         df,
         1,
         function(x)
-            .printLine(x["start"], x["end"], x["chrom"], x["score"], x["count"])
+            .printLine(
+                x["start"],
+                x["end"],
+                x["chrom"],
+                x["score"],
+                x["count"]
+            )
     )
     sink()
 }
@@ -39,8 +50,12 @@ setMethod(
         }
         dd$count <- seq(1, nrow(dd))
 
-        .export.bed(df=dd, name=name, desc=desc,
-                    filename=paste(filepath, chrom, sep="."))
+        .export.bed(
+            df=dd,
+            name=name,
+            desc=desc,
+            filename=paste(filepath, chrom, sep=".")
+        )
     }
 )
 
@@ -48,13 +63,19 @@ setMethod(
     "export.bed",
     signature(ranges="CompressedIRangesList"),
     function (ranges, score=NULL, name, desc=name, filepath=name,
-              splitByChrom=TRUE) {
+            splitByChrom=TRUE) {
 
         if (splitByChrom) {
             for(chr in names(ranges)) {
-                export.bed(ranges=ranges[[chr]], score=score[[chr]],
-                           chrom=chr, name=name, desc=desc, filepath=filepath,
-                           splitByChrom=FALSE)
+                export.bed(
+                    ranges=ranges[[chr]],
+                    score=score[[chr]],
+                    chrom=chr,
+                    name=name,
+                    desc=desc,
+                    filepath=filepath,
+                    splitByChrom=FALSE
+                )
             }
         } else {
             dd <- as.data.frame(unlist(ranges))
@@ -74,13 +95,18 @@ setMethod(
     "export.bed",
     signature(ranges="RangedData"),
     function (ranges, score=NULL, name, desc=name, filepath=name,
-              splitByChrom=TRUE) {
+            splitByChrom=TRUE) {
 
         if (splitByChrom) {
             for(chr in names(ranges)) {
-                export.bed(ranges=ranges[chr], chrom=chr, name=name, desc=desc,
-                           filepath=paste(filepath, chr, sep="."),
-                           splitByChrom=FALSE)
+                export.bed(
+                    ranges=ranges[chr],
+                    chrom=chr,
+                    name=name,
+                    desc=desc,
+                    filepath=paste(filepath, chr, sep="."),
+                    splitByChrom=FALSE
+                )
             }
         } else {
             dd <- as.data.frame(ranges)
@@ -96,15 +122,19 @@ setMethod(
     "export.bed",
     signature(ranges="GRanges"),
     function (ranges, score=NULL, name, desc=name, filepath=name,
-              splitByChrom=TRUE) {
+            splitByChrom=TRUE) {
 
         if (splitByChrom) {
             #for(chr in IRanges::levels(seqnames(ranges))) {
-            for(chr in levels(seqnames(ranges))) {
-                export.bed(ranges[seqnames(ranges) == chr],
-                           chrom=chr, name=name, desc=desc,
-                           filepath=paste(filepath, chr, sep="."),
-                           splitByChrom=FALSE)
+            for (chr in levels(seqnames(ranges))) {
+                export.bed(
+                    ranges[seqnames(ranges) == chr],
+                    chrom=chr,
+                    name=name,
+                    desc=desc,
+                    filepath=paste(filepath, chr, sep="."),
+                    splitByChrom=FALSE
+                )
             }
         } else {
             dd <- as.data.frame(ranges)

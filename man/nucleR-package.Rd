@@ -3,18 +3,18 @@
 \alias{nucleR}
 \docType{package}
 \title{
-    Nucleosome positioning package for R
+Nucleosome positioning package for R
 }
 \description{
-    Nucleosome positioning from Tiling Arrays and High-Troughput Sequencing
-    Experiments
+Nucleosome positioning from Tiling Arrays and High-Troughput Sequencing
+Experiments
 }
 \details{
 \tabular{ll}{
-    Package: \tab nucleR\cr
-    Type: \tab Package\cr
-    License: \tab LGPL (>= 3)\cr
-    LazyLoad: \tab yes\cr
+Package: \tab nucleR\cr
+Type: \tab Package\cr
+License: \tab LGPL (>= 3)\cr
+LazyLoad: \tab yes\cr
 }
 This package provides a convenient pipeline to process and analize nucleosome
 positioning experiments from High-Troughtput Sequencing or Tiling Arrays.
@@ -25,14 +25,13 @@ for general ChIP experiments, such as ChIP-on-ChIP or ChIP-Seq.
 See following example for a brief introduction to the available functions
 }
 \author{
-    Oscar Flores
-    Ricard Illa
+Oscar Flores
+Ricard Illa
 
-    Maintainer: Ricard Illa <ricard.illa@irbbarcelona.org>
+Maintainer: Ricard Illa <ricard.illa@irbbarcelona.org>
 }
 \keyword{ package }
 \examples{
-
     #Load example dataset:
     # some NGS paired-end reads, mapped with Bowtie and processed with R
     # it is a RangedData object with the start/end coordinates for each read.
@@ -53,9 +52,14 @@ See following example for a brief introduction to the available functions
     t2 = as.vector(cover_trim[[1]])[1:2000]
     t1 = (t1-min(t1))/max(t1-min(t1)) #Normalization
     t2 = (t2-min(t2))/max(t2-min(t2)) #Normalization
-    plot(t1, type="l", lwd="2", col="blue", main="Original vs Trimmed coverage")
+    plot(
+        t1, type="l", lwd="2", col="blue", main="Original vs Trimmed coverage"
+    )
     lines(t2, lwd="2", col="red")
-    legend("bottomright", c("Original coverage", "Trimmed coverage"), lwd=2, col=c("blue","red"), bty="n")
+    legend(
+        "bottomright", c("Original coverage", "Trimmed coverage"), lwd=2,
+        col=c("blue","red"), bty="n"
+    )
 
     #Let's try to call nucleosomes from the trimmed version
     #First of all, let's remove some noise with FFT
@@ -64,9 +68,15 @@ See following example for a brief introduction to the available functions
     cover_clean = filterFFT(cover_trim, pcKeepComp=0.02, showPowerSpec=TRUE)
 
     #How clean is now?
-    plot(as.vector(cover_trim[[1]])[1:4000], t="l", lwd=2, col="red", main="Noisy vs Filtered coverage")
+    plot(
+        as.vector(cover_trim[[1]])[1:4000], t="l", lwd=2, col="red",
+        main="Noisy vs Filtered coverage"
+    )
     lines(cover_clean[[1]][1:4000], lwd=2, col="darkgreen")
-    legend("bottomright", c("Input coverage", "Filtered coverage"), lwd=2, col=c("red","darkgreen"), bty="n")
+    legend(
+        "bottomright", c("Input coverage", "Filtered coverage"), lwd=2,
+        col=c("red","darkgreen"), bty="n"
+    )
 
     #And how similar? Let's see the correlation
     cor(cover_clean[[1]], as.vector(cover_trim[[1]]))
