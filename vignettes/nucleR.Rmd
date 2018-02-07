@@ -179,6 +179,20 @@ directly to the filtering functions, as described later in the section
 \@ref(peaks).
 
 
+## Importing BAM files
+
+Additionally, the function `importBAM`, allows to directly import into \R{} the
+mapped reads of a NGS experiment contained in a *BAM* file. The user has to
+specify whether the file contains *paired-end* or *single-end* read fragments.
+
+```{r readBAM}
+sample.file <- system.file("extdata", "cellCycleM_chrII_5000-25000.bam",
+    package="nucleR")
+reads <- readBAM(sample.file, type="paired")
+head(reads)
+```
+
+
 ## Next Generation Sequencing
 
 NGS has become one of the most popular technique to map nucleosome in the
@@ -206,6 +220,7 @@ mapped using Bowtie and imported into \R{} using \Biocpkg{ShortRead}.
 Paired ends where merged and sorted according the start position. Those in the
 first 8000bp of chromosome 1 where saved for this example. Further details are
 in the reference [@Deniz2011]:
+
 
 ```{r import}
 data(nucleosome_htseq)
@@ -570,5 +585,6 @@ syn <- syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20,
     fuz.var=50, max.cover=20, nuc.len=147, lin.len=20, rnd.seed=1,
     as.ratio=TRUE, show.plot=TRUE, ylab="", xlab="position")
 ```
+
 
 # References
