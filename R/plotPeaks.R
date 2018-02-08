@@ -1,3 +1,9 @@
+setGeneric(
+    "plotPeaks",
+    function(peaks, data, ...)
+        standardGeneric("plotPeaks")
+)
+
 setMethod(
     "plotPeaks",
     signature(peaks="numeric"),

@@ -1,3 +1,9 @@
+setGeneric(
+    "coverage.rpm",
+    function (data, scale=1e6, ...)
+        standardGeneric("coverage.rpm")
+)
+
 setMethod(
     "coverage.rpm",
     signature(data="GRanges"),

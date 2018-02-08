@@ -1,3 +1,9 @@
+setGeneric(
+    "peakScoring",
+    function(peaks, data, threshold=0.25, ...)
+        standardGeneric("peakScoring")
+)
+
 setMethod(
     "peakScoring",
     signature(peaks="list"),

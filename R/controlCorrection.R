@@ -1,4 +1,9 @@
-#############
+setGeneric(
+    "controlCorrection",
+    function(exp, ctr, ...)
+        standardGeneric("controlCorrection")
+)
+
 setMethod(
     "controlCorrection",
     signature(exp="SimpleRleList"),
@@ -24,7 +29,6 @@ setMethod(
     }
 )
 
-################
 setMethod(
     "controlCorrection",
     signature(exp="Rle"),
@@ -36,7 +40,6 @@ setMethod(
     }
 )
 
-################
 setMethod(
     "controlCorrection",
     signature(exp="list"),
@@ -62,7 +65,6 @@ setMethod(
     }
 )
 
-################
 setMethod(
     "controlCorrection",
     signature(exp="numeric"),

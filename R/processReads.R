@@ -1,3 +1,9 @@
+setGeneric(
+    "processReads",
+    function(data, type="single", fragmentLen, trim, ...)
+        standardGeneric("processReads")
+)
+
 setMethod(
     "processReads",
     signature(data="AlignedRead"),

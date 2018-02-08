@@ -1,3 +1,9 @@
+setGeneric(
+    "filterFFT",
+    function(data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE, ...)
+        standardGeneric("filterFFT")
+)
+
 setMethod(
     "filterFFT",
     signature(data="SimpleRleList"),

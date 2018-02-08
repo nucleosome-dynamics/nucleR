@@ -1,5 +1,12 @@
 #!/usr/bin/env Rscript
 
+setGeneric(
+    "export.bed",
+    function(ranges, score=NULL, chrom, name, desc=name, filepath=name,
+            splitByChrom=TRUE)
+        standardGeneric("export.bed")
+)
+
 .export.bed <- function(df, name, desc, filename)
 {
     hasScore <- "score" %in% names(df)

@@ -1,3 +1,10 @@
+setGeneric(
+    "fragmentLenDetect",
+    function(reads, samples=1000, window=5000, min.shift=1, max.shift=100,
+            mc.cores=1, as.shift=FALSE)
+        standardGeneric("fragmentLenDetect")
+)
+
 setMethod(
     "fragmentLenDetect",
     signature(reads="AlignedRead"), 
