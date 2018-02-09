@@ -5,14 +5,14 @@
 #'
 #' @param data Coverage/intensity values (numeric vector)
 #' @param name Name of the track
-#' @param chrom Information about chromosome if not inferrable from \code{data}
-#' (only for numeric vectors)
+#' @param chrom Information about chromosome if not inferrable from `data`
+#'   (only for numeric vectors)
 #' @param filepath Filepath where to save the object. Chromosome name and "wig"
-#' extension will be automatically added
+#'   extension will be automatically added
 #' @return (none)
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
 #' @references WIG format specification:
-#' http://genome.ucsc.edu/FAQ/FAQformat#format6
+#'   http://genome.ucsc.edu/FAQ/FAQformat#format6
 #' @keywords file
 #' @examples
 #'

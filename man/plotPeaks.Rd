@@ -30,20 +30,19 @@ plotPeaks(peaks, data, ...)
   indiv.scores = TRUE, ...)
 }
 \arguments{
-\item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or
-\code{RangedData} object containing the detected peaks information. See help
-of \code{\link{peakDetection}} or \code{\link{peakScoring}} for more
-details.}
+\item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or \code{RangedData} object
+containing the detected peaks information. See help of
+\code{\link[=peakDetection]{peakDetection()}} or \code{\link[=peakScoring]{peakScoring()}} for more details.}
 
 \item{data}{Coverage or Tiling Array intensities}
 
-\item{\dots}{Other parameters passed to \code{\link{plot}} function}
+\item{\dots}{Other parameters passed to \code{\link[graphics:plot]{graphics::plot()}} function}
 
 \item{threshold}{Threshold applied in \code{peakDetection}}
 
-\item{scores}{If \code{peaks} is a \code{data.frame} or a \code{RangedData}
-it's obtained from 'score' column, otherwise, \code{scores} can be given
-here as a \code{numeric} vector.}
+\item{scores}{If \code{peaks} is a \code{data.frame} or a \code{RangedData} it's obtained
+from 'score' column, otherwise, \code{scores} can be given here as a `numeric
+vector.}
 
 \item{start, end}{Start and end points defining a subset in the range of
 \code{data}. This is a convenient way to plot only a small region of data,
@@ -77,9 +76,9 @@ Helper function for a quick and convenient overview of nucleosome calling
 data.
 }
 \details{
-This function is intended to plot data previously processed with
-\code{nucleR} pipeline. It shows a coverage/intensity profile toghether with
-the identified peaks. If available, score of each peak is also shown.
+This function is intended to plot data previously processed with \code{nucleR}
+pipeline. It shows a coverage/intensity profile toghether with the
+identified peaks. If available, score of each peak is also shown.
 }
 \examples{
 
@@ -98,8 +97,7 @@ plotPeaks(peaks, cover_fft, threshold="40\%", start=1000, end=6000)
 
 }
 \seealso{
-\code{\link{peakDetection}}, \code{\link{peakScoring}},
-\code{\link{plot}},
+\code{\link[=peakDetection]{peakDetection()}}, \code{\link[=peakScoring]{peakScoring()}}, \code{\link[graphics:plot]{graphics::plot()}},
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

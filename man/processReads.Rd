@@ -21,11 +21,11 @@ processReads(data, type = "single", fragmentLen, trim, ...)
 }
 \arguments{
 \item{data}{Sequence reads objects, probably imported using other packages
-as \code{ShortRead}. Allowed object types are \code{AlignedRead} and
-\code{RangedData} with a \code{strand} attribute.}
+as \code{ShortRead}. Allowed object types are \code{AlignedRead} and \code{RangedData}
+with a \code{strand} attribute.}
 
-\item{type}{Describes the type of reads. Values allowed are \code{single}
-for single-ended reads and \code{paired} for paired-ended.}
+\item{type}{Describes the type of reads. Values allowed are \code{single} for
+single-ended reads and \code{paired} for paired-ended.}
 
 \item{fragmentLen}{Expected original length of the sequenced fragments. See
 details.}
@@ -46,8 +46,8 @@ of strand-specific single-end reads and the trimming of reads to a given
 length.
 }
 \details{
-This function reads a \code{AlignedRead} or a \code{RangedData} object
-containing the position, length and strand of the sequence reads.
+This function reads a \code{AlignedRead} or a \code{RangedData} object containing the
+position, length and strand of the sequence reads.
 
 It allows the processment of both paired and single ended reads. In the case
 of single end reads this function corrects the strand-specific mapping by
@@ -57,14 +57,14 @@ fragment length (\code{fragmentLen}).
 
 For paired end reads, mononucleosomal reads could extend more than expected
 length due to mapping issues or experimental conditions. In this case, the
-\code{fragmentLen} variable sets the threshold from which reads longer than
-it should be ignored.
+\code{fragmentLen} variable sets the threshold from which reads longer than it
+should be ignored.
 
 If no value is supplied for \code{fragmentLen} it will be calculated
-automatically (increasing the computing time) using \code{fragmentLenDetect}
-with default parameters. Performance can be increased by tunning
-\code{fragmentLenDetect} parameteres in a separated call and passing its
-result as \code{fragmentLen} parameter.
+automatically (increasing the computing time) using \code{fragmentLenDetect} with
+default parameters. Performance can be increased by tunning
+\code{fragmentLenDetect} parameteres in a separated call and passing its result
+as \code{fragmentLen} parameter.
 
 In some cases, could be useful trim the reads to a shorter length to improve
 the detection of nucleosome dyads, easing its detection and automatic
@@ -72,11 +72,11 @@ positioning. The parameter \code{trim} allows the selection of how many
 nucleotides select from each read.
 
 A special case for single-ended data is setting the \code{trim} to the same
-value as \code{fragmentLen}, so the reads will be extended strand-wise
-towards the 3' direction, creating an artificial map comparable with
+value as \code{fragmentLen}, so the reads will be extended strand-wise towards
+the 3' direction, creating an artificial map comparable with
 paired-ended data. The same but opposite can be performed with paired-end
-data, setting a \code{trim} value equal to the read length from paired
-ended, so paired-ended data will look like single-ended.
+data, setting a \code{trim} value equal to the read length from paired ended, so
+paired-ended data will look like single-ended.
 }
 \note{
 \strong{IMPORTANT}: this information is only used to correct possible
@@ -106,8 +106,8 @@ plot(
 
 }
 \seealso{
-\code{\link[ShortRead]{AlignedRead}}, \code{\link{RangedData}},
-\code{\link{fragmentLenDetect}}
+\link[ShortRead:AlignedRead]{ShortRead::AlignedRead}, \link[IRanges:RangedData]{IRanges::RangedData},
+\code{\link[=fragmentLenDetect]{fragmentLenDetect()}}
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

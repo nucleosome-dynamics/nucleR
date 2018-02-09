@@ -13,8 +13,7 @@ mergeCalls(calls, min.overlap = 50, discard.low = 0.2, mc.cores = 1,
 
 \item{min.overlap}{Minimum overlap between two reads for merge them}
 
-\item{discard.low}{Discard low covered calls (i.e. calls with \code{score_h
-< discard.low} will be discarded)}
+\item{discard.low}{Discard low covered calls (i.e. calls with \code{score_h < discard.low} will be discarded)}
 
 \item{mc.cores}{Number of cores available to parallel data processing.}
 
@@ -22,8 +21,8 @@ mergeCalls(calls, min.overlap = 50, discard.low = 0.2, mc.cores = 1,
 }
 \value{
 \code{RangedData} with merged calls and the additional data column
-  \code{nmerge}, with the count of how many original ranges are merged in
-  the resulting range.
+\code{nmerge}, with the count of how many original ranges are merged in
+the resulting range.
 }
 \description{
 This function joints close nucleosome calls into one larger, fuzzy
@@ -40,11 +39,10 @@ is close to C, the final call will comprise the range A-B-C. The resulting
 scores (mixed, width, height) of the final joined call will be the average
 value of the individual scores.
 
-The parameter \code{discard.low} allows to ignore the small peaks that could
-be merged with larger ones, originating large calls. In the case that all of
+The parameter \code{discard.low} allows to ignore the small peaks that could be
+merged with larger ones, originating large calls. In the case that all of
 the overlapped reads in a given position have \code{score_h} less than
-\code{discard.low}, all of them will be selected instead of deleting that
-call.
+\code{discard.low}, all of them will be selected instead of deleting that call.
 }
 \examples{
 # Generate a synthetic coverage map (assuming reads of 40bp and fragments
@@ -66,7 +64,7 @@ plotPeaks(merged_calls, cover)
 
 }
 \seealso{
-\code{\link{peakScoring}}
+\code{\link[=peakScoring]{peakScoring()}}
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

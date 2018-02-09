@@ -20,10 +20,10 @@ peakDetection(data, threshold = 0.25, width = 1, score = TRUE,
 \item{data}{Input numeric values, or a list of them}
 
 \item{threshold}{Threshold value from which the peaks will be selected. Can
-be given as a percentage string (i.e., \code{"25\%"} will use the value in
-the 1st quantile of \code{data}) or as an absolute coverage numeric value
-(i.e., \code{20} will not look for peaks in regions without less than 20
-reads (or reads per milion)).}
+be given as a percentage string (i.e., \code{"25\\%"} will use the value in the
+1st quantile of \code{data}) or as an absolute coverage numeric value (i.e.,
+\code{20} will not look for peaks in regions without less than 20 reads (or
+reads per milion)).}
 
 \item{width}{If a positive integer > 1 is given, the peaks are returned as a
 range of the given width centered in the local maximum. Useful for
@@ -36,36 +36,33 @@ function.}
 as a nucleosome call.}
 
 \item{mc.cores}{The number of cores to use, i.e. at most how many child
-processes will be run simultaneously. Parallelization requires at least two
-cores.}
+processes will be run simultaneously. Parallelization requires at least
+two cores.}
 }
 \value{
 The type of the return depends on the input parameters:
-
-\code{numeric} (or a list of them) if \code{width==1 & score==FALSE}
-containing the position of the peaks.
-
-\code{data.frame} (or list of them) if \code{width==1 & score==TRUE}
-containing a 'peak' column with the position of the peak plus a 'score'
-column with its score.
-
-\code{IRanges} (or \code{IRangesList}) if \code{width>1 & score==FALSE}
-containing the ranges of the peaks.
-
-\code{RangedData} if \code{width>1 & score==TRUE} containing the ranges of
-the peaks and the assigned score.
+\itemize{
+\item \code{numeric} (or a list of them) if \code{width==1 & score==FALSE} containing
+the position of the peaks.
+\item \code{data.frame} (or list of them) if \code{width==1 & score==TRUE} containing a
+'peak' column with the position of the peak plus a 'score' column with
+its score.
+\item \code{IRanges} (or \code{IRangesList}) if \code{width>1 & score==FALSE} containing the
+ranges of the peaks.
+\item \code{RangedData} if \code{width>1 & score==TRUE} containing the ranges of the
+peaks and the assigned score.
+}
 }
 \description{
 This function allows a efficient recognition of the local maximums (peaks)
 in a given numeric vector.
 }
 \details{
-It's recommended to smooth the input with \code{filterFFT} prior the
-detection.
+It's recommended to smooth the input with \code{filterFFT} prior the detection.
 }
 \note{
-If \code{width} > 1, those ranges outside the range
-\code{1:length(data)} will be skipped.
+If \code{width} > 1, those ranges outside the range \code{1:length(data)} will
+be skipped.
 }
 \examples{
 # Generate a random peaks profile
@@ -86,7 +83,7 @@ plotPeaks(peaks, cover_fft, threshold="40\%", start=10000, end=15000)
 
 }
 \seealso{
-\code{\link{filterFFT}}, \code{\link{peakScoring}}
+\code{\link[=filterFFT]{filterFFT()}}, \code{\link[=peakScoring]{peakScoring()}}
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

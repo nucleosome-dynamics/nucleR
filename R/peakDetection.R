@@ -3,44 +3,44 @@
 #' This function allows a efficient recognition of the local maximums (peaks)
 #' in a given numeric vector.
 #'
-#' It's recommended to smooth the input with \code{filterFFT} prior the
-#' detection.
+#' It's recommended to smooth the input with `filterFFT` prior the detection.
 #'
 #' @param data Input numeric values, or a list of them
 #' @param threshold Threshold value from which the peaks will be selected. Can
-#' be given as a percentage string (i.e., \code{"25\%"} will use the value in
-#' the 1st quantile of \code{data}) or as an absolute coverage numeric value
-#' (i.e., \code{20} will not look for peaks in regions without less than 20
-#' reads (or reads per milion)).
+#'   be given as a percentage string (i.e., `"25\%"` will use the value in the
+#'   1st quantile of `data`) or as an absolute coverage numeric value (i.e.,
+#'   `20` will not look for peaks in regions without less than 20 reads (or
+#'   reads per milion)).
 #' @param width If a positive integer > 1 is given, the peaks are returned as a
-#' range of the given width centered in the local maximum. Useful for
-#' nucleosome calling from a coverage peak in the dyad.
-#' @param score If TRUE, the results will be scored using \code{peakScoring}
-#' function.
+#'   range of the given width centered in the local maximum. Useful for
+#'   nucleosome calling from a coverage peak in the dyad.
+#' @param score If TRUE, the results will be scored using `peakScoring`
+#'   function.
 #' @param min.cov Minimum coverage that a peak needs in order to be considered
-#' as a nucleosome call.
+#'   as a nucleosome call.
 #' @param mc.cores The number of cores to use, i.e. at most how many child
-#' processes will be run simultaneously. Parallelization requires at least two
-#' cores.
+#'   processes will be run simultaneously. Parallelization requires at least
+#'   two cores.
 #'
 #' @return The type of the return depends on the input parameters:
 #'
-#' \code{numeric} (or a list of them) if \code{width==1 & score==FALSE}
-#' containing the position of the peaks.
-#' 
-#' \code{data.frame} (or list of them) if \code{width==1 & score==TRUE}
-#' containing a 'peak' column with the position of the peak plus a 'score'
-#' column with its score.
-#' 
-#' \code{IRanges} (or \code{IRangesList}) if \code{width>1 & score==FALSE}
-#' containing the ranges of the peaks.
-#' 
-#' \code{RangedData} if \code{width>1 & score==TRUE} containing the ranges of
-#' the peaks and the assigned score.
-#' @note If \code{width} > 1, those ranges outside the range
-#' \code{1:length(data)} will be skipped.
+#'   * `numeric` (or a list of them) if `width==1 & score==FALSE` containing
+#'     the position of the peaks.
+#'
+#'   * `data.frame` (or list of them) if `width==1 & score==TRUE` containing a
+#'     'peak' column with the position of the peak plus a 'score' column with
+#'     its score.
+#'
+#'   * `IRanges` (or `IRangesList`) if `width>1 & score==FALSE` containing the
+#'     ranges of the peaks.
+#'
+#'   * `RangedData` if `width>1 & score==TRUE` containing the ranges of the
+#'      peaks and the assigned score.
+#'
+#' @note If `width` > 1, those ranges outside the range `1:length(data)` will
+#'   be skipped.
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
-#' @seealso \code{\link{filterFFT}}, \code{\link{peakScoring}}
+#' @seealso [filterFFT()], [peakScoring()]
 #' @keywords manip
 #' @rdname peakDetection
 #'

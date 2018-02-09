@@ -30,39 +30,42 @@
 #'
 #' The tiling space between adjacent array probes could be not constant, or
 #' could be also there are regions not covered in the used microarray. With the
-#' function argument \code{inferLen} you can specify wich amout of space (in
+#' function argument `inferLen` you can specify wich amout of space (in
 #' basepairs) you allow to infer the non-present values.
 #'
 #' If at some point the range not covered (gap) between two adjacent probes of
-#' the array is greater than \code{inferLen} value, then the coordinates
-#' between these probes will be setted to NA.
+#' the array is greater than `inferLen` value, then the coordinates between
+#' these probes will be setted to `NA`.
 #'
-#' @param data \code{ExpressionSet} object wich contains the data of the tiling
-#' array.
-#' @param exprName Name of the \code{sample} in \code{ExpressionSet} which
-#' contains the ratio between nucleosomal and genomic dna (if using
-#' \code{Starr}, the \code{description} argument supplied to \code{getRatio}
-#' function). If this name is not provided, it is assumed \code{data} has only
-#' one column.
-#' @param chrPattern Only chromosomes that contain \code{chrPattern} string
-#' will be selected from ExpressionSet. Sometimes tilling arrays contain
-#' control quality information that is imported as a chromosome. This allows
-#' filtering it. If no value is supplied, all chromosomes will be used.
+#' @param data `ExpressionSet` object wich contains the data of the tiling
+#'   array.
+#' @param exprName Name of the `sample` in `ExpressionSet` which contains the
+#'   ratio between nucleosomal and genomic dna (if using `Starr`, the
+#'   `description` argument supplied to `getRatio` function). If this name is
+#'   not provided, it is assumed `data` has only one column.
+#' @param chrPattern Only chromosomes that contain `chrPattern` string will be
+#'   selected from ExpressionSet. Sometimes tilling arrays contain control
+#'   quality information that is imported as a chromosome. This allows
+#'   filtering it. If no value is supplied, all chromosomes will be used.
 #' @param inferLen Maximum length (in basepairs) for allowing data gaps
-#' inference. See \code{details} for further information.
+#'   inference. See `details` for further information.
 #' @param mc.cores Number of cores available to parallel data processing.
 #' @param quiet Avoid printing on going information (TRUE | FALSE)
-#' @return RleList with the observed/inferred values for each coordinate.
-#' @note This function should be suitable for all \code{data} objects of kind
-#' ExpressionSet coding the annotations \code{"chr"} for chromosome and
-#' \code{"pos"} for position (acccessible by \code{pData(data@featureData)})
-#' and a expression value (accessible by \code{exprs(data)}).
-#' @section Warning: This function could not cover all kind of arrays in the
-#' market. This package assumes the data is processed and normalized prior this
-#' processing, using standard microarray packages existing for R, like
-#' \code{Starr}.
+#'
+#' @return `RleList` with the observed/inferred values for each coordinate.
+#'
+#' @note This function should be suitable for all `data` objects of kind
+#'   `ExpressionSet` coding the annotations `"chr"` for chromosome and `"pos"`
+#'   for position (acccessible by `pData(data@featureData)`) and a expression
+#'   value (accessible by `exprs(data)`).
+#'
+#' @section **Warning**: This function could not cover all kind of arrays in
+#'   the market. This package assumes the data is processed and normalized
+#'   prior this processing, using standard microarray packages existing for R,
+#'   like `Starr`.
+#'
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
-#' @seealso \code{\link[Biobase]{ExpressionSet}}, \code{\link[Starr]{getRatio}}
+#' @seealso [Biobase::ExpressionSet], [Starr::getRatio()]
 #' @keywords manip
 #'
 #' @examples

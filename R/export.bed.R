@@ -3,18 +3,18 @@
 #' Export ranges in BED format, compatible with UCSC genome browser, IGB, and
 #' others.
 #'
-#' @param ranges Ranges to export, in \code{IRanges}, \code{IRangesList} or
-#' \code{RangedData} format
-#' @param score Score data if not included in \code{ranges} object. Bed file
-#' will put all scores=1000 if scores are not present
-#' @param chrom For single \code{IRanges} objects, the chromosome they
-#' represent. For other data types, values from \code{names(...)} will be used.
+#' @param ranges Ranges to export, in `IRanges`, `IRangesList` or `RangedData`
+#'   format
+#' @param score Score data if not included in `ranges` object. Bed file will
+#'   put all scores=1000 if scores are not present
+#' @param chrom For single `IRanges` objects, the chromosome they represent.
+#'   For other data types, values from `names(...)` will be used.
 #' @param name Name of the track
 #' @param desc Description of the track
 #' @param filepath Path and prefix of the file(s) to write. Chromosome number
-#' and "bed" extension will be automatically added.
+#'   and "bed" extension will be automatically added.
 #' @param splitByChrom If multiple chromosomes are given, should they be
-#' splitted into one file per chromosome or shall them be saved all together?
+#'   splitted into one file per chromosome or shall them be saved all together?
 #'
 #' @return (none)
 #'

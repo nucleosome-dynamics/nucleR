@@ -5,11 +5,12 @@
 #' experiments.
 #'
 #' @param file List of input BAM files.
-#' @param type Describes the type of reads. Values allowed are \code{single}
-#' for single-ended reads and \code{paired} for pair-ended.
-#' @return List of \code{GRanges} containing the reads of each input BAM file.
-#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}, Ricard Illa
-#' \email{ricard.illa@@irbbarcelona.org}
+#' @param type Describes the type of reads. Values allowed are `single` for
+#'   single-ended reads and `paired` for pair-ended.
+#'
+#' @return List of `GRanges` containing the reads of each input BAM file.
+#'
+#' @author Ricard Illa \email{ricard.illa@@irbbarcelona.org}
 #' @keywords file
 #'
 #' @examples

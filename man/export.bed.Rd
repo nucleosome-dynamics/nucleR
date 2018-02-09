@@ -25,14 +25,14 @@ export.bed(ranges, score = NULL, chrom, name, desc = name,
   filepath = name, splitByChrom = TRUE)
 }
 \arguments{
-\item{ranges}{Ranges to export, in \code{IRanges}, \code{IRangesList} or
-\code{RangedData} format}
+\item{ranges}{Ranges to export, in \code{IRanges}, \code{IRangesList} or \code{RangedData}
+format}
 
-\item{score}{Score data if not included in \code{ranges} object. Bed file
-will put all scores=1000 if scores are not present}
+\item{score}{Score data if not included in \code{ranges} object. Bed file will
+put all scores=1000 if scores are not present}
 
-\item{chrom}{For single \code{IRanges} objects, the chromosome they
-represent. For other data types, values from \code{names(...)} will be used.}
+\item{chrom}{For single \code{IRanges} objects, the chromosome they represent.
+For other data types, values from \code{names(...)} will be used.}
 
 \item{name}{Name of the track}
 

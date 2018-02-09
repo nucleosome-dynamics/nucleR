@@ -19,7 +19,7 @@
 #' the peaks, but allows a complementary study of the MNase digestion effect.
 #'
 #' @param exp,ctr Comparable experimental and control samples (this means same
-#' format and equivalent preprocessment)
+#'   format and equivalent preprocessment)
 #' @param mc.cores Number of cores available for parallel list processing
 #' @param ... Further arguments to be passed to or from other methods.
 #'

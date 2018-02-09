@@ -20,16 +20,16 @@ nucleosomes. This will create some variation in the position of the reads
 describing the same nucleosome.}
 
 \item{fuz.num}{Number of fuzzy nucleosomes. They are distributed randomly
-over all the region. They could be overlapped with other well-positioned or
-fuzzy nucleosomes.}
+over all the region. They could be overlapped with other well-positioned
+or fuzzy nucleosomes.}
 
 \item{fuz.var}{Maximum variance of the fuzzy nucleosomes. This allow to set
 different variance in well-positioned and fuzzy nucleosome reads (using
 \code{wp.var} and \code{fuz.var}).}
 
 \item{max.cover}{Maximum coverage of a nucleosome, i.e., how many times a
-nucleosome read can be repeated. The final coverage probably will be higher
-by the addition of overlapping nucleosomes.}
+nucleosome read can be repeated. The final coverage probably will be
+higher by the addition of overlapping nucleosomes.}
 
 \item{nuc.len}{Nucleosome length. It's not recomended change the default
 147bp value.}
@@ -41,33 +41,36 @@ by setting the rnd.seed to a known value allows to reproduce maps in
 different executions or computers. If you don't need this, just left it in
 default value.}
 
-\item{as.ratio}{If \code{as.ratio=TRUE} this will create and return a
-synthetic naked DNA control map and the ratio between it and the nucleosome
+\item{as.ratio}{If \code{as.ratio=TRUE} this will create and return a synthetic
+naked DNA control map and the ratio between it and the nucleosome
 coverage. This can be used to simulate hybridization ratio data, like the
 one in Tiling Arrays.}
 
 \item{show.plot}{If \code{TRUE}, will plot the output coverage map, with the
 nucleosome calls and optionally the calculated ratio.}
 
-\item{...}{Additional parameters to be passed to \code{plot} if
+\item{\dots}{Additional parameters to be passed to \code{plot} if
 \code{show.plot=TRUE}}
 }
 \value{
-A list with the following elements: \item{wp.starts}{Start points of
-well-positioned nucleosomes} \item{wp.nreads}{Number of repetitions of each
-well positioned read} \item{wp.reads}{Well positioned nucleosome reads
-(\code{IRanges} format), containing the repetitions} \item{fuz.starts}{Start
-points of the fuzzy nucleosomes} \item{fuz.nreads}{Number of repetitions of
-each fuzzy nucleosome read} \item{fuz.reads}{Fuzzy nucleosome reads
-(\code{IRanges} format), containing all the repetitions}
-\item{syn.reads}{All synthetic nucleosome reads togheter (\code{IRanges}
-format)}
+A list with the following elements:
+\itemize{
+\item wp.starts Start points of well-positioned nucleosomes
+\item wp.nreads Number of repetitions of each well positioned read
+\item wp.reads Well positioned nucleosome reads (\code{IRanges} format),
+containing the repetitions
+\item fuz.starts Start points of the fuzzy nucleosomes
+\item fuz.nreads Number of repetitions of each fuzzy nucleosome read
+\item fuz.reads Fuzzy nucleosome reads (\code{IRanges} format), containing all
+the repetitions
+\item syn.reads All synthetic nucleosome reads togheter (\code{IRanges} format)
+}
 
 The following elements will be only returned if \code{as.ratio=TRUE}:
-
-\item{ctr.reads}{The pseudo-naked DNA (control) reads (\code{IRanges}
-format)} \item{syn.ratio}{The calculated ratio nucleosomal/control
-(\code{Rle} format)}
+\itemize{
+\item ctr.reads The pseudo-naked DNA (control) reads (\code{IRanges} format)
+\item syn.ratio The calculated ratio nucleosomal/control (\code{Rle} format)
+}
 }
 \description{
 This function generates a synthetic nucleosome map using the parameters

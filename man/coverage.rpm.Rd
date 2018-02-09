@@ -28,22 +28,22 @@ for abnormal high or low amount of reads.}
 \code{RleList} object with the coverage objects
 }
 \description{
-Calculates the coverage values from a \code{RangedData} object (or anything
-with a defined \code{coverage} function associated) and returns the coverage
+Calculates the coverage values from a \code{RangedData} object (or anything with
+a defined \code{coverage} function associated) and returns the coverage
 normalized to reads per million, allowing the comparison of experiments with
 a different absolut number of reads.
 }
 \examples{
-#Load the example dataset and get the coverage
+# Load the example dataset and get the coverage
 data(nucleosome_htseq)
-cov = coverage.rpm(nucleosome_htseq)
+cov <- coverage.rpm(nucleosome_htseq)
 print(cov)
-#Plot it
+# Plot it
 plot(as.vector(cov[["chr1"]]), type="l", ylab="coverage", xlab="position")
 
 }
 \seealso{
-\code{\link{processReads}}, \code{\link{coverage}}
+\code{\link[=processReads]{processReads()}}, \code{\link[IRanges:coverage]{IRanges::coverage()}}
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

@@ -11,7 +11,7 @@ pcKeepCompDetect(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
 \arguments{
 \item{data}{Numeric vector to be filtered}
 
-\item{pc.min, pc.max}{Range of allowed values for pcKeepComp (minimum and
+\item{pc.min, pc.max}{Range of allowed values for \code{pcKeepComp} (minimum and
 maximum), in the range 0:1.}
 
 \item{max.iter}{Maximum number of iterations}
@@ -25,9 +25,9 @@ data and around 0.7 for Tiling Arrays.}
 \item{cor.tol}{Tolerance allowed between the obtained correlation an the
 target one.}
 
-\item{smpl.num}{If \code{data} is a large vector, some samples from the
-vector will be used instead the whole dataset. This parameters tells the
-number of samples to pick.}
+\item{smpl.num}{If \code{data} is a large vector, some samples from the vector
+will be used instead the whole dataset. This parameters tells the number
+of samples to pick.}
 
 \item{smpl.min.size, smpl.max.size}{Minimum and maximum size of the samples.
 This is used for selection and sub-selection of ranges with meaningful
@@ -46,28 +46,25 @@ value. Usually you don't need to call directly this function, is used in
 \code{filterFFT} by default.
 }
 \details{
-This function predicts a suitable \code{pcKeepComp} value for
-\code{filterFFT} function. This is the recommended amount of components (in
-percentage) to keep in the \code{filterFFT} function to obtain a correlation
-of (or near of) \code{cor.target}.
+This function predicts a suitable \code{pcKeepComp} value for \code{filterFFT}
+function. This is the recommended amount of components (in percentage) to
+keep in the \code{filterFFT} function to obtain a correlation of (or near of)
+\code{cor.target}.
 
-The search starts from two given values \code{pc.min, pc.max} and uses
-linial interpolation to quickly reach a value that gives a corelation
-between the filtered and the original near \code{cor.target} within the
-specified tolerance \code{cor.tol}.
+The search starts from two given values \code{pc.min}, \code{pc.max} and uses linial
+interpolation to quickly reach a value that gives a corelation between the
+filtered and the original near \code{cor.target} within the specified tolerance
+\code{cor.tol}.
 
 To allow a quick detection without an exhaustive search, this function uses
 a subset of the data by randomly sampling those regions with meaningful
-coverage values (i,e, different from 0 or NA) larger than
-\code{smpl.min.size}. If it's not possible to obtain \code{smpl.max.size}
-from this region (this could be due to flanking 0's, for example) at least
-\code{smpl.min.size} will be used to check correlation. Mean correlation
-between all sampled regions is used to test the performance of the
-pcKeepComp parameter.
+coverage values (i,e, different from 0 or NA) larger than \code{smpl.min.size}.
+If it's not possible to obtain \code{smpl.max.size} from this region (this could
+be due to flanking 0's, for example) at least \code{smpl.min.size} will be used
+to check correlation. Mean correlation between all sampled regions is used
+to test the performance of the \code{pcKeepComp} parameter.
 
-If the number of meaningful bases in \code{data} is less than
-\code{smpl.min.size * (smpl.num/2)} all the \code{data} vector will be used
-instead of using sampling.
+If the number of meaningful bases in \code{data} is less than \code{smpl.min.size * (smpl.num/2)} all the \code{data} vector will be used instead of using sampling.
 }
 \examples{
 # Load dataset

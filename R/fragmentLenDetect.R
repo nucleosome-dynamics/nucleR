@@ -3,39 +3,38 @@
 #' When using single-ended sequencing, the resulting partial sequences map only
 #' in one strand, causing a bias in the coverage profile if not corrected. The
 #' only way to correct this is knowing the average size of the real fragments.
-#' \code{nucleR} uses this information when preprocessing single-ended
-#' sequences. You can provide this information by your own (usually a 147bp
-#' length is a good aproximation) or you can use this method to automatically
-#' guess the size of the inserts.
+#' `nucleR` uses this information when preprocessing single-ended sequences.
+#' You can provide this information by your own (usually a 147bp length is a
+#' good aproximation) or you can use this method to automatically guess the
+#' size of the inserts.
 #'
-#' This function shifts one strand downstream one base by one from
-#' \code{min.shift} to \code{max.shift}. In every step, the correlation on a
-#' random position of length \code{window} is checked between both strands. The
-#' maximum correlation is returned and averaged for \code{samples} repetitions.
+#' This function shifts one strand downstream one base by one from `min.shift`
+#' to `max.shift`. In every step, the correlation on a random position of
+#' length `window` is checked between both strands. The maximum correlation is
+#' returned and averaged for `samples` repetitions.
 #'
 #' The final returned length is the best shift detected plus the width of the
 #' reads. You can increase the performance of this function by reducing the
-#' \code{samples} value and/or narrowing the shift range. The \code{window}
-#' size has almost no impact on the performance, despite a to small value can
-#' give biased results.
+#' `samples` value and/or narrowing the shift range. The `window` size has
+#' almost no impact on the performance, despite a to small value can give
+#' biased results.
 #'
-#' @param reads Raw single-end reads (\code{AlignedRead} or \code{RangedData}
-#' format)
+#' @param reads Raw single-end reads `AlignedRead` or `RangedData` format)
 #' @param samples Number of samples to perform the analysis (more = slower but
-#' more accurate)
+#'   more accurate)
 #' @param window Analysis window. Usually there's no need to touch this
-#' parameter.
+#'   parameter.
 #' @param min.shift,max.shift Minimum and maximum shift to apply on the strands
-#' to detect the optimal fragment size. If the range is too big, the
-#' performance decreases.
+#'   to detect the optimal fragment size. If the range is too big, the
+#'   performance decreases.
 #' @param as.shift If TRUE, returns the shift needed to align the middle of the
-#' reads in opposite strand. If FALSE, returns the mean inferred fragment
-#' length.
+#'   reads in opposite strand. If FALSE, returns the mean inferred fragment
+#'   length.
 #' @param mc.cores If multicore support, maximum number of cores allowed to
-#' use.
+#'   use.
 #'
 #' @return Inferred mean lenght of the inserts by default, or shift needed to
-#' align strands if \code{as.shift=TRUE}
+#'   align strands if `as.shift=TRUE`.
 #'
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
 #' @keywords attribute

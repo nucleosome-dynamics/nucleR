@@ -3,43 +3,41 @@
 #' Helper function for a quick and convenient overview of nucleosome calling
 #' data.
 #'
-#' This function is intended to plot data previously processed with
-#' \code{nucleR} pipeline. It shows a coverage/intensity profile toghether with
-#' the identified peaks. If available, score of each peak is also shown.
+#' This function is intended to plot data previously processed with `nucleR`
+#' pipeline. It shows a coverage/intensity profile toghether with the
+#' identified peaks. If available, score of each peak is also shown.
 #'
-#' @param peaks \code{numeric}, \code{data.frame}, \code{IRanges} or
-#' \code{RangedData} object containing the detected peaks information. See help
-#' of \code{\link{peakDetection}} or \code{\link{peakScoring}} for more
-#' details.
+#' @param peaks `numeric`, `data.frame`, `IRanges` or `RangedData` object
+#'   containing the detected peaks information. See help of
+#'   [peakDetection()] or [peakScoring()] for more details.
 #' @param data Coverage or Tiling Array intensities
-#' @param threshold Threshold applied in \code{peakDetection}
-#' @param scores If \code{peaks} is a \code{data.frame} or a \code{RangedData}
-#' it's obtained from 'score' column, otherwise, \code{scores} can be given
-#' here as a \code{numeric} vector.
+#' @param threshold Threshold applied in `peakDetection`
+#' @param scores If `peaks` is a `data.frame` or a `RangedData` it's obtained
+#'   from 'score' column, otherwise, `scores` can be given here as a `numeric
+#'   vector.
 #' @param start,end Start and end points defining a subset in the range of
-#' \code{data}. This is a convenient way to plot only a small region of data,
-#' without dealing with subsetting of range or score objects.
+#'   `data`. This is a convenient way to plot only a small region of data,
+#'   without dealing with subsetting of range or score objects.
 #' @param dyn.pos If peaks are ranges, should they be positioned dynamicaly on
-#' top of the peaks or staticaly at \code{threshold} baseline. Spacing of
-#' overlapping ranges is automatically applied if \code{FALSE}.
-#' @param xlab,type,col.points Default values to be passed to \code{plot} and
-#' \code{points}
-#' @param thr.lty,thr.lwd,thr.col Default values to be passed to \code{abline}
-#' for threshold representation
-#' @param rect.thick,rect.lwd,rect.border Default values for \code{rect}
-#' representation or ranges. \code{rect.thick} indicates the thickness (in
-#' percentage relative to y-axis range) of the rectangles.
+#'   top of the peaks or staticaly at `threshold` baseline. Spacing of
+#'   overlapping ranges is automatically applied if `FALSE`.
+#' @param xlab,type,col.points Default values to be passed to `plot` and
+#'   `points`
+#' @param thr.lty,thr.lwd,thr.col Default values to be passed to `abline`
+#'   for threshold representation
+#' @param rect.thick,rect.lwd,rect.border Default values for `rect`
+#'   representation or ranges. `rect.thick` indicates the thickness (in
+#'   percentage relative to y-axis range) of the rectangles.
 #' @param scor.col,scor.font,scor.adj,scor.cex,scor.digits Default values for
-#' \code{text} representation for score numbers, if available.
+#'   `text` representation for score numbers, if available.
 #' @param indiv.scores Show or hide individual scores for width and height in
-#' brakets besides the mixed score.
-#' @param \dots Other parameters passed to \code{\link{plot}} function
+#'   brakets besides the mixed score.
+#' @param \dots Other parameters passed to [graphics::plot()] function
 #'
 #' @return (none)
 #'
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
-#' @seealso \code{\link{peakDetection}}, \code{\link{peakScoring}},
-#' \code{\link{plot}},
+#' @seealso [peakDetection()], [peakScoring()], [graphics::plot()],
 #' @keywords hplot
 #' @rdname plotPeaks
 #'

@@ -4,7 +4,7 @@
 #' nucleosome.
 #'
 #' This functions looks for overlapped calls and join those with more than
-#' \code{min.overlap} bases overlapped. More than two reads can be joined in
+#' `min.overlap` bases overlapped. More than two reads can be joined in
 #' one single call if all of them are overlapped at least that distance with
 #' almost another read in the range.
 #'
@@ -13,24 +13,23 @@
 #' scores (mixed, width, height) of the final joined call will be the average
 #' value of the individual scores.
 #'
-#' The parameter \code{discard.low} allows to ignore the small peaks that could
-#' be merged with larger ones, originating large calls. In the case that all of
-#' the overlapped reads in a given position have \code{score_h} less than
-#' \code{discard.low}, all of them will be selected instead of deleting that
-#' call.
+#' The parameter `discard.low` allows to ignore the small peaks that could be
+#' merged with larger ones, originating large calls. In the case that all of
+#' the overlapped reads in a given position have `score_h` less than
+#' `discard.low`, all of them will be selected instead of deleting that call.
 #'
-#' @param calls \code{RangedData} with scored and ranged nucleosome calls from
-#'   \code{peakScoring} or \code{peakDetection(..., score=TRUE)}.
+#' @param calls `RangedData` with scored and ranged nucleosome calls from
+#'   `peakScoring` or `peakDetection(..., score=TRUE)`.
 #' @param min.overlap Minimum overlap between two reads for merge them
-#' @param discard.low Discard low covered calls (i.e. calls with \code{score_h
-#'   < discard.low} will be discarded)
+#' @param discard.low Discard low covered calls (i.e. calls with `score_h
+#'   < discard.low` will be discarded)
 #' @param mc.cores Number of cores available to parallel data processing.
 #' @param verbose Show progress info?
-#' @return \code{RangedData} with merged calls and the additional data column
-#'   \code{nmerge}, with the count of how many original ranges are merged in
+#' @return `RangedData` with merged calls and the additional data column
+#'   `nmerge`, with the count of how many original ranges are merged in
 #'   the resulting range.
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
-#' @seealso \code{\link{peakScoring}}
+#' @seealso [peakScoring()]
 #' @keywords manip
 #'
 #' @examples

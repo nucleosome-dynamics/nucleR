@@ -9,8 +9,8 @@ readBAM(file, type = "paired")
 \arguments{
 \item{file}{List of input BAM files.}
 
-\item{type}{Describes the type of reads. Values allowed are \code{single}
-for single-ended reads and \code{paired} for pair-ended.}
+\item{type}{Describes the type of reads. Values allowed are \code{single} for
+single-ended reads and \code{paired} for pair-ended.}
 }
 \value{
 List of \code{GRanges} containing the reads of each input BAM file.
@@ -28,7 +28,6 @@ reads <- readBAM(infile, type="paired")
 
 }
 \author{
-Oscar Flores \email{oflores@mmb.pcb.ub.es}, Ricard Illa
-\email{ricard.illa@irbbarcelona.org}
+Ricard Illa \email{ricard.illa@irbbarcelona.org}
 }
 \keyword{file}

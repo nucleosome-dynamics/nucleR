@@ -19,8 +19,7 @@ fragmentLenDetect(reads, samples = 1000, window = 5000, min.shift = 1,
   as.shift = FALSE)
 }
 \arguments{
-\item{reads}{Raw single-end reads (\code{AlignedRead} or \code{RangedData}
-format)}
+\item{reads}{Raw single-end reads \code{AlignedRead} or \code{RangedData} format)}
 
 \item{samples}{Number of samples to perform the analysis (more = slower but
 more accurate)}
@@ -41,28 +40,28 @@ length.}
 }
 \value{
 Inferred mean lenght of the inserts by default, or shift needed to
-align strands if \code{as.shift=TRUE}
+align strands if \code{as.shift=TRUE}.
 }
 \description{
 When using single-ended sequencing, the resulting partial sequences map only
 in one strand, causing a bias in the coverage profile if not corrected. The
 only way to correct this is knowing the average size of the real fragments.
-\code{nucleR} uses this information when preprocessing single-ended
-sequences. You can provide this information by your own (usually a 147bp
-length is a good aproximation) or you can use this method to automatically
-guess the size of the inserts.
+\code{nucleR} uses this information when preprocessing single-ended sequences.
+You can provide this information by your own (usually a 147bp length is a
+good aproximation) or you can use this method to automatically guess the
+size of the inserts.
 }
 \details{
-This function shifts one strand downstream one base by one from
-\code{min.shift} to \code{max.shift}. In every step, the correlation on a
-random position of length \code{window} is checked between both strands. The
-maximum correlation is returned and averaged for \code{samples} repetitions.
+This function shifts one strand downstream one base by one from \code{min.shift}
+to \code{max.shift}. In every step, the correlation on a random position of
+length \code{window} is checked between both strands. The maximum correlation is
+returned and averaged for \code{samples} repetitions.
 
 The final returned length is the best shift detected plus the width of the
 reads. You can increase the performance of this function by reducing the
-\code{samples} value and/or narrowing the shift range. The \code{window}
-size has almost no impact on the performance, despite a to small value can
-give biased results.
+\code{samples} value and/or narrowing the shift range. The \code{window} size has
+almost no impact on the performance, despite a to small value can give
+biased results.
 }
 \examples{
 library(IRanges)

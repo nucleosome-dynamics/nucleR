@@ -10,10 +10,16 @@ Nucleosome positioning from Tiling Arrays and High-Troughput Sequencing
 Experiments
 }
 \details{
-\tabular{ll}{ Package: \tab nucleR\cr Type: \tab Package\cr License: \tab
-LGPL (>= 3)\cr LazyLoad: \tab yes\cr } This package provides a convenient
-pipeline to process and analize nucleosome positioning experiments from
-High-Troughtput Sequencing or Tiling Arrays.
+\tabular{ll}{
+Package:  \tab nucleR      \cr
+Type:     \tab Package     \cr
+License:  \tab LGPL (>= 3) \cr
+LazyLoad: \tab yes         \cr
+}
+
+This package provides a convenient pipeline to process and analize
+nucleosome positioning experiments from High-Troughtput Sequencing or Tiling
+Arrays.
 
 Despite it's use is intended to nucleosome experiments, it can be also
 useful for general ChIP experiments, such as ChIP-on-ChIP or ChIP-Seq.
@@ -86,6 +92,6 @@ plotPeaks(peaks, cover_clean[[1]], threshold="25\%")
 \author{
 Oscar Flores Ricard Illa
 
-Maintainer: Ricard Illa <ricard.illa@irbbarcelona.org>
+Maintainer: Ricard Illa \href{mailto:ricard.illa@irbbarcelona.org}{ricard.illa@irbbarcelona.org}
 }
 \keyword{package}

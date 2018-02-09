@@ -1,53 +1,51 @@
-#' Auto detection of a fitted \code{pcKeepComp} param for filterFFT function
+#' Auto detection of a fitted `pcKeepComp` param for filterFFT function
 #'
 #' This function tries to obtain the minimum number of components needed in a
 #' FFT filter to achieve or get as close as possible to a given correlation
 #' value. Usually you don't need to call directly this function, is used in
-#' \code{filterFFT} by default.
+#' `filterFFT` by default.
 #' 
-#' This function predicts a suitable \code{pcKeepComp} value for
-#' \code{filterFFT} function. This is the recommended amount of components (in
-#' percentage) to keep in the \code{filterFFT} function to obtain a correlation
-#' of (or near of) \code{cor.target}.
+#' This function predicts a suitable `pcKeepComp` value for `filterFFT`
+#' function. This is the recommended amount of components (in percentage) to
+#' keep in the `filterFFT` function to obtain a correlation of (or near of)
+#' `cor.target`.
 #'
-#' The search starts from two given values \code{pc.min, pc.max} and uses
-#' linial interpolation to quickly reach a value that gives a corelation
-#' between the filtered and the original near \code{cor.target} within the
-#' specified tolerance \code{cor.tol}.
+#' The search starts from two given values `pc.min`, `pc.max` and uses linial
+#' interpolation to quickly reach a value that gives a corelation between the
+#' filtered and the original near `cor.target` within the specified tolerance
+#' `cor.tol`.
 #'
 #' To allow a quick detection without an exhaustive search, this function uses
 #' a subset of the data by randomly sampling those regions with meaningful
-#' coverage values (i,e, different from 0 or NA) larger than
-#' \code{smpl.min.size}. If it's not possible to obtain \code{smpl.max.size}
-#' from this region (this could be due to flanking 0's, for example) at least
-#' \code{smpl.min.size} will be used to check correlation. Mean correlation
-#' between all sampled regions is used to test the performance of the
-#' pcKeepComp parameter.
+#' coverage values (i,e, different from 0 or NA) larger than `smpl.min.size`.
+#' If it's not possible to obtain `smpl.max.size` from this region (this could
+#' be due to flanking 0's, for example) at least `smpl.min.size` will be used
+#' to check correlation. Mean correlation between all sampled regions is used
+#' to test the performance of the `pcKeepComp` parameter.
 #'
-#' If the number of meaningful bases in \code{data} is less than
-#' \code{smpl.min.size * (smpl.num/2)} all the \code{data} vector will be used
-#' instead of using sampling.
+#' If the number of meaningful bases in `data` is less than `smpl.min.size *
+#' (smpl.num/2)` all the `data` vector will be used instead of using sampling.
 #'
 #' @param data Numeric vector to be filtered
-#' @param pc.min,pc.max Range of allowed values for pcKeepComp (minimum and
-#' maximum), in the range 0:1.
+#' @param pc.min,pc.max Range of allowed values for `pcKeepComp` (minimum and
+#'   maximum), in the range 0:1.
 #' @param max.iter Maximum number of iterations
 #' @param verbose Extra information (debug)
 #' @param cor.target Target correlation between the filtered and the original
-#' profiles. A value around 0.99 is recommeded for Next Generation Sequencing
-#' data and around 0.7 for Tiling Arrays.
+#'   profiles. A value around 0.99 is recommeded for Next Generation Sequencing
+#'   data and around 0.7 for Tiling Arrays.
 #' @param cor.tol Tolerance allowed between the obtained correlation an the
-#' target one.
-#' @param smpl.num If \code{data} is a large vector, some samples from the
-#' vector will be used instead the whole dataset. This parameters tells the
-#' number of samples to pick.
+#'   target one.
+#' @param smpl.num If `data` is a large vector, some samples from the vector
+#'   will be used instead the whole dataset. This parameters tells the number
+#'   of samples to pick.
 #' @param smpl.min.size,smpl.max.size Minimum and maximum size of the samples.
-#' This is used for selection and sub-selection of ranges with meaningful
-#' values (i,e, different from 0 and NA). Power of 2 values are recommended,
-#' despite non-mandatory.
-#' @param \dots Parameters to be pass to \code{autoPcKeepComp}
+#'   This is used for selection and sub-selection of ranges with meaningful
+#'   values (i,e, different from 0 and NA). Power of 2 values are recommended,
+#'   despite non-mandatory.
+#' @param \dots Parameters to be pass to `autoPcKeepComp`
 #'
-#' @return Fitted \code{pcKeepComp} value
+#' @return Fitted `pcKeepComp` value
 #'
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}, David Rosell
 #' \email{david.rosell@@irbbarcelona.org}
