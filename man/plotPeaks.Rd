@@ -85,7 +85,7 @@ the identified peaks. If available, score of each peak is also shown.
 
 # Generate a random peaks profile
 reads <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
-cover <- coverage(reads)
+cover <- coverage.rpm(reads)
 
 # Filter them
 cover_fft <- filterFFT(cover)

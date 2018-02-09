@@ -99,11 +99,11 @@ print(res)
 # Let's use this to plot the nucleosomal + the random map
 par(mfrow=c(3,1), mar=c(3,4,1,1))
 plot(
-    as.vector(coverage(res$syn.reads)), type="h", col="red",
+    as.vector(coverage.rpm(res$syn.reads)), type="h", col="red",
     ylab="nucleosomal", ylim=c(0,35)
 )
 plot(
-    as.vector(coverage(res$ctr.reads)), type="h", col="blue",
+    as.vector(coverage.rpm(res$ctr.reads)), type="h", col="blue",
     ylab="random", ylim=c(0,35)
 )
 plot(

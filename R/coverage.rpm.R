@@ -34,23 +34,34 @@ setGeneric(
 )
 
 #' @rdname coverage.rpm
+#' @importFrom IRanges RleList coverage
 setMethod(
     "coverage.rpm",
     signature(data="GRanges"),
     function(data, scale=1e6, ...)
-        IRanges::RleList(lapply(
-            IRanges::coverage(data, ...),
-            function(x) x / length(data) * scale
+        RleList(lapply(
+            coverage(data, ...),
+            function (x) x / length(data) * scale
         ), compress=FALSE)
 )
 
 #' @rdname coverage.rpm
+#' @importFrom IRanges RleList coverage
 setMethod(
     "coverage.rpm",
     signature(data="RangedData"),
     function(data, scale=1e6, ...)
-        IRanges::RleList(lapply(
-            IRanges::coverage(data, ...),
-            function(x) x / nrow(data) * scale
+        RleList(lapply(
+            coverage(data, ...),
+            function (x) x / nrow(data) * scale
         ), compress=FALSE)
+)
+
+#' @rdname coverage.rpm
+#' @importFrom IRanges coverage
+setMethod(
+    "coverage.rpm",
+    signature(data="IRanges"),
+    function(data, scale=1e6, ...)
+        coverage(data) / length(data) * scale
 )

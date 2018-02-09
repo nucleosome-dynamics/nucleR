@@ -65,6 +65,7 @@ size has almost no impact on the performance, despite a to small value can
 give biased results.
 }
 \examples{
+library(IRanges)
 # Create a sinthetic dataset, simulating single-end reads, for positive and
 # negative strands
 # Positive strand reads

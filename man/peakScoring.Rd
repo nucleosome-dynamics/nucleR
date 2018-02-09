@@ -105,7 +105,7 @@ map <- syntheticNucMap(nuc.len=40, lin.len=130)
 
 # Get the information of dyads and the coverage
 peaks <- c(map$wp.starts, map$fz.starts)
-cover <- filterFFT(coverage(map$syn.reads))
+cover <- filterFFT(coverage.rpm(map$syn.reads))
 
 # Calculate the scores
 scores <- peakScoring(peaks, cover)

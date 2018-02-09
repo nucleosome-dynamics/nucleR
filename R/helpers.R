@@ -10,18 +10,26 @@
     }
 }
 
+#' mclapply warapper
+#'
+#' Wrapper to choose between lapply and mclapply accordingly
+#'
+#' @importFrom parallel mclapply
 .xlapply <- function(X, FUN, ..., mc.cores = 1)
-{   # Wrapper to choose between lapply and mclapply accordingly
+{
     actual.cores <- .check.mc(mc.cores)
 
     if (actual.cores > 1) {
-        parallel::mclapply(X=X, FUN=FUN, ...=..., mc.cores=actual.cores)
+        mclapply(X=X, FUN=FUN, ...=..., mc.cores=actual.cores)
     } else {
         lapply(X=X, FUN=FUN, ...=...)
     }
 }
 
-# Simple function for returning the middle point of a RangedData or of a
-# GRanges (normal mid doesn't work there)
+#' Find midpoints
+#'
+#' Simple function for returning the middle point of a RangedData or of a
+#' GRanges (normal mid doesn't work there)
+#' @importMethodsFrom IRanges start end
 .mid <- function(x)
-    floor((IRanges::start(x) + IRanges::end(x)) / 2)
+    floor((start(x) + end(x)) / 2)

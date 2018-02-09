@@ -52,8 +52,8 @@ the peaks, but allows a complementary study of the MNase digestion effect.
 }
 \examples{
 map = syntheticNucMap(as.ratio=TRUE)
-exp = coverage(map$syn.reads)
-ctr = coverage(map$ctr.reads)
+exp = coverage.rpm(map$syn.reads)
+ctr = coverage.rpm(map$ctr.reads)
 corrected = controlCorrection(exp, ctr)
 
 }

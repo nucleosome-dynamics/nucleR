@@ -22,8 +22,8 @@ mergeCalls(calls, min.overlap = 50, discard.low = 0.2, mc.cores = 1,
 }
 \value{
 \code{RangedData} with merged calls and the additional data column
-\code{nmerge}, with the count of how many original ranges are merged in the
-resulting range.
+  \code{nmerge}, with the count of how many original ranges are merged in
+  the resulting range.
 }
 \description{
 This function joints close nucleosome calls into one larger, fuzzy
@@ -52,7 +52,7 @@ call.
 map <- syntheticNucMap(
     wp.num=20, fuz.num=20,  nuc.len=40, lin.len=130, rnd.seed=1
 )
-cover <- filterFFT(coverage(map$syn.reads))
+cover <- filterFFT(coverage.rpm(map$syn.reads))
 
 # Find peaks over FFT filtered coverage
 calls <- peakDetection(filterFFT(

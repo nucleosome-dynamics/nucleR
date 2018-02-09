@@ -52,6 +52,7 @@ Export ranges in BED format, compatible with UCSC genome browser, IGB, and
 others.
 }
 \examples{
+library(IRanges)
 # Generate random ranges with scores
 ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
 names(ran) <- "chrX"

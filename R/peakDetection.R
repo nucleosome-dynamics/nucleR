@@ -47,7 +47,7 @@
 #' @examples
 #' # Generate a random peaks profile
 #' reads <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
-#' cover <- coverage(reads)
+#' cover <- coverage.rpm(reads)
 #'
 #' # Filter them
 #' cover_fft <- filterFFT(cover)
@@ -70,6 +70,7 @@ setGeneric(
 )
 
 #' @rdname peakDetection
+#' @importFrom IRanges IRangesList
 setMethod(
     "peakDetection",
     signature(data="list"),
@@ -101,9 +102,9 @@ setMethod(
                 # res is a list of RangedData
                 res <- unlist(res)
                 if (length(res)) {
-                    res <- IRanges::IRangesList(res)
+                    res <- IRangesList(res)
                 } else {
-                    res <- IRanges::IRangesList()
+                    res <- IRangesList()
                 }
             }
         }
@@ -113,6 +114,9 @@ setMethod(
 )
 
 #' @rdname peakDetection
+#' @importFrom IRanges IRanges
+#' @importFrom stats quantile
+#' @importMethodsFrom IRanges start end
 setMethod(
     "peakDetection",
     signature(data="numeric"),
@@ -127,7 +131,7 @@ setMethod(
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-                threshold <- stats::quantile(
+                threshold <- quantile(
                     data,
                     as.numeric(sub("%", "", threshold)) / 100,
                     na.rm=TRUE
@@ -135,7 +139,7 @@ setMethod(
             }
         }
 
-        ranges <- IRanges::IRanges(!is.na(data) & data > threshold)
+        ranges <- IRanges(!is.na(data) & data > threshold)
         if (length(ranges) == 0) {
             return(NULL)
         }
@@ -150,7 +154,7 @@ setMethod(
                 if (length(x) == 1) {
                     1
                 } else {
-                    IRanges::start(IRanges::IRanges(
+                    start(IRanges(
                         x[2:length(x)] <
                         x[1:(length(x) - 1)]
                     ))
@@ -167,7 +171,7 @@ setMethod(
         )[1]
 
         # Add start offset to peaks relative to the start of the range
-        starts <- IRanges::start(ranges)
+        starts <- start(ranges)
         res <- unlist(sapply(
             1:length(starts),
             function(i) pea[[i]] + starts[[i]]
@@ -184,9 +188,9 @@ setMethod(
             starts <- res - ext
             # Odd/pair correction
             ends <- res + ifelse(width %% 2 == 0, ext - 1, ext)
-            res <- IRanges::IRanges(start=starts, end=ends)
+            res <- IRanges(start=starts, end=ends)
             # Remove out of bounds
-            res <- res[IRanges::start(res) > 1 & IRanges::end(res) < length(data)]
+            res <- res[start(res) > 1 & end(res) < length(data)]
         }
 
         if (score) {

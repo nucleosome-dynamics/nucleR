@@ -79,7 +79,7 @@
 #' 
 #' # Get the information of dyads and the coverage
 #' peaks <- c(map$wp.starts, map$fz.starts)
-#' cover <- filterFFT(coverage(map$syn.reads))
+#' cover <- filterFFT(coverage.rpm(map$syn.reads))
 #' 
 #' # Calculate the scores
 #' scores <- peakScoring(peaks, cover)
@@ -143,6 +143,7 @@ setMethod(
 )
 
 #' @rdname peakScoring
+#' @importFrom stats pnorm quantile
 setMethod(
     "peakScoring",
     signature(peaks="numeric"),
@@ -152,7 +153,7 @@ setMethod(
         if (!is.numeric(threshold)) {
             # If threshold is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-                threshold <- stats::quantile(
+                threshold <- quantile(
                     data,
                     as.numeric(sub("%", "", threshold)) / 100,
                     na.rm=TRUE
@@ -163,12 +164,16 @@ setMethod(
         mean <- mean(data[!is.na(data) & data > threshold], na.rm=TRUE)
         sd <- sd(data[!is.na(data) & data > threshold], na.rm=TRUE)
 
-        res <- stats::pnorm(data[peaks], mean=mean, sd=sd, lower.tail=TRUE)
+        res <- pnorm(data[peaks], mean=mean, sd=sd, lower.tail=TRUE)
         return (data.frame(peak=peaks, score=res))
     }
 )
 
 #' @rdname peakScoring
+#' @importFrom stats pnorm
+#' @importFrom IRanges IRanges RangedData
+#' @importFrom stats quantile
+#' @importMethodsFrom IRanges start width
 setMethod(
     "peakScoring",
     signature(peaks="IRanges"),
@@ -179,7 +184,7 @@ setMethod(
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-                threshold <- stats::quantile(
+                threshold <- quantile(
                     data,
                     as.numeric(sub("%", "", threshold)) / 100,
                     na.rm=TRUE
@@ -196,16 +201,16 @@ setMethod(
         sd <- sd(data[data > threshold], na.rm=TRUE)
 
         # Calculate dyad range
-        dyad.middl <- IRanges::start(peaks) + floor(IRanges::width(peaks) / 2)
+        dyad.middl <- start(peaks) + floor(width(peaks) / 2)
         dyad.start <- dyad.middl - floor((dyad.length / 2))
         dyad.end <- dyad.start + (dyad.length - 1)
-        dyads <- IRanges::IRanges(start=dyad.start, end=dyad.end)
+        dyads <- IRanges(start=dyad.start, end=dyad.end)
 
         sums.range <- lapply(peaks, function(x) mean(data[x], na.rm=TRUE))
         sums.dyad  <- lapply(dyads, function(x) mean(data[x], na.rm=TRUE))
 
         # Score the heigh of the peak
-        scor.heigh <- stats::pnorm(data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE)
+        scor.heigh <- pnorm(data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE)
 
         # Score the width (dispersion) of the peak
         scor.width <- unlist(sums.dyad) / unlist(sums.range)
@@ -217,7 +222,7 @@ setMethod(
             ((scor.width * weight.width) / sum.wei)
 
         # Return everything or just merged score
-        return (IRanges::RangedData(
+        return (RangedData(
             peaks,
             score   = scor.final,
             score_w = scor.width,

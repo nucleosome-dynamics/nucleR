@@ -20,15 +20,15 @@
 #' call.
 #'
 #' @param calls \code{RangedData} with scored and ranged nucleosome calls from
-#' \code{peakScoring} or \code{peakDetection(..., score=TRUE)}.
+#'   \code{peakScoring} or \code{peakDetection(..., score=TRUE)}.
 #' @param min.overlap Minimum overlap between two reads for merge them
 #' @param discard.low Discard low covered calls (i.e. calls with \code{score_h
-#' < discard.low} will be discarded)
+#'   < discard.low} will be discarded)
 #' @param mc.cores Number of cores available to parallel data processing.
 #' @param verbose Show progress info?
 #' @return \code{RangedData} with merged calls and the additional data column
-#' \code{nmerge}, with the count of how many original ranges are merged in the
-#' resulting range.
+#'   \code{nmerge}, with the count of how many original ranges are merged in
+#'   the resulting range.
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
 #' @seealso \code{\link{peakScoring}}
 #' @keywords manip
@@ -39,7 +39,7 @@
 #' map <- syntheticNucMap(
 #'     wp.num=20, fuz.num=20,  nuc.len=40, lin.len=130, rnd.seed=1
 #' )
-#' cover <- filterFFT(coverage(map$syn.reads))
+#' cover <- filterFFT(coverage.rpm(map$syn.reads))
 #'
 #' # Find peaks over FFT filtered coverage
 #' calls <- peakDetection(filterFFT(
@@ -67,7 +67,12 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
     return(do.call(c, unname(res)))
 }
 
-.mergeSpace <- function(calls, min.overlap, discard.low, mc.cores, verbose)
+#' Space merger
+#'
+#' @importFrom S4Vectors queryHits
+#' @importFrom IRanges IRanges RangedData
+#' @importMethodsFrom IRanges start width findOverlaps reduce
+.mergeSpace <- function (calls, min.overlap, discard.low, mc.cores, verbose)
 {
     if (verbose) {
         message("* Starting space: ", names(calls))
@@ -82,7 +87,7 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
     if (verbose) {
         message(" - Finding overlapped reads")
     }
-    ovlps <- IRanges::findOverlaps(
+    ovlps <- findOverlaps(
         calls,
         minoverlap = min.overlap,
         type       = "any",
@@ -90,7 +95,7 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
     )
 
     # Select those reads wich are overlapped (by construction with the n+1 read)
-    hits <- S4Vectors::queryHits(ovlps[[1]])
+    hits <- queryHits(ovlps[[1]])
     # This is the rownumber of ALL the overlapped reads
     selhits <- unique(sort(c(hits, hits + 1)))
 
@@ -101,7 +106,7 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
 
     # Make a list of the id of those reads wich are overlapped and with
     # how many following reads they are overlapped
-    red <- IRanges::reduce(IRanges::IRanges(start=hits, width=1))
+    red <- reduce(IRanges(start=hits, width=1))
 
     # Make list of "grouping" calls
     # So [[1]] = 23, 24   means that the first "merged" call is the overlap
@@ -112,8 +117,8 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
 
     xs <- mapply(
         function (x, y) seq.int(from=x, length.out=y),
-        IRanges::start(red),
-        IRanges::width(red) + 1,
+        start(red),
+        width(red) + 1,
         SIMPLIFY=FALSE
     )
 
@@ -188,5 +193,5 @@ mergeCalls <- function (calls, min.overlap = 50, discard.low = 0.2,
             " merged calls)"
         )
     }
-    return(IRanges::RangedData(all))
+    return(RangedData(all))
 }

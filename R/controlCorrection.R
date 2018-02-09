@@ -31,8 +31,8 @@
 #'
 #' @examples
 #' map = syntheticNucMap(as.ratio=TRUE)
-#' exp = coverage(map$syn.reads)
-#' ctr = coverage(map$ctr.reads)
+#' exp = coverage.rpm(map$syn.reads)
+#' ctr = coverage.rpm(map$ctr.reads)
 #' corrected = controlCorrection(exp, ctr)
 #'
 #' @export
@@ -44,6 +44,7 @@ setGeneric(
 )
 
 #' @rdname controlCorrection
+#' @importFrom IRanges RleList
 setMethod(
     "controlCorrection",
     signature(exp="SimpleRleList"),
@@ -65,11 +66,12 @@ setMethod(
             mc.cores=mc.cores
         )
         names(res) <- names(exp)
-        return(IRanges::RleList(res, compress=FALSE))
+        return(RleList(res, compress=FALSE))
     }
 )
 
 #' @rdname controlCorrection
+#' @importMethodsFrom S4Vectors Rle
 setMethod(
     "controlCorrection",
     signature(exp="Rle"),
@@ -77,7 +79,7 @@ setMethod(
         if (class(exp) != class(ctr)) {
             stop("'exp' and 'ctr' classes must be equal")
         }
-        return(S4Vectors::Rle(controlCorrection(as.vector(exp), as.vector(ctr))))
+        return(Rle(controlCorrection(as.vector(exp), as.vector(ctr))))
     }
 )
 

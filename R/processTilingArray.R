@@ -102,6 +102,7 @@
 #'
 #' @export processTilingArray
 #'
+#' @importMethodsFrom Biobase pData sampleNames exprs
 processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
                                 mc.cores = 1, quiet = FALSE)
 {
@@ -111,17 +112,17 @@ processTilingArray <- function (data, exprName, chrPattern, inferLen = 50,
     if (!quiet) {
         message(" * Parsing annotation")
     }
-    df <- Biobase::pData(data@featureData)[, c("chr", "pos")]
+    df <- pData(data@featureData)[, c("chr", "pos")]
     df$chr <- as.character(df$chr)
 
     # Add expression (intensities) values
     if (missing(exprName)) {
-        exprName <- Biobase::sampleNames(data)[1]
+        exprName <- sampleNames(data)[1]
     }
     if (!quiet) {
         message(paste(" * Using feature name:", exprName))
     }
-    df$value <- Biobase::exprs(data)[, exprName]
+    df$value <- exprs(data)[, exprName]
 
     # Select names to keep
     if (!missing(chrPattern)) {

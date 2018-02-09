@@ -70,7 +70,7 @@ If \code{width} > 1, those ranges outside the range
 \examples{
 # Generate a random peaks profile
 reads <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
-cover <- coverage(reads)
+cover <- coverage.rpm(reads)
 
 # Filter them
 cover_fft <- filterFFT(cover)

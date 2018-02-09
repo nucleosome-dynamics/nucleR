@@ -96,11 +96,11 @@ pr2 <- processReads(nucleosome_htseq, fragmentLen=200, trim=40)
 # Compare the results:
 par(mfrow=c(2,1), mar=c(3,4,1,1))
 plot(
-    as.vector(coverage(pr1)[["chr1"]]), type="l",
+    as.vector(coverage.rpm(pr1)[["chr1"]]), type="l",
     ylab="coverage (original)"
 )
 plot(
-    as.vector(coverage(pr2)[["chr1"]]), type="l",
+    as.vector(coverage.rpm(pr2)[["chr1"]]), type="l",
     ylab="coverage (trimmed)"
 )
 

@@ -73,11 +73,11 @@
 #' # Compare the results:
 #' par(mfrow=c(2,1), mar=c(3,4,1,1))
 #' plot(
-#'     as.vector(coverage(pr1)[["chr1"]]), type="l",
+#'     as.vector(coverage.rpm(pr1)[["chr1"]]), type="l",
 #'     ylab="coverage (original)"
 #' )
 #' plot(
-#'     as.vector(coverage(pr2)[["chr1"]]), type="l",
+#'     as.vector(coverage.rpm(pr2)[["chr1"]]), type="l",
 #'     ylab="coverage (trimmed)"
 #' )
 #'
@@ -90,6 +90,9 @@ setGeneric(
 )
 
 #' @rdname processReads
+#' @importFrom IRanges IRanges RangedData
+#' @importMethodsFrom ShortRead position sread chromosome
+#' @importMethodsFrom BiocGenerics strand
 setMethod(
     "processReads",
     signature(data="AlignedRead"),
@@ -113,12 +116,12 @@ setMethod(
         if (type == "single") {  # Special case for trim==fragmentLength
             if (!missing(trim)) {
                 if (trim == fragmentLen) {
-                    start <- ShortRead::position(data)
-                    start[strand(data) == "-"] <- ShortRead::position(data) +
-                        nchar(ShortRead::sread(data))
-                    res <- IRanges::RangedData(
-                        ranges=IRanges::IRanges(start=start, width=fragmentLen),
-                        space=as.character(ShortRead::chromosome(data))
+                    start <- position(data)
+                    start[strand(data) == "-"] <- position(data) +
+                        nchar(sread(data))
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=as.character(chromosome(data))
                     )
                     return (res)
                 }
@@ -126,7 +129,7 @@ setMethod(
 
             # If no trim restriction, use whole read length,
             # else use trim length
-            sr_len <- nchar(ShortRead::sread(data))
+            sr_len <- nchar(sread(data))
 
             if (!missing(trim)) {
                 sr_len <- trim
@@ -151,20 +154,20 @@ setMethod(
             correct <- rep(0, length(shift))
             correct[(strand == -1) & ((fragmentLen - sr_len) %% 2 == 1)] <- 1
 
-            start <- ShortRead::position(data) + ((shift + correct) * strand)
-            res <- IRanges::RangedData(
-                ranges=IRanges::IRanges(start=start, width=sr_len),
-                space=as.character(ShortRead::chromosome(data))
+            start <- position(data) + ((shift + correct) * strand)
+            res <- RangedData(
+                ranges=IRanges(start=start, width=sr_len),
+                space=as.character(chromosome(data))
             )
 
         #######################################################################
         } else if (type == "paired") {
-            sr_len <- nchar(ShortRead::sread(data))
+            sr_len <- nchar(sread(data))
             selection <- sr_len < fragmentLen
-            space <- as.character(ShortRead::chromosome(data)[selection])
+            space <- as.character(chromosome(data)[selection])
 
             # Normal start or trimmed version if requested
-            start <- ShortRead::position(data)[selection]
+            start <- position(data)[selection]
             if (!missing(trim)) {
                 start <- start + (sr_len[selection] / 2 - floor(trim / 2))
             }
@@ -173,8 +176,8 @@ setMethod(
             if (!missing(trim)) {
                 width <- trim
             }
-            res <- IRanges::RangedData(
-                ranges=IRanges::IRanges(start=start, width=width),
+            res <- RangedData(
+                ranges=IRanges(start=start, width=width),
                 space=space
             )
 
@@ -191,6 +194,9 @@ setMethod(
 )
 
 #' @rdname processReads
+#' @importFrom IRanges IRanges RangedData
+#' @importMethodsFrom IRanges end
+#' @importMethodsFrom S4Vectors space
 setMethod(
     "processReads",
     signature(data="RangedData"),
@@ -213,10 +219,10 @@ setMethod(
                 if (trim == fragmentLen) {
                     start <- start(data)
                     negStrand <- data$strand == "-"
-                    start[negStrand] <- IRanges::end(data)[negStrand] - fragmentLen
-                    res <- IRanges::RangedData(
-                        ranges=IRanges::IRanges(start=start, width=fragmentLen),
-                        space=S4Vectors::space(data)
+                    start[negStrand] <- end(data)[negStrand] - fragmentLen
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=space(data)
                     )
                     return (res)
                 }
@@ -242,9 +248,9 @@ setMethod(
             correct[(strand == -1) & ((fragmentLen - sr_len) %% 2 == 1)] <- 1
 
             start <- start(data) + ((shift + correct) * strand)
-            res <- IRanges::RangedData(
-                ranges=IRanges::IRanges(start=start, width=sr_len),
-                space=S4Vectors::space(data)
+            res <- RangedData(
+                ranges=IRanges(start=start, width=sr_len),
+                space=space(data)
             )
 
         #######################################################################
@@ -264,9 +270,9 @@ setMethod(
                 width <- trim
             }
 
-            res <- IRanges::RangedData(
-                ranges=IRanges::IRanges(start=start, width=width),
-                space=S4Vectors::space(data)
+            res <- RangedData(
+                ranges=IRanges(start=start, width=width),
+                space=space(data)
             )
         #######################################################################
         } else {
@@ -281,6 +287,11 @@ setMethod(
 )
 
 #' @rdname processReads
+#' @importFrom IRanges RangedData
+#' @importFrom GenomicRanges GRanges
+#' @importMethodsFrom IRanges end
+#' @importMethodsFrom S4Vectors space
+#' @importMethodsFrom GenomeInfoDb seqnames
 setMethod(
     "processReads",
     signature(data="GRanges"),
@@ -305,10 +316,10 @@ setMethod(
                 if (trim == fragmentLen) {
                     start <- start(data)
                     negStrand <- data$strand == "-"
-                    start[negStrand] <- IRanges::end(data)[negStrand] - fragmentLen
-                    res <- IRanges::RangedData(
-                        ranges=IRanges::IRanges(start=start, width=fragmentLen),
-                        space=S4Vectors::space(data)
+                    start[negStrand] <- end(data)[negStrand] - fragmentLen
+                    res <- RangedData(
+                        ranges=IRanges(start=start, width=fragmentLen),
+                        space=space(data)
                     )
                     return (res)
                 }
@@ -336,9 +347,9 @@ setMethod(
 
             start <- start(data) + ((shift+correct) * strand)
 
-            res <- GenomicRanges::GRanges(
-                ranges=IRanges::IRanges(start=start, width=sr_len),
-                seqnames=GenomeInfoDb::seqnames(data)
+            res <- GRanges(
+                ranges=IRanges(start=start, width=sr_len),
+                seqnames=seqnames(data)
             )
 
         #######################################################################
@@ -358,9 +369,9 @@ setMethod(
                 width <- trim
             }
 
-            res <- GenomicRanges::GRanges(
-                ranges=IRanges::IRanges(start=start, width=width),
-                seqnames=GenomeInfoDb::seqnames(data)
+            res <- GRanges(
+                ranges=IRanges(start=start, width=width),
+                seqnames=seqnames(data)
             )
         #######################################################################
         } else {

@@ -161,6 +161,10 @@ setMethod(
 )
 
 #' @rdname filterFFT
+#' @importFrom graphics plot abline
+#' @importFrom IRanges IRanges
+#' @importMethodsFrom S4Vectors Rle
+#' @importMethodsFrom IRanges start end width end<-
 setMethod(
     "filterFFT",
     signature(data="numeric"),
@@ -184,14 +188,14 @@ setMethod(
                     "power spectrum"
                 ))
             }
-            temp <- stats::fft(data[1:upper])
+            temp <- fft(data[1:upper])
             keep <- round(upper * pcKeepComp)
-            graphics::plot(
+            plot(
                 Re(temp[2:round(length(temp) / 2)]), type="l",
                 xlab="Components", ylab="Power",
                 sub="Selected components threshold marked as red line"
             )
-            graphics::abline(v=keep, col="red", lwd=1, lty=2)
+            abline(v=keep, col="red", lwd=1, lty=2)
         }
 
         # Bypass all optimizations, very much slower
@@ -200,16 +204,16 @@ setMethod(
         }
 
         # Partition the data for available values
-        ranges <- IRanges::IRanges(!is.na(data))
-        ranges <- ranges[IRanges::width(ranges) > 50]  # Discard short regions
+        ranges <- IRanges(!is.na(data))
+        ranges <- ranges[width(ranges) > 50]  # Discard short regions
         defVal <- NA
 
         # Split, instead of NAs, the large 0 rows
-        if (IRanges::width(ranges[1]) == length(data)) {
-            r <- S4Vectors::Rle(data == 0)
+        if (width(ranges[1]) == length(data)) {
+            r <- Rle(data == 0)
             r@values[r@values == TRUE & r@lengths > 500] <- "SPLIT"
-            ranges <- IRanges::IRanges(as.vector(r) != "SPLIT")
-            ranges <- ranges[IRanges::width(ranges) > 100]
+            ranges <- IRanges(as.vector(r) != "SPLIT")
+            ranges <- ranges[width(ranges) > 100]
             defVal <- 0
         }
 
@@ -222,32 +226,32 @@ setMethod(
         # in performance
         .fftRegion <- function(data2, pcKeepComp) {
             # Make windows overlapped 5000bp
-            ran <- IRanges::IRanges(
+            ran <- IRanges(
                 start=seq(from=1, to=length(data2), by=(2 ^ 19) - 5000),
                 width=2^19
             )
             # Last range has the lenght till the end of data
-            IRanges::end(ran[length(ran)]) <- length(data2)
+            end(ran[length(ran)]) <- length(data2)
 
             # If this gives only one range, return the fft directly
             if (length(ran) == 1) {
                 return (.filterFFT(
                     .pad2power2(data2),
                     pcKeepComp
-                )[1:IRanges::end(ran[1])])
+                )[1:end(ran[1])])
             }
 
             # If last range is shorter than 5000, extend the last-1
             # (we know now we have >1 ranges)
-            if (IRanges::width(ran)[length(ran)] < 5000) {
-                IRanges::end(ran[length(ran) - 1]) <- IRanges::end(ran[length(ran)])  # Extend
+            if (width(ran)[length(ran)] < 5000) {
+                end(ran[length(ran) - 1]) <- end(ran[length(ran)])  # Extend
                 ran <- ran[1:(length(ran) - 1)]  # Remove last range
             }
 
             #Iterative case
             res <- NULL
             while (length(ran) > 1) {  # While not last range
-                tmp <- .filterFFT(data2[IRanges::start(ran[1]):IRanges::end(ran[1])], pcKeepComp)
+                tmp <- .filterFFT(data2[start(ran[1]):end(ran[1])], pcKeepComp)
                 if(is.null(res)){
                     res <- tmp
                 } else {
@@ -261,9 +265,9 @@ setMethod(
 
             # Last range
             tmp <- .filterFFT(
-                .pad2power2(data2[IRanges::start(ran[1]):IRanges::end(ran[1])]),
+                .pad2power2(data2[start(ran[1]):end(ran[1])]),
                 pcKeepComp
-            )[1:IRanges::width(ran[1])]
+            )[1:width(ran[1])]
 
             # If res not set, set it; otherwise append (by construction
             # is larger than 5000bp)
@@ -289,16 +293,16 @@ setMethod(
         # Set to default values the positions that have them in the input
         # (remove strange periodicities from large uncovered regions)
         if (is.na(defVal)) {
-            rtmp <- IRanges::IRanges(is.na(data))
-            rtmp <- rtmp[IRanges::width(rtmp) > 15]
+            rtmp <- IRanges(is.na(data))
+            rtmp <- rtmp[width(rtmp) > 15]
             if (length(rtmp) > 0) {
                 for (i in 1:length(rtmp)) {
                     res[rtmp[[i]]] <- NA
                 }
             }
         } else if (defVal == 0) {
-            rtmp <- IRanges::IRanges(data == 0)
-            rtmp <- rtmp[IRanges::width(rtmp) > 15]
+            rtmp <- IRanges(data == 0)
+            rtmp <- rtmp[width(rtmp) > 15]
             if (length(rtmp) > 0) {
                 for (i in 1:length(rtmp)) {
                     res[rtmp[[i]]] <- 0
@@ -311,12 +315,12 @@ setMethod(
     }
 )
 
-# This is the filter itself
+#' @importFrom stats fft
 .filterFFT <- function(data, pcKeepComp)
 {
     data[is.na(data)] <- 0
-    temp <- stats::fft(data)
+    temp <- fft(data)
     keep <- round(length(temp) * pcKeepComp)
     temp[keep:(length(temp) - keep)] <- 0
-    return (Re(stats::fft(temp, inverse=TRUE)) / length(temp))
+    return (Re(fft(temp, inverse=TRUE)) / length(temp))
 }

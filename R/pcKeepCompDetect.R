@@ -79,6 +79,10 @@
 #'
 #' @export pcKeepCompDetect
 #'
+#' @importFrom stats runif
+#' @importFrom IRanges IRanges
+#' @importMethodsFrom stats cor
+#' @importMethodsFrom IRanges width start
 pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
                             verbose = FALSE, cor.target = 0.98, cor.tol = 1e-3,
                             smpl.num = 25, smpl.min.size = 2 ^ 10,
@@ -106,7 +110,7 @@ pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
         if (pc == 0) {
             return(0)
         }
-        cors <- sapply(samp, function(x) stats::cor(filterFFT(x, pcKeepComp=pc), x))
+        cors <- sapply(samp, function(x) cor(filterFFT(x, pcKeepComp=pc), x))
         return(mean(cors, na.rm=TRUE))
     }
 
@@ -224,10 +228,10 @@ pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
         }
 
         # Select ranges <> from 0 or NA and longer than minimum size
-        rang <- IRanges::IRanges(data != 0 & !is.na(data))
-        rang <- rang[IRanges::width(rang) > smpl.min.size]
+        rang <- IRanges(data != 0 & !is.na(data))
+        rang <- rang[width(rang) > smpl.min.size]
 
-        tota <- sum(IRanges::width(rang))
+        tota <- sum(width(rang))
         # If the overall useful bases don't satisfy the criteria, return all
         if (tota < smpl.min.size * (smpl.num / 2)) {
             if (verbose) {
@@ -246,7 +250,7 @@ pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
                 1:length(rang),
                 size=smpl.num,
                 replace=TRUE,
-                prob=IRanges::width(rang) / tota
+                prob=width(rang) / tota
             )
 
             # Random selection of start points
@@ -254,16 +258,16 @@ pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
             # will pickup a random start position inside it that still it's in
             # the limits. The width of the final ranges will be the minimum of
             # the range's size and smpl.max.size
-            wids <- IRanges::width(rang[reps])
+            wids <- width(rang[reps])
             marg <- unlist(sapply(wids - smpl.max.size, max, 0))
             rnof <- unlist(sapply(
                 marg[marg > 0],
-                function(x) floor(stats::runif(n=1, max=x, min=1))
+                function(x) floor(runif(n=1, max=x, min=1))
             ))
             marg[marg > 0] <- rnof
 
-            fina <- IRanges::IRanges(
-                start=IRanges::start(rang[reps]) + marg,
+            fina <- IRanges(
+                start=start(rang[reps]) + marg,
                 width=sapply(wids, min, smpl.max.size)
             )
 

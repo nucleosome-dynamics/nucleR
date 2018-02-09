@@ -47,7 +47,7 @@
 #'
 #' # Generate a random peaks profile
 #' reads <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
-#' cover <- coverage(reads)
+#' cover <- coverage.rpm(reads)
 #'
 #' # Filter them
 #' cover_fft <- filterFFT(cover)
@@ -67,6 +67,8 @@ setGeneric(
 )
 
 #' @rdname plotPeaks
+#' @importFrom graphics plot points abline text
+#' @importFrom stats quantile
 setMethod(
     "plotPeaks",
     signature(peaks="numeric"),
@@ -79,7 +81,7 @@ setMethod(
         # If threshold is given as a string with percentage, convert it
         if (!is.numeric(threshold)) {
             if (grep("%", threshold) == 1) {
-                threshold <- stats::quantile(
+                threshold <- quantile(
                     data,
                     as.numeric(sub("%","", threshold)) / 100,
                     na.rm=TRUE
@@ -97,16 +99,16 @@ setMethod(
             scores <- scores[subset]
         }
 
-        graphics::plot(start:end, data, type=type, xlab=xlab, ...)
+        plot(start:end, data, type=type, xlab=xlab, ...)
         if (is.null(scores)) {
-            graphics::points(peaks, data[as.character(peaks)], col=col.points)
+            points(peaks, data[as.character(peaks)], col=col.points)
         }
         if (threshold != 0) {
-            graphics::abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
+            abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
         }
 
         if (!is.null(scores))
-            graphics::text(
+            text(
                 peaks, data[as.character(peaks)],
                 labels=format(scores, digits=scor.digits),
                 cex=scor.cex, adj=scor.adj, col=scor.col,
@@ -124,22 +126,27 @@ setMethod(
 )
 
 #' @rdname plotPeaks
+#' @importFrom IRanges IRanges
+#' @importMethodsFrom S4Vectors space values
 setMethod(
     "plotPeaks",
     signature(peaks="RangedData"),
     function(peaks, data, ...) {
-        if (length(unique(S4Vectors::space(peaks))) > 1) {
+        if (length(unique(space(peaks))) > 1) {
             stop("Only uni-spatial RangedData is supported")
         }
-        scoreMatrix <- as.data.frame(S4Vectors::values(peaks)[[1]])
+        scoreMatrix <- as.data.frame(values(peaks)[[1]])
         if (ncol(scoreMatrix) == 0) {
             scoreMatrix <- NULL
         }
-        plotPeaks(peaks=IRanges::ranges(peaks)[[1]], data=data, scores=scoreMatrix, ...)
+        plotPeaks(peaks=ranges(peaks)[[1]], data=data, scores=scoreMatrix, ...)
     }
 )
 
 #' @rdname plotPeaks
+#' @importFrom graphics plot rect abline text
+#' @importFrom stats quantile
+#' @importMethodsFrom IRanges start end width disjointBins
 setMethod(
     "plotPeaks",
     signature(peaks="IRanges"),
@@ -158,7 +165,7 @@ setMethod(
         # If threshold is given as a string with percentage, convert it
         if (!is.numeric(threshold)) {
             if (grep("%", threshold) == 1) {
-                threshold <- stats::quantile(
+                threshold <- quantile(
                     data,
                     as.numeric(sub("%","", threshold)) / 100,
                     na.rm=TRUE)
@@ -166,7 +173,7 @@ setMethod(
         }
 
         # Subset data
-        subset <- which(IRanges::end(peaks) >= start & IRanges::start(peaks) <= end)
+        subset <- which(end(peaks) >= start & start(peaks) <= end)
         data_full <- data
         data <- data[start:end]
         names(data) <- start:end
@@ -180,7 +187,7 @@ setMethod(
         pc <- (0.01 * max(data))
 
         # Dynamic positioning (on top of the peaks) or all the same
-        win_m <- round(min(IRanges::width(peaks)) / 2) / 2  # This takes a widow |half|
+        win_m <- round(min(width(peaks)) / 2) / 2  # This takes a widow |half|
         midpoints <- .mid(peaks)
 
         if (dyn.pos) {
@@ -190,17 +197,17 @@ setMethod(
                     max(data_full[(x - win_m):(x + win_m)])
             )
         } else {
-            ybottom <- stats::quantile(data, threshold, na.rm=TRUE)
+            ybottom <- quantile(data, threshold, na.rm=TRUE)
         }
 
         # Overlap correction
         if (!dyn.pos) {
-            bins <- IRanges::disjointBins(IRanges::IRanges(IRanges::start(peaks), IRanges::end(peaks) + 10))
+            bins <- disjointBins(IRanges(start(peaks), end(peaks) + 10))
             ybottom <- ((bins - 1) * pc * 2) + ybottom
         }
 
         # Plot coverage
-        graphics::plot(start:end, data, type=type, xlab=xlab, ...)
+        plot(start:end, data, type=type, xlab=xlab, ...)
 
         # We have information about merged calls
         if (!is.null(scores) & "nmerge" %in% names(scores)) {
@@ -209,10 +216,10 @@ setMethod(
             ybot <- ybottom[scores$nmerge == 1]
 
             if (length(p1) > 0) {
-                graphics::rect(
-                    IRanges::start(p1),
+                rect(
+                    start(p1),
                     ybot + pc,
-                    IRanges::end(p1),
+                    end(p1),
                     ybot + pc * rect.thick,
                     lwd=rect.lwd,
                     col=col.points,
@@ -224,10 +231,10 @@ setMethod(
             p2 <- peaks[scores$nmerge > 1, ]
             ybot <- ybottom[scores$nmerge > 1]
             if (length(p2) > 0) {
-                graphics::rect(
-                    IRanges::start(p2),
+                rect(
+                    start(p2),
                     ybot + pc,
-                    IRanges::end(p2),
+                    end(p2),
                     ybot + pc * rect.thick,
                     lwd=rect.lwd,
                     col=col.points,
@@ -237,10 +244,10 @@ setMethod(
             }
 
         } else {  # All are normal calls
-            graphics::rect(
-                IRanges::start(peaks),
+            rect(
+                start(peaks),
                 ybottom + pc,
-                IRanges::end(peaks),
+                end(peaks),
                 ybottom + pc * rect.thick,
                 lwd=rect.lwd,
                 col=col.points,
@@ -249,7 +256,7 @@ setMethod(
         }
 
         if (threshold != 0) {
-            graphics::abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
+            abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
         }
 
         # Add text
@@ -270,7 +277,7 @@ setMethod(
                 scores <- .f(scores$score)
             }
 
-            graphics::text(
+            text(
                 midpoints,
                 ybottom + pc * rect.thick + pc * 3,
                 labels=scores,

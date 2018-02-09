@@ -31,24 +31,31 @@ readBAM <- function (file, type="paired")
     }
 }
 
-irLs2rd <- function(x)
+#' Convert IRangesList to RangedData
+#'
+#' @importFrom IRanges RangedData
+.irLs2rd <- function(x)
     # Convert a list of IRanges to a RangedData
-    IRanges::RangedData(
+    RangedData(
         ranges=do.call(c, unname(x)),
         space=rep(names(x), sapply(x, length))
     )
 
-sortReads <- function (reads)
+#' Read Sorter
+#'
+#' Sort reads RangedData format. Sort them first by chromosome, then by
+#' start and then by end
+#'
+#' @importMethodsFrom IRanges start end ranges
+.sortReads <- function (reads)
 {
-    # Sort reads RangedData format. Sort them first by chromosome, then by
-    # start and then by end
     sortChrs <- function (rans)
         rans[order(names(rans))]
     sortRans <- function (x) {
-        tmp <- x[sort.list(IRanges::end(x))]
-        tmp[sort.list(IRanges::start(tmp))]
+        tmp <- x[sort.list(end(x))]
+        tmp[sort.list(start(tmp))]
     }
-    irLs2rd(lapply(sortChrs(IRanges::ranges(reads)), sortRans))
+    .irLs2rd(lapply(sortChrs(ranges(reads)), sortRans))
 }
 
 vectorizedAll <- function(...)
@@ -56,18 +63,23 @@ vectorizedAll <- function(...)
     # `all`
     Reduce(`&`, list(...))
 
+#' Load a single-end BAM
+#'
+#' @importFrom IRanges IRanges RangedData
+#' @importMethodsFrom Rsamtools scanBam ScanBamParam
+#'
 .loadSingleBam <- function (exp)
 {
     what <- c("pos", "qwidth", "strand", "rname")
-    bam <- Rsamtools::scanBam(exp, param=Rsamtools::ScanBamParam(what=what))[[1]]
+    bam <- scanBam(exp, param=ScanBamParam(what=what))[[1]]
 
     non.na <- Reduce(`&`, lapply(bam, Negate(is.na)))
     filtered.bam <- lapply(bam, `[`, non.na)
 
     # IRanges
-    IRanges::RangedData(
+    RangedData(
         space  = filtered.bam$rname,
-        ranges = IRanges::IRanges(
+        ranges = IRanges(
             start = filtered.bam[["pos"]],
             width = filtered.bam[["qwidth"]]
         ),
@@ -108,9 +120,9 @@ vectorizedAll <- function(...)
             strand
         ))
     } else {
-        IRanges::RangedData(
+        RangedData(
             space  = as.character(reads1$rname),
-            ranges = IRanges::IRanges(
+            ranges = IRanges(
                 start = reads1$pos,
                 end   = reads2$pos + reads2$qwidth - 1
             )
@@ -118,6 +130,11 @@ vectorizedAll <- function(...)
     }
 }
 
+#' Load a paired-end-end BAM
+#'
+#' @importFrom IRanges IRanges RangedData
+#' @importMethodsFrom Rsamtools scanBam ScanBamParam
+#'
 .loadPairedBam <- function (file)
 {
     message(sprintf("reading file %s", file))
@@ -132,16 +149,16 @@ vectorizedAll <- function(...)
         "mrnm",
         "mpos"
     )
-    bam <- as.data.frame(Rsamtools::scanBam(
+    bam <- as.data.frame(scanBam(
         file=file,
-        param=Rsamtools::ScanBamParam(what=what)
+        param=ScanBamParam(what=what)
     )[[1]])
 
     message("processing flags")
     bam$flag <- bam$flag %% 256
 
     # Process both strand and return the reads in sorted order
-    sortReads(IRanges::rbind(
+    .sortReads(IRanges::rbind(
         .processStrand("+", bam),
         .processStrand("-", bam)
     ))

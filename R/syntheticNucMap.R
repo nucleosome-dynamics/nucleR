@@ -79,11 +79,11 @@
 #' # Let's use this to plot the nucleosomal + the random map
 #' par(mfrow=c(3,1), mar=c(3,4,1,1))
 #' plot(
-#'     as.vector(coverage(res$syn.reads)), type="h", col="red",
+#'     as.vector(coverage.rpm(res$syn.reads)), type="h", col="red",
 #'     ylab="nucleosomal", ylim=c(0,35)
 #' )
 #' plot(
-#'     as.vector(coverage(res$ctr.reads)), type="h", col="blue",
+#'     as.vector(coverage.rpm(res$ctr.reads)), type="h", col="blue",
 #'     ylab="random", ylim=c(0,35)
 #' )
 #' plot(
@@ -91,6 +91,12 @@
 #' )
 #'
 #' @export syntheticNucMap
+#'
+#' @importFrom stats runif
+#' @importFrom IRanges IRanges
+#' @importFrom graphics plot lines abline points legend
+#' @importMethodsFrom IRanges start coverage
+#' @importMethodsFrom S4Vectors Rle
 #'
 syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
                             fuz.num = 50, fuz.var = 50, max.cover = 20,
@@ -107,41 +113,41 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
     wp.starts <- (nuc.len + lin.len) * seq(0, wp.num - 1) + 1
 
     # How many times a read is repeated
-    wp.nreads <- round(stats::runif(wp.num, min=1, max=max.cover))
+    wp.nreads <- round(runif(wp.num, min=1, max=max.cover))
 
     # Delete some reads (set repetition times to 0)
-    wp.nreads[round(stats::runif(wp.del, min=0, max=wp.num))] <- 0
+    wp.nreads[round(runif(wp.del, min=0, max=wp.num))] <- 0
 
     # Set each nucleosome as a repeated single start position
     wp.repstar <- rep(wp.starts, wp.nreads)
 
     # Add some variance to the starting points
-    var <- round(stats::runif(length(wp.repstar), min=-wp.var, max=wp.var))
+    var <- round(runif(length(wp.repstar), min=-wp.var, max=wp.var))
     wp.varstar <- wp.repstar + var
 
     # Putative reads
-    wp.reads <- IRanges::IRanges(start=wp.varstar, width=nuc.len)
+    wp.reads <- IRanges(start=wp.varstar, width=nuc.len)
 
     # OVERLAPPED (FUZZY) NUCLEOSOMES
     # Starting point of fuzzy nucleosomes (random)
-    fuz.starts <- round(stats::runif(
+    fuz.starts <- round(runif(
         fuz.num,
         min=1,
         max=(nuc.len + lin.len) * wp.num
     ))
 
     # How many times a read is repeated
-    fuz.nreads <- round(stats::runif(fuz.num, min=1, max=max.cover))
+    fuz.nreads <- round(runif(fuz.num, min=1, max=max.cover))
 
     # Set each nucleosome as a repeated single start position
     fuz.repstar <- rep(fuz.starts, fuz.nreads)
 
     # Add some variance to the starting points
-    var <- round(stats::runif(length(fuz.repstar), min=-fuz.var, max=fuz.var))
+    var <- round(runif(length(fuz.repstar), min=-fuz.var, max=fuz.var))
     fuz.varstar <- fuz.repstar + var
 
     # Overlapped reads
-    fuz.reads <- IRanges::IRanges(start=fuz.varstar, width=nuc.len)
+    fuz.reads <- IRanges(start=fuz.varstar, width=nuc.len)
 
     # ALL SYNTHETIC READS
     syn.reads <- c(wp.reads, fuz.reads)
@@ -149,26 +155,26 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
     # RATIO AS HYBRIDIZATION (Tiling Array)
     if (as.ratio) {
         # Just put the same amount of reads as before randomly
-        ctr.starts <- round(stats::runif(
+        ctr.starts <- round(runif(
             length(syn.reads),
             min=1,
-            max=max(IRanges::start(syn.reads))
+            max=max(start(syn.reads))
         ))
 
         # This time use a random read length, between 50 and 250 
-        ctr.widths <- round(stats::runif(length(syn.reads), min=50, max=250))
+        ctr.widths <- round(runif(length(syn.reads), min=50, max=250))
 
         # "Control reads"
-        ctr.reads <- IRanges::IRanges(start=ctr.starts, width=ctr.widths)
+        ctr.reads <- IRanges(start=ctr.starts, width=ctr.widths)
 
         # ratio
         syn.ratio <- suppressWarnings(
-            log2(as.vector(IRanges::coverage(syn.reads))) -
-            log2(as.vector(IRanges::coverage(ctr.reads)))
+            log2(as.vector(coverage(syn.reads))) -
+            log2(as.vector(coverage(ctr.reads)))
         )
 
         syn.ratio[abs(syn.ratio) == Inf] <- NA  # Some lost bases... as reality
-        syn.ratio <- S4Vectors::Rle(syn.ratio)
+        syn.ratio <- Rle(syn.ratio)
     }
 
     result <- list()
@@ -190,40 +196,40 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
 
     if(show.plot) {
         # Y-lim range
-        max <- max(IRanges::coverage(syn.reads), na.rm=TRUE)
+        max <- max(coverage(syn.reads), na.rm=TRUE)
         min <- 0
         if (as.ratio) {
             min <- min(syn.ratio, na.rm=TRUE)
         }
 
-        graphics::plot(
-            as.vector(IRanges::coverage(syn.reads)), type="h", col="#AADDAA",
+        plot(
+            as.vector(coverage(syn.reads)), type="h", col="#AADDAA",
             ylim=c(min,max),
             ...
         )
 
         # Plot ratio, if asked for
         if (as.ratio) {
-            graphics::lines(as.vector(syn.ratio), type="l", col="darkorange", lwd=2)
+            lines(as.vector(syn.ratio), type="l", col="darkorange", lwd=2)
         }
         if (as.ratio) {
-            graphics::abline(h=0, col="darkorange4")
+            abline(h=0, col="darkorange4")
         }
 
         # Plot nucleosome positions (dyad)
-        graphics::points(wp.starts + 74, wp.nreads, col="red", pch=19)
-        graphics::points(fuz.starts + 74, fuz.nreads, col="blue", pch=20)
+        points(wp.starts + 74, wp.nreads, col="red", pch=19)
+        points(fuz.starts + 74, fuz.nreads, col="blue", pch=20)
 
         # Plot legend
         if (as.ratio) {
-            graphics::legend(
+            legend(
                 "top",
                 c("Coverage", "Ratio", "Well-pos", "Fuzzy"),
                 fill=c("#AADDAA", "darkorange", "red", "blue"), bty="n",
                 horiz=TRUE
             )
         } else {
-            graphics::legend(
+            legend(
                 "top",
                 c("Coverage", "Well-pos", "Fuzzy"),
                 fill=c("#AADDAA", "red", "blue"), bty="n", horiz=TRUE

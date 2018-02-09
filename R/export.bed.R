@@ -25,6 +25,7 @@
 #' @rdname export.bed
 #'
 #' @examples
+#' library(IRanges)
 #' # Generate random ranges with scores
 #' ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
 #' names(ran) <- "chrX"
@@ -133,6 +134,7 @@ setMethod(
 )
 
 #' @rdname export.bed
+#' @importMethodsFrom GenomeInfoDb seqnames
 setMethod(
     "export.bed",
     signature(ranges="GRanges"),
@@ -140,10 +142,9 @@ setMethod(
             splitByChrom=TRUE) {
 
         if (splitByChrom) {
-            #for(chr in IRanges::levels(seqnames(ranges))) {
-            for (chr in levels(GenomeInfoDb::seqnames(ranges))) {
+            for (chr in levels(seqnames(ranges))) {
                 export.bed(
-                    ranges[GenomeInfoDb::seqnames(ranges) == chr],
+                    ranges[seqnames(ranges) == chr],
                     chrom=chr,
                     name=name,
                     desc=desc,

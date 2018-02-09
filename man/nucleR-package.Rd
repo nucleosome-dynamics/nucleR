@@ -32,7 +32,7 @@ preads_orig <- processReads(reads, type="paired", fragmentLen=200)
 # Process the reads, but now trim each read to 40bp around the dyad
 preads_trim <- processReads(reads, type="paired", fragmentLen=200, trim=40)
 
-# Calculate the coverage, directly in reads per million (r.p.m)
+# Calculate the coverage, directly in reads per million (r.p.m.)
 cover_orig <- coverage.rpm(preads_orig)
 cover_trim <- coverage.rpm(preads_trim)
 

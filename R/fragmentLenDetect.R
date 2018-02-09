@@ -42,6 +42,7 @@
 #' @rdname fragmentLenDetect
 #'
 #' @examples
+#' library(IRanges)
 #' # Create a sinthetic dataset, simulating single-end reads, for positive and
 #' # negative strands
 #' # Positive strand reads
@@ -68,6 +69,10 @@ setGeneric(
 )
 
 #' @rdname fragmentLenDetect
+#' @importFrom stats runif cor
+#' @importMethodsFrom BiocGenerics strand
+#' @importMethodsFrom IRanges coverage width
+#' @importMethodsFrom ShortRead chromosome
 setMethod(
     "fragmentLenDetect",
     signature(reads="AlignedRead"), 
@@ -75,13 +80,13 @@ setMethod(
             max.shift = 100, mc.cores = 1, as.shift = FALSE) {
 
         # Randomly select regions in the available chromosome bounds
-        chrSample <- as.character(sample(ShortRead::chromosome(reads), samples))
+        chrSample <- as.character(sample(chromosome(reads), samples))
         chrsLen <- sapply(
-            levels(ShortRead::chromosome(reads)),
+            levels(chromosome(reads)),
             function(x)
-                max(position(reads[ShortRead::chromosome(reads) == x]))
+                max(position(reads[chromosome(reads) == x]))
         )
-        position <- round(stats::runif(samples, max=chrsLen[chrSample] - window))
+        position <- round(runif(samples, max=chrsLen[chrSample] - window))
         dd <- data.frame(chrSample, position)
 
         # For each sampled region, look for the shift with higher correlation
@@ -91,7 +96,7 @@ setMethod(
             sta <- as.numeric(dd[i, "position"])
             end <- sta + window
             rea <- reads[
-                ShortRead::chromosome(reads) == chr &
+                chromosome(reads) == chr &
                 position(reads) > sta &
                 position(reads) < end
             ]
@@ -101,13 +106,13 @@ setMethod(
 
             cpos <- try(
                 as.vector(
-                    IRanges::coverage(rea[as.character(BiocGenerics::strand(rea)) == "+"])[[1]]
+                    coverage(rea[as.character(strand(rea)) == "+"])[[1]]
                 )[sta:end],
                 silent=TRUE
             )
             cneg <- try(
                 as.vector(
-                    IRanges::coverage(rea[as.character(BiocGenerics::strand(rea)) == "-"])[[1]]
+                    coverage(rea[as.character(strand(rea)) == "-"])[[1]]
                 )[sta:end],
                 silent=TRUE
             )
@@ -123,7 +128,7 @@ setMethod(
             x <- sapply(
                 min.shift:max.shift,
                 function(s)
-                    stats::cor(cpos[1:(window + 1 - s)], cneg[s:window])
+                    cor(cpos[1:(window + 1 - s)], cneg[s:window])
             )
             res <- which(x == max(x))[1]
 
@@ -144,7 +149,7 @@ setMethod(
                                             mc.cores=mc.cores))))
 
         #Fragment length is the shift * 2 + the length of the read
-        fragLen <- shift * 2 + IRanges::width(reads)[1]
+        fragLen <- shift * 2 + width(reads)[1]
 
         if (as.shift) {
             return(shift)
@@ -156,6 +161,9 @@ setMethod(
 )
 
 #' @rdname fragmentLenDetect
+#' @importFrom IRanges IRanges
+#' @importMethodsFrom IRanges width
+#' @importFrom stats runif cor
 setMethod(
     "fragmentLenDetect",
     signature(reads="RangedData"),
@@ -170,10 +178,10 @@ setMethod(
             df <- as.data.frame(reads[chr])
             dp <- df[df$strand == "+",]
             dn <- df[df$strand == "-",]
-            rp <- IRanges::IRanges(start=dp$start, width=dp$width)
-            rn <- IRanges::IRanges(start=dn$start, width=dn$width)
-            cp <- IRanges::coverage(rp, method="hash")
-            cn <- IRanges::coverage(rn, method="hash")
+            rp <- IRanges(start=dp$start, width=dp$width)
+            rn <- IRanges(start=dn$start, width=dn$width)
+            cp <- coverage(rp, method="hash")
+            cn <- coverage(rn, method="hash")
             return(list(pos=cp, neg=cn))
         }
 
@@ -189,7 +197,7 @@ setMethod(
             function(x)
                 min(length(x$pos), length(x$neg))
         )
-        position <- round(stats::runif(samples, max=chrLength[chrSample] - window))
+        position <- round(runif(samples, max=chrLength[chrSample] - window))
         dd <- data.frame(chrSample, position)
 
 
@@ -216,7 +224,7 @@ setMethod(
             x <- sapply(
                 min.shift:max.shift,
                 function (s)
-                    stats::cor(cpos[1:(window + 1 - s)], cneg[s:window])
+                    cor(cpos[1:(window + 1 - s)], cneg[s:window])
             )
             res <- which(x == max(x, na.rm=TRUE))[1]
 
@@ -238,7 +246,7 @@ setMethod(
                             na.rm=TRUE))
 
         #Fragment length is the shift * 2 + the length of the read
-        fragLen <- shift * 2 + IRanges::width(reads)[1]
+        fragLen <- shift * 2 + width(reads)[1]
 
         if (as.shift) {
             return(shift)
