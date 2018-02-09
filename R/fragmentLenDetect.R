@@ -1,3 +1,65 @@
+#' Fragments length detection from single-end sequencing samples
+#'
+#' When using single-ended sequencing, the resulting partial sequences map only
+#' in one strand, causing a bias in the coverage profile if not corrected. The
+#' only way to correct this is knowing the average size of the real fragments.
+#' \code{nucleR} uses this information when preprocessing single-ended
+#' sequences. You can provide this information by your own (usually a 147bp
+#' length is a good aproximation) or you can use this method to automatically
+#' guess the size of the inserts.
+#'
+#' This function shifts one strand downstream one base by one from
+#' \code{min.shift} to \code{max.shift}. In every step, the correlation on a
+#' random position of length \code{window} is checked between both strands. The
+#' maximum correlation is returned and averaged for \code{samples} repetitions.
+#'
+#' The final returned length is the best shift detected plus the width of the
+#' reads. You can increase the performance of this function by reducing the
+#' \code{samples} value and/or narrowing the shift range. The \code{window}
+#' size has almost no impact on the performance, despite a to small value can
+#' give biased results.
+#'
+#' @param reads Raw single-end reads (\code{AlignedRead} or \code{RangedData}
+#' format)
+#' @param samples Number of samples to perform the analysis (more = slower but
+#' more accurate)
+#' @param window Analysis window. Usually there's no need to touch this
+#' parameter.
+#' @param min.shift,max.shift Minimum and maximum shift to apply on the strands
+#' to detect the optimal fragment size. If the range is too big, the
+#' performance decreases.
+#' @param as.shift If TRUE, returns the shift needed to align the middle of the
+#' reads in opposite strand. If FALSE, returns the mean inferred fragment
+#' length.
+#' @param mc.cores If multicore support, maximum number of cores allowed to
+#' use.
+#'
+#' @return Inferred mean lenght of the inserts by default, or shift needed to
+#' align strands if \code{as.shift=TRUE}
+#'
+#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
+#' @keywords attribute
+#' @rdname fragmentLenDetect
+#'
+#' @examples
+#' # Create a sinthetic dataset, simulating single-end reads, for positive and
+#' # negative strands
+#' # Positive strand reads
+#' pos <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
+#' # Negative strand (shifted 147bp)
+#' neg <- IRanges(end=start(pos)+147, width=40)
+#' sim <- RangedData(
+#'     c(pos, neg),
+#'     strand=c(rep("+", length(pos)), rep("-", length(neg)))
+#' )
+#'
+#' # Detect fragment lenght (we know by construction it is really 147)
+#' fragmentLenDetect(sim, samples=50)
+#'
+#' # The function restrict the sampling to speed up the example
+#'
+#' @export
+#'
 setGeneric(
     "fragmentLenDetect",
     function(reads, samples=1000, window=5000, min.shift=1, max.shift=100,
@@ -5,6 +67,7 @@ setGeneric(
         standardGeneric("fragmentLenDetect")
 )
 
+#' @rdname fragmentLenDetect
 setMethod(
     "fragmentLenDetect",
     signature(reads="AlignedRead"), 
@@ -12,13 +75,13 @@ setMethod(
             max.shift = 100, mc.cores = 1, as.shift = FALSE) {
 
         # Randomly select regions in the available chromosome bounds
-        chrSample <- as.character(sample(chromosome(reads), samples))
+        chrSample <- as.character(sample(ShortRead::chromosome(reads), samples))
         chrsLen <- sapply(
-            levels(chromosome(reads)),
+            levels(ShortRead::chromosome(reads)),
             function(x)
-                max(position(reads[chromosome(reads) == x]))
+                max(position(reads[ShortRead::chromosome(reads) == x]))
         )
-        position <- round(runif(samples, max=chrsLen[chrSample] - window))
+        position <- round(stats::runif(samples, max=chrsLen[chrSample] - window))
         dd <- data.frame(chrSample, position)
 
         # For each sampled region, look for the shift with higher correlation
@@ -28,7 +91,7 @@ setMethod(
             sta <- as.numeric(dd[i, "position"])
             end <- sta + window
             rea <- reads[
-                chromosome(reads) == chr &
+                ShortRead::chromosome(reads) == chr &
                 position(reads) > sta &
                 position(reads) < end
             ]
@@ -38,13 +101,13 @@ setMethod(
 
             cpos <- try(
                 as.vector(
-                    coverage(rea[as.character(strand(rea)) == "+"])[[1]]
+                    IRanges::coverage(rea[as.character(BiocGenerics::strand(rea)) == "+"])[[1]]
                 )[sta:end],
                 silent=TRUE
             )
             cneg <- try(
                 as.vector(
-                    coverage(rea[as.character(strand(rea)) == "-"])[[1]]
+                    IRanges::coverage(rea[as.character(BiocGenerics::strand(rea)) == "-"])[[1]]
                 )[sta:end],
                 silent=TRUE
             )
@@ -60,7 +123,7 @@ setMethod(
             x <- sapply(
                 min.shift:max.shift,
                 function(s)
-                    cor(cpos[1:(window + 1 - s)], cneg[s:window])
+                    stats::cor(cpos[1:(window + 1 - s)], cneg[s:window])
             )
             res <- which(x == max(x))[1]
 
@@ -81,7 +144,7 @@ setMethod(
                                             mc.cores=mc.cores))))
 
         #Fragment length is the shift * 2 + the length of the read
-        fragLen <- shift * 2 + width(reads)[1]
+        fragLen <- shift * 2 + IRanges::width(reads)[1]
 
         if (as.shift) {
             return(shift)
@@ -92,6 +155,7 @@ setMethod(
     }
 )
 
+#' @rdname fragmentLenDetect
 setMethod(
     "fragmentLenDetect",
     signature(reads="RangedData"),
@@ -106,10 +170,10 @@ setMethod(
             df <- as.data.frame(reads[chr])
             dp <- df[df$strand == "+",]
             dn <- df[df$strand == "-",]
-            rp <- IRanges(start=dp$start, width=dp$width)
-            rn <- IRanges(start=dn$start, width=dn$width)
-            cp <- coverage(rp, method="hash")
-            cn <- coverage(rn, method="hash")
+            rp <- IRanges::IRanges(start=dp$start, width=dp$width)
+            rn <- IRanges::IRanges(start=dn$start, width=dn$width)
+            cp <- IRanges::coverage(rp, method="hash")
+            cn <- IRanges::coverage(rn, method="hash")
             return(list(pos=cp, neg=cn))
         }
 
@@ -125,7 +189,7 @@ setMethod(
             function(x)
                 min(length(x$pos), length(x$neg))
         )
-        position <- round(runif(samples, max=chrLength[chrSample] - window))
+        position <- round(stats::runif(samples, max=chrLength[chrSample] - window))
         dd <- data.frame(chrSample, position)
 
 
@@ -152,7 +216,7 @@ setMethod(
             x <- sapply(
                 min.shift:max.shift,
                 function (s)
-                    cor(cpos[1:(window + 1 - s)], cneg[s:window])
+                    stats::cor(cpos[1:(window + 1 - s)], cneg[s:window])
             )
             res <- which(x == max(x, na.rm=TRUE))[1]
 
@@ -174,7 +238,7 @@ setMethod(
                             na.rm=TRUE))
 
         #Fragment length is the shift * 2 + the length of the read
-        fragLen <- shift * 2 + width(reads)[1]
+        fragLen <- shift * 2 + IRanges::width(reads)[1]
 
         if (as.shift) {
             return(shift)

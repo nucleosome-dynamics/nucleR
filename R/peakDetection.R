@@ -1,9 +1,75 @@
+#' Detect peaks (local maximum) from values series
+#'
+#' This function allows a efficient recognition of the local maximums (peaks)
+#' in a given numeric vector.
+#'
+#' It's recommended to smooth the input with \code{filterFFT} prior the
+#' detection.
+#'
+#' @param data Input numeric values, or a list of them
+#' @param threshold Threshold value from which the peaks will be selected. Can
+#' be given as a percentage string (i.e., \code{"25\%"} will use the value in
+#' the 1st quantile of \code{data}) or as an absolute coverage numeric value
+#' (i.e., \code{20} will not look for peaks in regions without less than 20
+#' reads (or reads per milion)).
+#' @param width If a positive integer > 1 is given, the peaks are returned as a
+#' range of the given width centered in the local maximum. Useful for
+#' nucleosome calling from a coverage peak in the dyad.
+#' @param score If TRUE, the results will be scored using \code{peakScoring}
+#' function.
+#' @param min.cov Minimum coverage that a peak needs in order to be considered
+#' as a nucleosome call.
+#' @param mc.cores The number of cores to use, i.e. at most how many child
+#' processes will be run simultaneously. Parallelization requires at least two
+#' cores.
+#'
+#' @return The type of the return depends on the input parameters:
+#'
+#' \code{numeric} (or a list of them) if \code{width==1 & score==FALSE}
+#' containing the position of the peaks.
+#' 
+#' \code{data.frame} (or list of them) if \code{width==1 & score==TRUE}
+#' containing a 'peak' column with the position of the peak plus a 'score'
+#' column with its score.
+#' 
+#' \code{IRanges} (or \code{IRangesList}) if \code{width>1 & score==FALSE}
+#' containing the ranges of the peaks.
+#' 
+#' \code{RangedData} if \code{width>1 & score==TRUE} containing the ranges of
+#' the peaks and the assigned score.
+#' @note If \code{width} > 1, those ranges outside the range
+#' \code{1:length(data)} will be skipped.
+#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
+#' @seealso \code{\link{filterFFT}}, \code{\link{peakScoring}}
+#' @keywords manip
+#' @rdname peakDetection
+#'
+#' @examples
+#' # Generate a random peaks profile
+#' reads <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
+#' cover <- coverage(reads)
+#'
+#' # Filter them
+#' cover_fft <- filterFFT(cover)
+#'
+#' # Detect and plot peaks (up a bit the threshold for accounting synthetic
+#' # data)
+#' peaks <- peakDetection(cover_fft, threshold="40%", score=TRUE)
+#' plotPeaks(peaks, cover_fft, threshold="40%", start=10000, end=15000)
+#'
+#' #Now use ranges version, which accounts for fuzziness when scoring
+#' peaks <- peakDetection(cover_fft, threshold="40%", score=TRUE, width=147)
+#' plotPeaks(peaks, cover_fft, threshold="40%", start=10000, end=15000)
+#'
+#' @export
+#'
 setGeneric(
     "peakDetection",
     function(data, threshold=0.25, width=1, score=TRUE, min.cov=2, mc.cores=1)
         standardGeneric("peakDetection")
 )
 
+#' @rdname peakDetection
 setMethod(
     "peakDetection",
     signature(data="list"),
@@ -35,9 +101,9 @@ setMethod(
                 # res is a list of RangedData
                 res <- unlist(res)
                 if (length(res)) {
-                    res <- IRangesList(res)
+                    res <- IRanges::IRangesList(res)
                 } else {
-                    res <- IRangesList()
+                    res <- IRanges::IRangesList()
                 }
             }
         }
@@ -46,6 +112,7 @@ setMethod(
     }
 )
 
+#' @rdname peakDetection
 setMethod(
     "peakDetection",
     signature(data="numeric"),
@@ -60,7 +127,7 @@ setMethod(
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
             if (grep("%", threshold) == 1) {
-                threshold <- quantile(
+                threshold <- stats::quantile(
                     data,
                     as.numeric(sub("%", "", threshold)) / 100,
                     na.rm=TRUE
@@ -68,7 +135,7 @@ setMethod(
             }
         }
 
-        ranges <- IRanges(!is.na(data) & data > threshold)
+        ranges <- IRanges::IRanges(!is.na(data) & data > threshold)
         if (length(ranges) == 0) {
             return(NULL)
         }
@@ -83,7 +150,7 @@ setMethod(
                 if (length(x) == 1) {
                     1
                 } else {
-                    start(IRanges(
+                    IRanges::start(IRanges::IRanges(
                         x[2:length(x)] <
                         x[1:(length(x) - 1)]
                     ))
@@ -100,7 +167,7 @@ setMethod(
         )[1]
 
         # Add start offset to peaks relative to the start of the range
-        starts <- start(ranges)
+        starts <- IRanges::start(ranges)
         res <- unlist(sapply(
             1:length(starts),
             function(i) pea[[i]] + starts[[i]]
@@ -117,9 +184,9 @@ setMethod(
             starts <- res - ext
             # Odd/pair correction
             ends <- res + ifelse(width %% 2 == 0, ext - 1, ext)
-            res <- IRanges(start=starts, end=ends)
+            res <- IRanges::IRanges(start=starts, end=ends)
             # Remove out of bounds
-            res <- res[start(res) > 1 & end(res) < length(data)]
+            res <- res[IRanges::start(res) > 1 & IRanges::end(res) < length(data)]
         }
 
         if (score) {

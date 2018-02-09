@@ -15,7 +15,7 @@
     actual.cores <- .check.mc(mc.cores)
 
     if (actual.cores > 1) {
-        mclapply(X=X, FUN=FUN, ...=..., mc.cores=actual.cores)
+        parallel::mclapply(X=X, FUN=FUN, ...=..., mc.cores=actual.cores)
     } else {
         lapply(X=X, FUN=FUN, ...=...)
     }
@@ -24,4 +24,4 @@
 # Simple function for returning the middle point of a RangedData or of a
 # GRanges (normal mid doesn't work there)
 .mid <- function(x)
-    floor((start(x) + end(x)) / 2)
+    floor((IRanges::start(x) + IRanges::end(x)) / 2)

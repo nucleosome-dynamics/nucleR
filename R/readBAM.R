@@ -1,6 +1,39 @@
+#' Import reads from a list of BAM files.
+#'
+#' This function allows to load reads from BAM files from both single and
+#' paired-end commming from Next Generation Sequencing nucleosome mapping
+#' experiments.
+#'
+#' @param file List of input BAM files.
+#' @param type Describes the type of reads. Values allowed are \code{single}
+#' for single-ended reads and \code{paired} for pair-ended.
+#' @return List of \code{GRanges} containing the reads of each input BAM file.
+#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}, Ricard Illa
+#' \email{ricard.illa@@irbbarcelona.org}
+#' @keywords file
+#'
+#' @examples
+#' infile <- system.file(
+#'     "extdata", "cellCycleM_chrII_5000-25000.bam", package="nucleR"
+#' )
+#' reads <- readBAM(infile, type="paired")
+#'
+#' @export readBAM
+#'
+readBAM <- function (file, type="paired")
+{
+    if (type == "single") {
+        .loadSingleBam(file)
+    } else if (type == "paired") {
+        .loadPairedBam(file)
+    } else {
+        stop("type must be `single` or `paired`")
+    }
+}
+
 irLs2rd <- function(x)
     # Convert a list of IRanges to a RangedData
-    RangedData(
+    IRanges::RangedData(
         ranges=do.call(c, unname(x)),
         space=rep(names(x), sapply(x, length))
     )
@@ -12,10 +45,10 @@ sortReads <- function (reads)
     sortChrs <- function (rans)
         rans[order(names(rans))]
     sortRans <- function (x) {
-        tmp <- x[sort.list(end(x))]
-        tmp[sort.list(start(tmp))]
+        tmp <- x[sort.list(IRanges::end(x))]
+        tmp[sort.list(IRanges::start(tmp))]
     }
-    irLs2rd(lapply(sortChrs(ranges(reads)), sortRans))
+    irLs2rd(lapply(sortChrs(IRanges::ranges(reads)), sortRans))
 }
 
 vectorizedAll <- function(...)
@@ -26,15 +59,15 @@ vectorizedAll <- function(...)
 .loadSingleBam <- function (exp)
 {
     what <- c("pos", "qwidth", "strand", "rname")
-    bam <- scanBam(exp, param=ScanBamParam(what=what))[[1]]
+    bam <- Rsamtools::scanBam(exp, param=Rsamtools::ScanBamParam(what=what))[[1]]
 
     non.na <- Reduce(`&`, lapply(bam, Negate(is.na)))
     filtered.bam <- lapply(bam, `[`, non.na)
 
     # IRanges
-    RangedData(
+    IRanges::RangedData(
         space  = filtered.bam$rname,
-        ranges = IRanges(
+        ranges = IRanges::IRanges(
             start = filtered.bam[["pos"]],
             width = filtered.bam[["qwidth"]]
         ),
@@ -75,9 +108,9 @@ vectorizedAll <- function(...)
             strand
         ))
     } else {
-        RangedData(
+        IRanges::RangedData(
             space  = as.character(reads1$rname),
-            ranges = IRanges(
+            ranges = IRanges::IRanges(
                 start = reads1$pos,
                 end   = reads2$pos + reads2$qwidth - 1
             )
@@ -99,53 +132,17 @@ vectorizedAll <- function(...)
         "mrnm",
         "mpos"
     )
-    bam <- as.data.frame(scanBam(
+    bam <- as.data.frame(Rsamtools::scanBam(
         file=file,
-        param=ScanBamParam(what=what)
+        param=Rsamtools::ScanBamParam(what=what)
     )[[1]])
 
     message("processing flags")
     bam$flag <- bam$flag %% 256
 
     # Process both strand and return the reads in sorted order
-    sortReads(rbind(
+    sortReads(IRanges::rbind(
         .processStrand("+", bam),
         .processStrand("-", bam)
     ))
-}
-
-
-
-
-
-#' Import reads from a list of BAM files.
-#' 
-#' This function allows to load reads from BAM files from both single and
-#' paired-end commming from Next Generation Sequencing nucleosome mapping
-#' experiments.
-#' 
-#' 
-#' @param file List of input BAM files.
-#' @param type Describes the type of reads. Values allowed are \code{single}
-#' for single-ended reads and \code{paired} for pair-ended.
-#' @return List of \code{GRanges} containing the reads of each input BAM file.
-#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}, Ricard Illa
-#' \email{ricard.illa@@irbbarcelona.org}
-#' @keywords
-#' @examples
-#' 
-#'     infile <- system.file(
-#'         "extdata", "cellCycleM_chrII_5000-25000.bam", package="nucleR"
-#'     )
-#'     reads <- readBAM(infile, type="paired")
-#' 
-readBAM <- function (file, type="paired")
-{
-    if (type == "single") {
-        .loadSingleBam(file)
-    } else if (type == "paired") {
-        .loadPairedBam(file)
-    } else {
-        stop("type must be `single` or `paired`")
-    }
 }
