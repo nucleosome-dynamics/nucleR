@@ -7,7 +7,7 @@
 #'
 #' @param data Input numeric values, or a list of them
 #' @param threshold Threshold value from which the peaks will be selected. Can
-#'   be given as a percentage string (i.e., `"25\%"` will use the value in the
+#'   be given as a percentage string (i.e., `"25\\%"` will use the value in the
 #'   1st quantile of `data`) or as an absolute coverage numeric value (i.e.,
 #'   `20` will not look for peaks in regions without less than 20 reads (or
 #'   reads per milion)).
@@ -26,14 +26,11 @@
 #'
 #'   * `numeric` (or a list of them) if `width==1 & score==FALSE` containing
 #'     the position of the peaks.
-#'
 #'   * `data.frame` (or list of them) if `width==1 & score==TRUE` containing a
 #'     'peak' column with the position of the peak plus a 'score' column with
 #'     its score.
-#'
 #'   * `IRanges` (or `IRangesList`) if `width>1 & score==FALSE` containing the
 #'     ranges of the peaks.
-#'
 #'   * `RangedData` if `width>1 & score==TRUE` containing the ranges of the
 #'      peaks and the assigned score.
 #'

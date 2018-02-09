@@ -31,7 +31,7 @@ implemented as a \code{numeric} list or a \code{IRangesList}}
 
 \item{threshold}{The non-default \code{threshold} previously used in
 \code{peakDetection} function, if applicable. Can be given as a percentage
-string (i.e., \code{"25\\%"} will use the value in the 1st quantile of \code{data})
+string (i.e., \code{"25\\\%"} will use the value in the 1st quantile of \code{data})
 or as an absolute coverage numeric value (i.e., \code{20} will not look for
 peaks in regions without less than 20 reads (or reads per million)).}
 

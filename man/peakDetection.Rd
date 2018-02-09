@@ -20,7 +20,7 @@ peakDetection(data, threshold = 0.25, width = 1, score = TRUE,
 \item{data}{Input numeric values, or a list of them}
 
 \item{threshold}{Threshold value from which the peaks will be selected. Can
-be given as a percentage string (i.e., \code{"25\\%"} will use the value in the
+be given as a percentage string (i.e., \code{"25\\\%"} will use the value in the
 1st quantile of \code{data}) or as an absolute coverage numeric value (i.e.,
 \code{20} will not look for peaks in regions without less than 20 reads (or
 reads per milion)).}

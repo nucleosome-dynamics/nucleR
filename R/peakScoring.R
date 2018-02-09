@@ -41,7 +41,7 @@
 #' @param data Data of nucleosome coverage or intensites.
 #' @param threshold The non-default `threshold` previously used in
 #'   `peakDetection` function, if applicable. Can be given as a percentage
-#'   string (i.e., `"25\%"` will use the value in the 1st quantile of `data`)
+#'   string (i.e., `"25\\%"` will use the value in the 1st quantile of `data`)
 #'   or as an absolute coverage numeric value (i.e., `20` will not look for
 #'   peaks in regions without less than 20 reads (or reads per million)).
 #' @param dyad.length How many bases account in the nucleosome dyad for

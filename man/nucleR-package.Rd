@@ -92,6 +92,6 @@ plotPeaks(peaks, cover_clean[[1]], threshold="25\%")
 \author{
 Oscar Flores Ricard Illa
 
-Maintainer: Ricard Illa \href{mailto:ricard.illa@irbbarcelona.org}{ricard.illa@irbbarcelona.org}
+Maintainer: Ricard Illa \email{ricard.illa@irbbarcelona.org}
 }
 \keyword{package}
