@@ -79,7 +79,7 @@
 #'
 #' @importFrom stats runif
 #' @importFrom IRanges IRanges
-#' @importMethodsFrom stats cor
+#' @importFrom stats cor
 #' @importMethodsFrom IRanges width start
 pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
                             verbose = FALSE, cor.target = 0.98, cor.tol = 1e-3,
