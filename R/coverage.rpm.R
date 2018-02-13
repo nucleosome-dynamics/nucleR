@@ -34,7 +34,8 @@ setGeneric(
 )
 
 #' @rdname coverage.rpm
-#' @importFrom IRanges RleList coverage
+#' @importFrom IRanges RleList
+#' @importMethodsFrom IRanges coverage
 setMethod(
     "coverage.rpm",
     signature(data="GRanges"),
@@ -46,7 +47,8 @@ setMethod(
 )
 
 #' @rdname coverage.rpm
-#' @importFrom IRanges RleList coverage
+#' @importFrom IRanges RleList
+#' @importMethodsFrom IRanges coverage
 setMethod(
     "coverage.rpm",
     signature(data="RangedData"),
@@ -58,7 +60,7 @@ setMethod(
 )
 
 #' @rdname coverage.rpm
-#' @importFrom IRanges coverage
+#' @importMethodsFrom IRanges coverage
 setMethod(
     "coverage.rpm",
     signature(data="IRanges"),
