@@ -6,6 +6,8 @@
 #' It's recommended to smooth the input with `filterFFT` prior the detection.
 #'
 #' @param data Input numeric values, or a list of them
+#' @param chromosome Optionally specify the name of the chromosome for input
+#'   data that doesn't specify it.
 #' @param threshold Threshold value from which the peaks will be selected. Can
 #'   be given as a percentage string (i.e., `"25\\%"` will use the value in the
 #'   1st quantile of `data`) or as an absolute coverage numeric value (i.e.,
@@ -14,7 +16,7 @@
 #' @param width If a positive integer > 1 is given, the peaks are returned as a
 #'   range of the given width centered in the local maximum. Useful for
 #'   nucleosome calling from a coverage peak in the dyad.
-#' @param score If TRUE, the results will be scored using `peakScoring`
+#' @param score If TRUE, the results will be scored using [peakScoring()]
 #'   function.
 #' @param min.cov Minimum coverage that a peak needs in order to be considered
 #'   as a nucleosome call.
@@ -31,7 +33,7 @@
 #'     its score.
 #'   * `IRanges` (or `IRangesList`) if `width>1 & score==FALSE` containing the
 #'     ranges of the peaks.
-#'   * `RangedData` if `width>1 & score==TRUE` containing the ranges of the
+#'   * `GRanges` if `width>1 & score==TRUE` containing the ranges of the
 #'      peaks and the assigned score.
 #'
 #' @note If `width` > 1, those ranges outside the range `1:length(data)` will
@@ -54,7 +56,7 @@
 #' peaks <- peakDetection(cover_fft, threshold="40%", score=TRUE)
 #' plotPeaks(peaks, cover_fft, threshold="40%", start=10000, end=15000)
 #'
-#' #Now use ranges version, which accounts for fuzziness when scoring
+#' # Now use ranges version, which accounts for fuzziness when scoring
 #' peaks <- peakDetection(cover_fft, threshold="40%", score=TRUE, width=147)
 #' plotPeaks(peaks, cover_fft, threshold="40%", start=10000, end=15000)
 #'
@@ -62,12 +64,14 @@
 #'
 setGeneric(
     "peakDetection",
-    function(data, threshold=0.25, width=1, score=TRUE, min.cov=2, mc.cores=1)
+    function(data, threshold=0.25, chromosome=NULL, width=1, score=TRUE,
+             min.cov=2, mc.cores=1)
         standardGeneric("peakDetection")
 )
 
 #' @rdname peakDetection
 #' @importFrom IRanges IRangesList
+#' @importMethodsFrom GenomeInfoDb "seqlevels<-"
 setMethod(
     "peakDetection",
     signature(data="list"),
@@ -75,28 +79,30 @@ setMethod(
             mc.cores=1) {
 
         res <- .xlapply(
-            data,
-            peakDetection,
-            threshold = threshold,
-            width     = width,
-            score     = score,
-            min.cov   = min.cov,
-            mc.cores  = mc.cores
+            names(data),
+            function (x)
+                peakDetection(data[[x]],
+                              chromosome = x,
+                              threshold  = threshold,
+                              width      = width,
+                              score      = score,
+                              min.cov    = min.cov,
+                              mc.cores   = mc.cores)
         )
+        names(res) <- names(data)
 
         # Process the result, case with ranges
         if (width > 1) {
             if (score) {
-                # res is a list of IRanges, conversion is direct
+                # res is a list of GRanges
                 res <- res[!sapply(res, is.null)]
                 for (name in names(res)) {
-                    names(res[[name]]) <- name
+                    seqlevels(res[[name]]) <- names(res)
                 }
-                # Combine RangedData objects into single one
-                res <- do.call(c, unname(res))
+                res <- do.call(`c`, unname(res))
 
             } else {
-                # res is a list of RangedData
+                # res is a list of IRanges
                 res <- unlist(res)
                 if (length(res)) {
                     res <- IRangesList(res)
@@ -117,8 +123,8 @@ setMethod(
 setMethod(
     "peakDetection",
     signature(data="numeric"),
-    function (data, threshold="25%", width=1, score=TRUE, min.cov=2,
-            mc.cores=1) {
+    function (data, threshold="25%", chromosome=NULL, width=1, score=TRUE,
+              min.cov=2, mc.cores=1) {
 
         if (width < 1) {
             stop("'width' attribute should be greater than 1")
@@ -127,7 +133,7 @@ setMethod(
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
             # If threshdol is given as a string with percentage, convert it
-            if (grep("%", threshold) == 1) {
+            if (grepl("%$", threshold)) {
                 threshold <- quantile(
                     data,
                     as.numeric(sub("%", "", threshold)) / 100,
@@ -191,7 +197,12 @@ setMethod(
         }
 
         if (score) {
-            return (peakScoring(peaks=res, data=data, threshold=threshold))
+            return (peakScoring(
+                peaks      = res,
+                chromosome = chromosome,
+                data       = data,
+                threshold  = threshold
+            ))
         } else {
             return (res)
         }

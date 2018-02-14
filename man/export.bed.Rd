@@ -5,7 +5,6 @@
 \alias{export.bed}
 \alias{export.bed,IRanges-method}
 \alias{export.bed,CompressedIRangesList-method}
-\alias{export.bed,RangedData-method}
 \alias{export.bed,GRanges-method}
 \title{Export ranges in BED format}
 \usage{
@@ -18,15 +17,12 @@ export.bed(ranges, score = NULL, chrom, name, desc = name,
 \S4method{export.bed}{CompressedIRangesList}(ranges, score = NULL, name,
   desc = name, filepath = name, splitByChrom = TRUE)
 
-\S4method{export.bed}{RangedData}(ranges, score = NULL, name, desc = name,
-  filepath = name, splitByChrom = TRUE)
-
 \S4method{export.bed}{GRanges}(ranges, score = NULL, name, desc = name,
   filepath = name, splitByChrom = TRUE)
 }
 \arguments{
-\item{ranges}{Ranges to export, in \code{IRanges}, \code{IRangesList} or \code{RangedData}
-format}
+\item{ranges}{Ranges to export, in \link[IRanges:IRanges]{IRanges::IRanges},
+\link[IRanges:IRangesList]{IRanges::IRangesList} or \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} format}
 
 \item{score}{Score data if not included in \code{ranges} object. Bed file will
 put all scores=1000 if scores are not present}
@@ -52,10 +48,12 @@ Export ranges in BED format, compatible with UCSC genome browser, IGB, and
 others.
 }
 \examples{
-library(IRanges)
-# Generate random ranges with scores
-ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
-names(ran) <- "chrX"
+# Generate some ranges with scores
+library(GenomicRanges)
+ran <- GRanges(
+    seqnames="chrX", ranges=IRanges(start=1:100, end=101:200),
+    score=(1:100)/100
+)
 
 # Export as bed file
 export.bed(ran, name="test_track", desc="Just a test track")

@@ -539,7 +539,7 @@ The next example shows a simple way to merge those nucleosomes which are
 overlap accounting them as a fuzzy regions:
 
 ```{r figranges, echo=-6, fig.cap=getCaps(), set.par=TRUE}
-nuc_calls <- ranges(peaks[peaks$score > 0.1, ])[[1]]
+nuc_calls <- ranges(peaks[peaks$score > 0.1, ])
 red_calls <- reduce(nuc_calls)
 red_class <- RangedData(red_calls, isFuzzy=width(red_calls) > 140)
 red_class

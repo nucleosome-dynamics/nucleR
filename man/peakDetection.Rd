@@ -7,14 +7,15 @@
 \alias{peakDetection,numeric-method}
 \title{Detect peaks (local maximum) from values series}
 \usage{
-peakDetection(data, threshold = 0.25, width = 1, score = TRUE,
-  min.cov = 2, mc.cores = 1)
+peakDetection(data, threshold = 0.25, chromosome = NULL, width = 1,
+  score = TRUE, min.cov = 2, mc.cores = 1)
 
 \S4method{peakDetection}{list}(data, threshold = "25\%", width = 1,
   score = TRUE, min.cov = 2, mc.cores = 1)
 
-\S4method{peakDetection}{numeric}(data, threshold = "25\%", width = 1,
-  score = TRUE, min.cov = 2, mc.cores = 1)
+\S4method{peakDetection}{numeric}(data, threshold = "25\%",
+  chromosome = NULL, width = 1, score = TRUE, min.cov = 2,
+  mc.cores = 1)
 }
 \arguments{
 \item{data}{Input numeric values, or a list of them}
@@ -25,11 +26,14 @@ be given as a percentage string (i.e., \code{"25\\\%"} will use the value in the
 \code{20} will not look for peaks in regions without less than 20 reads (or
 reads per milion)).}
 
+\item{chromosome}{Optionally specify the name of the chromosome for input
+data that doesn't specify it.}
+
 \item{width}{If a positive integer > 1 is given, the peaks are returned as a
 range of the given width centered in the local maximum. Useful for
 nucleosome calling from a coverage peak in the dyad.}
 
-\item{score}{If TRUE, the results will be scored using \code{peakScoring}
+\item{score}{If TRUE, the results will be scored using \code{\link[=peakScoring]{peakScoring()}}
 function.}
 
 \item{min.cov}{Minimum coverage that a peak needs in order to be considered
@@ -49,7 +53,7 @@ the position of the peaks.
 its score.
 \item \code{IRanges} (or \code{IRangesList}) if \code{width>1 & score==FALSE} containing the
 ranges of the peaks.
-\item \code{RangedData} if \code{width>1 & score==TRUE} containing the ranges of the
+\item \code{GRanges} if \code{width>1 & score==TRUE} containing the ranges of the
 peaks and the assigned score.
 }
 }
@@ -77,7 +81,7 @@ cover_fft <- filterFFT(cover)
 peaks <- peakDetection(cover_fft, threshold="40\%", score=TRUE)
 plotPeaks(peaks, cover_fft, threshold="40\%", start=10000, end=15000)
 
-#Now use ranges version, which accounts for fuzziness when scoring
+# Now use ranges version, which accounts for fuzziness when scoring
 peaks <- peakDetection(cover_fft, threshold="40\%", score=TRUE, width=147)
 plotPeaks(peaks, cover_fft, threshold="40\%", start=10000, end=15000)
 

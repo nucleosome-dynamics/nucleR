@@ -19,7 +19,8 @@
 #' almost no impact on the performance, despite a to small value can give
 #' biased results.
 #'
-#' @param reads Raw single-end reads `AlignedRead` or `RangedData` format)
+#' @param reads Raw single-end reads [ShortRead::AlignedRead] or
+#'   [GenomicRanges::GRanges] format)
 #' @param samples Number of samples to perform the analysis (more = slower but
 #'   more accurate)
 #' @param window Analysis window. Usually there's no need to touch this
@@ -41,22 +42,24 @@
 #' @rdname fragmentLenDetect
 #'
 #' @examples
+#' library(GenomicRanges)
 #' library(IRanges)
+#'
 #' # Create a sinthetic dataset, simulating single-end reads, for positive and
 #' # negative strands
 #' # Positive strand reads
 #' pos <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
 #' # Negative strand (shifted 147bp)
 #' neg <- IRanges(end=start(pos)+147, width=40)
-#' sim <- RangedData(
-#'     c(pos, neg),
+#' sim <- GRanges(
+#'     seqnames="chr1",
+#'     ranges=c(pos, neg),
 #'     strand=c(rep("+", length(pos)), rep("-", length(neg)))
 #' )
 #'
 #' # Detect fragment lenght (we know by construction it is really 147)
 #' fragmentLenDetect(sim, samples=50)
-#'
-#' # The function restrict the sampling to speed up the example
+#' # The function restricts the sampling to speed up the example
 #'
 #' @export
 #'
@@ -74,9 +77,9 @@ setGeneric(
 #' @importMethodsFrom ShortRead chromosome
 setMethod(
     "fragmentLenDetect",
-    signature(reads="AlignedRead"), 
-    function (reads, samples = 1000, window = 1000, min.shift = 1,
-            max.shift = 100, mc.cores = 1, as.shift = FALSE) {
+    signature(reads="AlignedRead"),
+    function (reads, samples=1000, window=1000, min.shift=1, max.shift=100,
+              mc.cores=1, as.shift=FALSE) {
 
         # Randomly select regions in the available chromosome bounds
         chrSample <- as.character(sample(chromosome(reads), samples))
@@ -143,9 +146,13 @@ setMethod(
             return(res + min.shift - 1)
         }
 
-        shift <- round(mean(unlist(.xlapply(1:nrow(dd),
-                                            shiftPos,
-                                            mc.cores=mc.cores))))
+        shift <- round(mean(unlist(.xlapply(
+            1:nrow(dd),
+            shiftPos,
+            mc.cores=mc.cores
+        ))))
+
+        kk <- lapply(1:nrow(dd), shiftPos)
 
         #Fragment length is the shift * 2 + the length of the read
         fragLen <- shift * 2 + width(reads)[1]
@@ -160,49 +167,46 @@ setMethod(
 )
 
 #' @rdname fragmentLenDetect
-#' @importFrom IRanges IRanges
-#' @importMethodsFrom IRanges width
 #' @importFrom stats runif cor
+#' @importMethodsFrom IRanges width
+#' @importMethodsFrom BiocGenerics strand
+#' @importMethodsFrom GenomeInfoDb seqnames
 setMethod(
     "fragmentLenDetect",
-    signature(reads="RangedData"),
+    signature(reads="GRanges"),
     function (reads, samples=1000, window=1000, min.shift=1, max.shift=100,
             mc.cores=1, as.shift=FALSE) {
 
         # Calculate the whole coverage here saves cpu and memory later for big
         # genomes. This improves a lot the performance on big genomes if the
-        # sampling value is big. For small datasets could be less efficient than
-        # obvious approach, but it is worth it
-        .doCover <- function(chr) {
-            df <- as.data.frame(reads[chr])
-            dp <- df[df$strand == "+",]
-            dn <- df[df$strand == "-",]
-            rp <- IRanges(start=dp$start, width=dp$width)
-            rn <- IRanges(start=dn$start, width=dn$width)
-            cp <- coverage(rp, method="hash")
-            cn <- coverage(rn, method="hash")
-            return(list(pos=cp, neg=cn))
-        }
+        # sampling value is big. For small datasets could be less efficient
+        # than obvious approach, but it is worth it
+        .doCover <- function (x)
+            lapply(
+                list(pos="+", neg="-"),
+                function (s)
+                    coverage(x[strand(x) == s, ])[[1]]
+            )
 
-        cover <- .xlapply(names(reads), .doCover, mc.cores=mc.cores)
-        names(cover) <- names(reads)
+        chrs <- levels(seqnames(reads))
+        splt <- split(reads, chrs)
+        cover <- lapply(splt, .doCover)
 
         # Randomly select regions in the available chromosome bounds
-        count <- sapply(reads, nrow)
+        count <- sapply(splt, length)
         probs <- count / sum(count)
-        chrSample <- sample(names(reads), samples, replace=TRUE, prob=probs)
+        chrSample <- sample(chrs, samples, replace=TRUE, prob=probs)
         chrLength <- sapply(
             cover,
-            function(x)
-                min(length(x$pos), length(x$neg))
+            function (x)
+                min(length(x[["pos"]]), length(x[["neg"]]))
         )
         position <- round(runif(samples, max=chrLength[chrSample] - window))
         dd <- data.frame(chrSample, position)
 
-
         # For each sampled region, look for the shift with higher correlation
         # between strands
-        shiftPos <- function(i) {
+        shiftPos <- function (i) {
             chr <- as.character(dd[i, "chrSample"])
             sta <- as.numeric(dd[i, "position"])
             end <- sta + window
@@ -239,18 +243,19 @@ setMethod(
             return(res + min.shift - 1)
         }
 
-        shift <- round(mean(unlist(.xlapply(1:nrow(dd),
-                                            shiftPos,
-                                            mc.cores=mc.cores)),
-                            na.rm=TRUE))
+        shift <- round(mean(unlist(.xlapply(
+            1:nrow(dd),
+            shiftPos,
+            mc.cores=mc.cores
+        )), na.rm=TRUE))
 
-        #Fragment length is the shift * 2 + the length of the read
+        # Fragment length is the shift * 2 + the length of the read
         fragLen <- shift * 2 + width(reads)[1]
 
         if (as.shift) {
-            return(shift)
+            return (shift)
         } else {
-            return(fragLen)
+            return (fragLen)
         }
     }
 )

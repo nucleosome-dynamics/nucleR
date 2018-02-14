@@ -5,7 +5,7 @@
 \alias{plotPeaks}
 \alias{plotPeaks,numeric-method}
 \alias{plotPeaks,data.frame-method}
-\alias{plotPeaks,RangedData-method}
+\alias{plotPeaks,GRanges-method}
 \alias{plotPeaks,IRanges-method}
 \title{Nucleosome calling plot function}
 \usage{
@@ -19,7 +19,7 @@ plotPeaks(peaks, data, ...)
 
 \S4method{plotPeaks}{data.frame}(peaks, data, ...)
 
-\S4method{plotPeaks}{RangedData}(peaks, data, ...)
+\S4method{plotPeaks}{GRanges}(peaks, data, ...)
 
 \S4method{plotPeaks}{IRanges}(peaks, data, threshold = 0, scores = NULL,
   start = 1, end = length(data), dyn.pos = TRUE, xlab = "position",
@@ -30,9 +30,9 @@ plotPeaks(peaks, data, ...)
   indiv.scores = TRUE, ...)
 }
 \arguments{
-\item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or \code{RangedData} object
-containing the detected peaks information. See help of
-\code{\link[=peakDetection]{peakDetection()}} or \code{\link[=peakScoring]{peakScoring()}} for more details.}
+\item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or \code{GRanges} object
+containing the detected peaks information. See help of \code{\link[=peakDetection]{peakDetection()}}
+or \code{\link[=peakScoring]{peakScoring()}} for more details.}
 
 \item{data}{Coverage or Tiling Array intensities}
 
@@ -40,8 +40,8 @@ containing the detected peaks information. See help of
 
 \item{threshold}{Threshold applied in \code{peakDetection}}
 
-\item{scores}{If \code{peaks} is a \code{data.frame} or a \code{RangedData} it's obtained
-from 'score' column, otherwise, \code{scores} can be given here as a `numeric
+\item{scores}{If \code{peaks} is a \code{data.frame} or a \code{GRanges} it's obtained from
+'score' column, otherwise, \code{scores} can be given here as a \code{numeric}
 vector.}
 
 \item{start, end}{Start and end points defining a subset in the range of

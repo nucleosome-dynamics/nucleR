@@ -16,10 +16,12 @@ peakScoring(peaks, data, threshold = 0.25, ...)
 \S4method{peakScoring}{IRangesList}(peaks, data, threshold = "25\%",
   weight.width = 1, weight.height = 1, dyad.length = 38, mc.cores = 1)
 
-\S4method{peakScoring}{numeric}(peaks, data, threshold = "25\%")
+\S4method{peakScoring}{numeric}(peaks, data, chromosome = NULL,
+  threshold = "25\%")
 
-\S4method{peakScoring}{IRanges}(peaks, data, threshold = "25\%",
-  weight.width = 1, weight.height = 1, dyad.length = 38)
+\S4method{peakScoring}{IRanges}(peaks, data, chromosome = NULL,
+  threshold = "25\%", weight.width = 1, weight.height = 1,
+  dyad.length = 38)
 }
 \arguments{
 \item{peaks}{The identified peaks resulting from \code{peakDetection}. Could be a
@@ -48,15 +50,18 @@ weigths with these parameters. See details.}
 sharpness description. If working with NGS data, works best with the reads
 width value for single-ended data or the \code{trim} value given to the
 \code{processReads} function.}
+
+\item{chromosome}{Optionally specify the name of the chromosome for input
+data that doesn't specify it.}
 }
 \value{
 In the case of \code{numeric} input, the value returned is a \code{data.frame}
 containing a 'peak' and a 'score' column. If the input is a \code{list}, the
 result will be a \code{list} of \code{data.frame}.
 
-If input is a \code{IRanges} or \code{IRangesList}, the result will be a RangedData
-object with one or multiple spaces respectively and a 3 data column with the
-mixed, width and heigh score.
+If input is a \code{IRanges} or \code{IRangesList}, the result will be a \code{data.frame}
+or \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} object with one or multiple spaces respectively
+and a 3 data column with the mixed, width and heigh score.
 }
 \description{
 Scores peaks detected with function \code{peakDetection} according the height and

@@ -32,41 +32,23 @@ readBAM <- function (file, type="paired")
     }
 }
 
-#' Convert IRangesList to RangedData
-#'
-#' @importFrom IRanges RangedData
-.irLs2rd <- function(x)
-    # Convert a list of IRanges to a RangedData
-    RangedData(
-        ranges=do.call(c, unname(x)),
-        space=rep(names(x), sapply(x, length))
-    )
 
-#' Read Sorter
+#' Vectorized version of `all`
 #'
-#' Sort reads RangedData format. Sort them first by chromosome, then by
-#' start and then by end
+#' Helper function that behaves as a vectorized version of the function `all`
 #'
-#' @importMethodsFrom IRanges start end ranges
-.sortReads <- function (reads)
-{
-    sortChrs <- function (rans)
-        rans[order(names(rans))]
-    sortRans <- function (x) {
-        tmp <- x[sort.list(end(x))]
-        tmp[sort.list(start(tmp))]
-    }
-    .irLs2rd(lapply(sortChrs(ranges(reads)), sortRans))
-}
-
-vectorizedAll <- function(...)
-    # Helper function that behaves as a vectorized version of the function
-    # `all`
+#' @param ... arbitraty amount of `logical` vectors, expected to have the same
+#'   length
+#' @return `logical` vector
+#'
+.vectorizedAll <- function(...)
     Reduce(`&`, list(...))
+
 
 #' Load a single-end BAM
 #'
-#' @importFrom IRanges IRanges RangedData
+#' @importFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges
 #' @importMethodsFrom Rsamtools scanBam ScanBamParam
 #'
 .loadSingleBam <- function (exp)
@@ -77,9 +59,8 @@ vectorizedAll <- function(...)
     non.na <- Reduce(`&`, lapply(bam, Negate(is.na)))
     filtered.bam <- lapply(bam, `[`, non.na)
 
-    # IRanges
-    RangedData(
-        space  = filtered.bam$rname,
+    GRanges(
+        seqnames = filtered.bam$rname,
         ranges = IRanges(
             start = filtered.bam[["pos"]],
             width = filtered.bam[["qwidth"]]
@@ -88,6 +69,17 @@ vectorizedAll <- function(...)
     )
 }
 
+#' Process a given strand from a BAM file to read
+#'
+#' @param strand either strand "+" or "-"
+#' @param bam `data.frame` representing the BAM file as read by
+#'    [Rsamtools::scanBam]
+#' @return [GenomicRanges::GRanges] object representing the reads in a given
+#'   strand
+#'
+#' @importFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges
+#'
 .processStrand <- function (strand, bam)
 {
     message(sprintf("processing strand %s", strand))
@@ -109,7 +101,7 @@ vectorizedAll <- function(...)
     reads2 <- unsorted.reads2[common, ]
 
     # Consistency check
-    test <- all(vectorizedAll(
+    test <- all(.vectorizedAll(
         reads1$mpos  == reads2$pos,
         reads2$mpos  == reads1$pos,
         reads1$rname == reads2$rname
@@ -121,9 +113,9 @@ vectorizedAll <- function(...)
             strand
         ))
     } else {
-        RangedData(
-            space  = as.character(reads1$rname),
-            ranges = IRanges(
+        GRanges(
+            seqnames = reads1$rname,
+            ranges   = IRanges(
                 start = reads1$pos,
                 end   = reads2$pos + reads2$qwidth - 1
             )
@@ -133,8 +125,9 @@ vectorizedAll <- function(...)
 
 #' Load a paired-end-end BAM
 #'
-#' @importFrom IRanges IRanges RangedData
 #' @importMethodsFrom Rsamtools scanBam ScanBamParam
+#' @importMethodsFrom GenomeInfoDb sortSeqlevels
+#' @importMethodsFrom BiocGenerics sort
 #'
 .loadPairedBam <- function (file)
 {
@@ -159,8 +152,7 @@ vectorizedAll <- function(...)
     bam$flag <- bam$flag %% 256
 
     # Process both strand and return the reads in sorted order
-    .sortReads(IRanges::rbind(
-        .processStrand("+", bam),
-        .processStrand("-", bam)
-    ))
+    both.strands <- c(.processStrand("+", bam),
+                      .processStrand("-", bam))
+    sort(sortSeqlevels(both.strands))
 }

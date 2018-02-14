@@ -28,8 +28,8 @@
 
 #' Find midpoints
 #'
-#' Simple function for returning the middle point of a RangedData or of a
-#' GRanges (normal mid doesn't work there)
+#' Simple function for returning the middle point of a of a GRanges (normal mid
+#' doesn't work there)
 #' @importMethodsFrom IRanges start end
 .mid <- function(x)
     floor((start(x) + end(x)) / 2)

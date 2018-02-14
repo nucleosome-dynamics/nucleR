@@ -4,7 +4,6 @@
 \name{processReads}
 \alias{processReads}
 \alias{processReads,AlignedRead-method}
-\alias{processReads,RangedData-method}
 \alias{processReads,GRanges-method}
 \title{Process reads from High-Troughtput Sequencing experiments}
 \usage{
@@ -13,16 +12,13 @@ processReads(data, type = "single", fragmentLen, trim, ...)
 \S4method{processReads}{AlignedRead}(data, type = "single", fragmentLen, trim,
   ...)
 
-\S4method{processReads}{RangedData}(data, type = "single", fragmentLen, trim,
-  ...)
-
 \S4method{processReads}{GRanges}(data, type = "single", fragmentLen, trim,
   ...)
 }
 \arguments{
 \item{data}{Sequence reads objects, probably imported using other packages
-as \code{ShortRead}. Allowed object types are \code{AlignedRead} and \code{RangedData}
-with a \code{strand} attribute.}
+as \code{ShortRead}. Allowed object types are \link[ShortRead:AlignedRead]{ShortRead::AlignedRead} and
+\link[GenomicRanges:GRanges]{GenomicRanges::GRanges} with a \code{strand} attribute.}
 
 \item{type}{Describes the type of reads. Values allowed are \code{single} for
 single-ended reads and \code{paired} for paired-ended.}
@@ -37,7 +33,8 @@ length)}
 \code{fragmentLen} is given.}
 }
 \value{
-\code{RangedData} containing the aligned/trimmed individual reads
+\link[GenomicRanges:GRanges]{GenomicRanges::GRanges} containing the aligned/trimmed individual
+reads.
 }
 \description{
 This method allows the processment of NGS nucleosome reads from different
@@ -46,8 +43,8 @@ of strand-specific single-end reads and the trimming of reads to a given
 length.
 }
 \details{
-This function reads a \code{AlignedRead} or a \code{RangedData} object containing the
-position, length and strand of the sequence reads.
+This function reads a \link[ShortRead:AlignedRead]{ShortRead::AlignedRead} or a \link[GenomicRanges:GRanges]{GenomicRanges::GRanges}
+object containing the position, length and strand of the sequence reads.
 
 It allows the processment of both paired and single ended reads. In the case
 of single end reads this function corrects the strand-specific mapping by
@@ -106,7 +103,7 @@ plot(
 
 }
 \seealso{
-\link[ShortRead:AlignedRead]{ShortRead::AlignedRead}, \link[IRanges:RangedData]{IRanges::RangedData},
+\link[ShortRead:AlignedRead]{ShortRead::AlignedRead}, \link[GenomicRanges:GRanges]{GenomicRanges::GRanges},
 \code{\link[=fragmentLenDetect]{fragmentLenDetect()}}
 }
 \author{

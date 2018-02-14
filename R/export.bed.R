@@ -3,8 +3,8 @@
 #' Export ranges in BED format, compatible with UCSC genome browser, IGB, and
 #' others.
 #'
-#' @param ranges Ranges to export, in `IRanges`, `IRangesList` or `RangedData`
-#'   format
+#' @param ranges Ranges to export, in [IRanges::IRanges],
+#'   [IRanges::IRangesList] or [GenomicRanges::GRanges] format
 #' @param score Score data if not included in `ranges` object. Bed file will
 #'   put all scores=1000 if scores are not present
 #' @param chrom For single `IRanges` objects, the chromosome they represent.
@@ -25,10 +25,12 @@
 #' @rdname export.bed
 #'
 #' @examples
-#' library(IRanges)
-#' # Generate random ranges with scores
-#' ran <- RangedData(IRanges(start=1:100, end=101:200), score=(1:100) / 100)
-#' names(ran) <- "chrX"
+#' # Generate some ranges with scores
+#' library(GenomicRanges)
+#' ran <- GRanges(
+#'     seqnames="chrX", ranges=IRanges(start=1:100, end=101:200),
+#'     score=(1:100)/100
+#' )
 #'
 #' # Export as bed file
 #' export.bed(ran, name="test_track", desc="Just a test track")
@@ -49,6 +51,7 @@ setGeneric(
             splitByChrom=TRUE)
         standardGeneric("export.bed")
 )
+
 
 #' @rdname export.bed
 setMethod(
@@ -98,34 +101,6 @@ setMethod(
             if (!is.null(score)) {
                 dd$score <- unlist(score)
             }
-            dd$count <- seq(1, nrow(dd))
-
-            .export.bed(df=dd, name=name, desc=desc, filename=filepath)
-        }
-    }
-)
-
-#' @rdname export.bed
-setMethod(
-    "export.bed",
-    signature(ranges="RangedData"),
-    function (ranges, score=NULL, name, desc=name, filepath=name,
-            splitByChrom=TRUE) {
-
-        if (splitByChrom) {
-            for(chr in names(ranges)) {
-                export.bed(
-                    ranges=ranges[chr],
-                    chrom=chr,
-                    name=name,
-                    desc=desc,
-                    filepath=paste(filepath, chr, sep="."),
-                    splitByChrom=FALSE
-                )
-            }
-        } else {
-            dd <- as.data.frame(ranges)
-            dd$chrom <- dd$space
             dd$count <- seq(1, nrow(dd))
 
             .export.bed(df=dd, name=name, desc=desc, filename=filepath)

@@ -1,13 +1,13 @@
 #' Coverage calculation and normalization to reads per million (rpm)
 #'
-#' Calculates the coverage values from a `RangedData` object (or anything with
-#' a defined `coverage` function associated) and returns the coverage
-#' normalized to reads per million, allowing the comparison of experiments with
-#' a different absolut number of reads.
+#' Calculates the coverage values from a [GenomicRanges::GRanges] or
+#' [IRanges::IRanges] object normalized to reads per million, allowing the
+#' comparison of experiments with a different absolut number of reads.
 #'
-#' @param data `RangedData` (or compatible) with the reads information
+#' @param data [GenomicRanges::GenomicRanges] or [IRanges::IRanges] with the
+#'   reads information
 #' @param scale By default, a million (1e6), but you could change this value
-#' for abnormal high or low amount of reads.
+#'    for abnormal high or low amount of reads.
 #' @param \dots Additional arguments to be passed to `coverage` function
 #'
 #' @return `RleList` object with the coverage objects
@@ -43,19 +43,6 @@ setMethod(
         RleList(lapply(
             coverage(data, ...),
             function (x) x / length(data) * scale
-        ), compress=FALSE)
-)
-
-#' @rdname coverage.rpm
-#' @importFrom IRanges RleList
-#' @importMethodsFrom IRanges coverage
-setMethod(
-    "coverage.rpm",
-    signature(data="RangedData"),
-    function(data, scale=1e6, ...)
-        RleList(lapply(
-            coverage(data, ...),
-            function (x) x / nrow(data) * scale
         ), compress=FALSE)
 )
 
