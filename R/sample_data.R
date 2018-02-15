@@ -14,7 +14,7 @@
 #'
 #' @name nucleosome_htseq
 #' @docType data
-#' @format `RangedData` with the range of the reads and a data column with the
+#' @format `GRanges` with the range of the reads and a data column with the
 #'   strand information.
 #' @source Publication pending
 #' @keywords datasets

@@ -7,13 +7,13 @@
 #' pipeline. It shows a coverage/intensity profile toghether with the
 #' identified peaks. If available, score of each peak is also shown.
 #'
-#' @param peaks `numeric`, `data.frame`, `IRanges` or `RangedData` object
-#'   containing the detected peaks information. See help of
-#'   [peakDetection()] or [peakScoring()] for more details.
+#' @param peaks `numeric`, `data.frame`, `IRanges` or `GRanges` object
+#'   containing the detected peaks information. See help of [peakDetection()]
+#'   or [peakScoring()] for more details.
 #' @param data Coverage or Tiling Array intensities
 #' @param threshold Threshold applied in `peakDetection`
-#' @param scores If `peaks` is a `data.frame` or a `RangedData` it's obtained
-#'   from 'score' column, otherwise, `scores` can be given here as a `numeric
+#' @param scores If `peaks` is a `data.frame` or a `GRanges` it's obtained from
+#'  'score' column, otherwise, `scores` can be given here as a `numeric`
 #'   vector.
 #' @param start,end Start and end points defining a subset in the range of
 #'   `data`. This is a convenient way to plot only a small region of data,
@@ -71,9 +71,9 @@ setMethod(
     "plotPeaks",
     signature(peaks="numeric"),
     function (peaks, data, threshold=0, scores=NULL, start=1, end=length(data),
-            xlab="position", type="l", col.points="red", thr.lty=1, thr.lwd=1,
-            thr.col="darkred", scor.col=col.points, scor.font=2,
-            scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2, ...) {
+              xlab="position", type="l", col.points="red", thr.lty=1,
+              thr.lwd=1, thr.col="darkred", scor.col=col.points, scor.font=2,
+              scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2, ...) {
 
         # Calculate the ranges in threshold and get the coverage
         # If threshold is given as a string with percentage, convert it
@@ -124,6 +124,24 @@ setMethod(
 )
 
 #' @rdname plotPeaks
+#' @importMethodsFrom S4Vectors values runLength
+#' @importMethodsFrom IRanges ranges
+setMethod(
+    "plotPeaks",
+    signature(peaks="GRanges"),
+    function(peaks, data, ...) {
+        if (sum(runLength(seqnames(peaks)) > 0) > 1) {
+            stop("Only GRanges with a single seqname are supported")
+        }
+        scoreMatrix <- as.data.frame(values(peaks))
+        if (ncol(scoreMatrix) == 0) {
+            scoreMatrix <- NULL
+        }
+        plotPeaks(peaks=ranges(peaks), data=data, scores=scoreMatrix, ...)
+    }
+)
+
+#' @rdname plotPeaks
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom S4Vectors space values
 setMethod(
@@ -149,11 +167,11 @@ setMethod(
     "plotPeaks",
     signature(peaks="IRanges"),
     function (peaks, data, threshold=0, scores=NULL, start=1, end=length(data),
-            dyn.pos=TRUE, xlab="position", type="l", col.points="red",
-            thr.lty=1, thr.lwd=1, thr.col="darkred", rect.thick=2,
-            rect.lwd=1, rect.border="black", scor.col=col.points,
-            scor.font=2, scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2,
-            indiv.scores=TRUE, ...) {
+              dyn.pos=TRUE, xlab="position", type="l", col.points="red",
+              thr.lty=1, thr.lwd=1, thr.col="darkred", rect.thick=2,
+              rect.lwd=1, rect.border="black", scor.col=col.points,
+              scor.font=2, scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2,
+              indiv.scores=TRUE, ...) {
 
         if (!is.null(scores) & is.numeric(scores)) {
             scores <- data.frame(score=scores)

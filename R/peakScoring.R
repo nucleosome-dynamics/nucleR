@@ -39,6 +39,8 @@
 #'   with the extended range of the peak. For both types, list support is
 #'   implemented as a `numeric` list or a `IRangesList`
 #' @param data Data of nucleosome coverage or intensites.
+#' @param chromosome Optionally specify the name of the chromosome for input
+#'   data that doesn't specify it.
 #' @param threshold The non-default `threshold` previously used in
 #'   `peakDetection` function, if applicable. Can be given as a percentage
 #'   string (i.e., `"25\\%"` will use the value in the 1st quantile of `data`)
@@ -59,9 +61,9 @@
 #' containing a 'peak' and a 'score' column. If the input is a `list`, the
 #' result will be a `list` of `data.frame`.
 #'
-#' If input is a `IRanges` or `IRangesList`, the result will be a RangedData
-#' object with one or multiple spaces respectively and a 3 data column with the
-#' mixed, width and heigh score.
+#' If input is a `IRanges` or `IRangesList`, the result will be a `data.frame`
+#' or [GenomicRanges::GRanges] object with one or multiple spaces respectively
+#' and a 3 data column with the mixed, width and heigh score.
 #'
 #' @author Oscar Flores \email{oflores@@mmb.cpb.ub.es}
 #' @seealso [peakDetection()], [processReads()],
@@ -105,18 +107,20 @@ setMethod(
 )
 
 #' @rdname peakScoring
+#' @importMethodsFrom GenomeInfoDb "seqlevels<-"
 setMethod(
     "peakScoring",
     signature(peaks="IRangesList"),
     function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
-            dyad.length=38, mc.cores=1) {
-
+              dyad.length=38, mc.cores=1) {
+        chrs <- names(peaks)
         res <- .xlapply(
-            names(peaks),
+            chrs,
             function(x)
                 peakScoring(
                     peaks         = peaks[[x]],
                     data          = data[[x]],
+                    chromosome    = x,
                     threshold     = threshold,
                     dyad.length   = dyad.length,
                     weight.width  = weight.width,
@@ -124,18 +128,11 @@ setMethod(
                 ),
             mc.cores=mc.cores
         )
-        names(res) <- names(peaks)
-
-        # Result should be returned as a single RangedData object
-        # Put the correct space in RangedData
-        for (name in names(res)) {
-            if (nrow(res[[name]])) {
-                names(res[[name]]) <- name
-            }
+        names(res) <- chrs
+        for (i in chrs) {
+            seqlevels(res[[i]]) <- chrs
         }
-
-        # Combine RangedData objects into single one
-        do.call(c, unname(res))
+        do.call(`c`, unname(res))
     }
 )
 
@@ -144,7 +141,7 @@ setMethod(
 setMethod(
     "peakScoring",
     signature(peaks="numeric"),
-    function (peaks, data, threshold="25%") {
+    function (peaks, data, chromosome=NULL, threshold="25%") {
 
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
@@ -162,20 +159,25 @@ setMethod(
         sd <- sd(data[!is.na(data) & data > threshold], na.rm=TRUE)
 
         res <- pnorm(data[peaks], mean=mean, sd=sd, lower.tail=TRUE)
-        return (data.frame(peak=peaks, score=res))
+        if (!is.null(chromosome)) {
+            return (data.frame(peak=peaks, score=res, chromosome=chromosome))
+        } else {
+            return (data.frame(peak=peaks, score=res))
+        }
     }
 )
 
 #' @rdname peakScoring
 #' @importFrom stats pnorm
-#' @importFrom IRanges IRanges RangedData
+#' @importFrom IRanges IRanges
 #' @importFrom stats quantile
-#' @importMethodsFrom IRanges start width
+#' @importFrom GenomicRanges GRanges
+#' @importMethodsFrom IRanges start end width
 setMethod(
     "peakScoring",
     signature(peaks="IRanges"),
-    function (peaks, data, threshold="25%", weight.width=1, weight.height=1,
-            dyad.length=38) {
+    function (peaks, data, chromosome=NULL, threshold="25%", weight.width=1,
+              weight.height=1, dyad.length=38) {
 
         # Calculate the ranges in threshold and get the coverage
         if (!is.numeric(threshold)) {
@@ -218,12 +220,16 @@ setMethod(
         scor.final <- ((scor.heigh * weight.height) / sum.wei) +
             ((scor.width * weight.width) / sum.wei)
 
-        # Return everything or just merged score
-        return (RangedData(
-            peaks,
-            score   = scor.final,
-            score_w = scor.width,
-            score_h = scor.heigh
+        if (is.null(chromosome)) {
+            chromosome <- "*"
+        }
+
+        return (GRanges(
+            seqnames = chromosome,
+            ranges   = peaks,
+            score    = scor.final,
+            score_w  = scor.width,
+            score_h  = scor.heigh
         ))
     }
 )

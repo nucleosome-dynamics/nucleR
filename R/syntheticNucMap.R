@@ -173,8 +173,9 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
             log2(as.vector(coverage(ctr.reads)))
         )
 
-        syn.ratio[abs(syn.ratio) == Inf] <- NA  # Some lost bases... as reality
-        syn.ratio <- Rle(syn.ratio)
+        # Some lost bases... as reality
+        syn.ratio[abs(syn.ratio) == Inf] <- NA
+        Rle(syn.ratio)
     }
 
     result <- list()
@@ -189,12 +190,12 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
 
     result[["syn.reads"]] <- syn.reads
 
-    if(as.ratio) {
+    if (as.ratio) {
         result[["ctr.reads"]] <- ctr.reads
         result[["syn.ratio"]] <- syn.ratio
     }
 
-    if(show.plot) {
+    if (show.plot) {
         # Y-lim range
         max <- max(coverage(syn.reads), na.rm=TRUE)
         min <- 0

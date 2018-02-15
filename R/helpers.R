@@ -28,8 +28,50 @@
 
 #' Find midpoints
 #'
-#' Simple function for returning the middle point of a RangedData or of a
-#' GRanges (normal mid doesn't work there)
+#' Simple function for returning the middle point of a of a GRanges (normal mid
+#' doesn't work there)
 #' @importMethodsFrom IRanges start end
 .mid <- function(x)
     floor((start(x) + end(x)) / 2)
+
+setGeneric(
+    ".whichChr",
+    function (x)
+        setGeneric(".whichChr")
+)
+
+#' @importMethodsFrom GenomeInfoDb seqnames
+#' @importMethodsFrom S4Vectors runValue
+setMethod(
+    ".whichChr",
+    signature(x="GRanges"),
+    function (x)
+        runValue(seqnames(x))
+)
+
+setMethod(
+    ".whichChr",
+    signature(x="RangedData"),
+    function (x)
+        names(x)
+)
+
+setGeneric(
+    ".countRows",
+    function (x)
+        setGeneric(".countRows")
+)
+
+setMethod(
+    ".countRows",
+    signature(x="GRanges"),
+    function (x)
+        length(x)
+)
+
+setMethod(
+    ".countRows",
+    signature(x="RangedData"),
+    function (x)
+        nrow(x)
+)

@@ -4,20 +4,21 @@
 \name{coverage.rpm}
 \alias{coverage.rpm}
 \alias{coverage.rpm,GRanges-method}
-\alias{coverage.rpm,RangedData-method}
 \alias{coverage.rpm,IRanges-method}
+\alias{coverage.rpm,RangedData-method}
 \title{Coverage calculation and normalization to reads per million (rpm)}
 \usage{
 coverage.rpm(data, scale = 1e+06, ...)
 
 \S4method{coverage.rpm}{GRanges}(data, scale = 1e+06, ...)
 
-\S4method{coverage.rpm}{RangedData}(data, scale = 1e+06, ...)
-
 \S4method{coverage.rpm}{IRanges}(data, scale = 1e+06, ...)
+
+\S4method{coverage.rpm}{RangedData}(data, scale = 1e+06, ...)
 }
 \arguments{
-\item{data}{\code{RangedData} (or compatible) with the reads information}
+\item{data}{\link[GenomicRanges:GenomicRanges]{GenomicRanges::GenomicRanges} or \link[IRanges:IRanges]{IRanges::IRanges} with the
+reads information}
 
 \item{scale}{By default, a million (1e6), but you could change this value
 for abnormal high or low amount of reads.}
@@ -28,10 +29,9 @@ for abnormal high or low amount of reads.}
 \code{RleList} object with the coverage objects
 }
 \description{
-Calculates the coverage values from a \code{RangedData} object (or anything with
-a defined \code{coverage} function associated) and returns the coverage
-normalized to reads per million, allowing the comparison of experiments with
-a different absolut number of reads.
+Calculates the coverage values from a \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} or
+\link[IRanges:IRanges]{IRanges::IRanges} object normalized to reads per million, allowing the
+comparison of experiments with a different absolut number of reads.
 }
 \examples{
 # Load the example dataset and get the coverage

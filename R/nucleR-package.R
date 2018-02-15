@@ -31,7 +31,7 @@
 #' @examples
 #' # Load example dataset:
 #' # some NGS paired-end reads, mapped with Bowtie and processed with R
-#' # it is a RangedData object with the start/end coordinates for each read.
+#' # it is a GRanges object with the start/end coordinates for each read.
 #' reads <- get(data(nucleosome_htseq))
 #'
 #' # Process the paired end reads, but discard those with length > 200

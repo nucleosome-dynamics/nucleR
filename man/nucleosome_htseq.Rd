@@ -5,7 +5,7 @@
 \alias{nucleosome_htseq}
 \title{Example reads from high-troughtput sequencing nucleosome positioning
 experiment}
-\format{\code{RangedData} with the range of the reads and a data column with the
+\format{\code{GRanges} with the range of the reads and a data column with the
 strand information.}
 \source{
 Publication pending

@@ -4,6 +4,7 @@
 \name{fragmentLenDetect}
 \alias{fragmentLenDetect}
 \alias{fragmentLenDetect,AlignedRead-method}
+\alias{fragmentLenDetect,GRanges-method}
 \alias{fragmentLenDetect,RangedData-method}
 \title{Fragments length detection from single-end sequencing samples}
 \usage{
@@ -14,12 +15,16 @@ fragmentLenDetect(reads, samples = 1000, window = 5000, min.shift = 1,
   window = 1000, min.shift = 1, max.shift = 100, mc.cores = 1,
   as.shift = FALSE)
 
+\S4method{fragmentLenDetect}{GRanges}(reads, samples = 1000, window = 1000,
+  min.shift = 1, max.shift = 100, mc.cores = 1, as.shift = FALSE)
+
 \S4method{fragmentLenDetect}{RangedData}(reads, samples = 1000,
   window = 1000, min.shift = 1, max.shift = 100, mc.cores = 1,
   as.shift = FALSE)
 }
 \arguments{
-\item{reads}{Raw single-end reads \code{AlignedRead} or \code{RangedData} format)}
+\item{reads}{Raw single-end reads \link[ShortRead:AlignedRead]{ShortRead::AlignedRead} or
+\link[GenomicRanges:GRanges]{GenomicRanges::GRanges} format)}
 
 \item{samples}{Number of samples to perform the analysis (more = slower but
 more accurate)}
@@ -64,22 +69,24 @@ almost no impact on the performance, despite a to small value can give
 biased results.
 }
 \examples{
+library(GenomicRanges)
 library(IRanges)
+
 # Create a sinthetic dataset, simulating single-end reads, for positive and
 # negative strands
 # Positive strand reads
 pos <- syntheticNucMap(nuc.len=40, lin.len=130)$syn.reads
 # Negative strand (shifted 147bp)
 neg <- IRanges(end=start(pos)+147, width=40)
-sim <- RangedData(
-    c(pos, neg),
+sim <- GRanges(
+    seqnames="chr1",
+    ranges=c(pos, neg),
     strand=c(rep("+", length(pos)), rep("-", length(neg)))
 )
 
 # Detect fragment lenght (we know by construction it is really 147)
 fragmentLenDetect(sim, samples=50)
-
-# The function restrict the sampling to speed up the example
+# The function restricts the sampling to speed up the example
 
 }
 \author{
