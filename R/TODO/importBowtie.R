@@ -56,21 +56,21 @@ readAlignedBatch <- function (fnames, dir=getwd(), type='Bowtie', paired=FALSE,
       fnameslist[[i]] <- fnames[i]
   }
   if (mc.cores == 1) {
-    ans <- lapply(fnameslist,
-                  readSingleFile,
-                  dir    = dir,
-                  type   = type,
-                  paired = paired,
-                  ...)
-  } else {
-    ans <- mclapply(fnameslist,
+      ans <- lapply(fnameslist,
                     readSingleFile,
                     dir    = dir,
                     type   = type,
                     paired = paired,
-                    ...,
-                    mc.preschedule = FALSE,
-                    mc.cores       = mc.cores)
+                    ...)
+  } else {
+      ans <- mclapply(fnameslist,
+                      readSingleFile,
+                      dir    = dir,
+                      type   = type,
+                      paired = paired,
+                      ...,
+                      mc.preschedule = FALSE,
+                      mc.cores       = mc.cores)
   }
   ans <- RangedDataList(ans)
   names(ans) <- sub("\\..+$", '', fnames)
