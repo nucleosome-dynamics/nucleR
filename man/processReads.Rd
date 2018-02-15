@@ -5,6 +5,7 @@
 \alias{processReads}
 \alias{processReads,AlignedRead-method}
 \alias{processReads,GRanges-method}
+\alias{processReads,RangedData-method}
 \title{Process reads from High-Troughtput Sequencing experiments}
 \usage{
 processReads(data, type = "single", fragmentLen, trim, ...)
@@ -13,6 +14,9 @@ processReads(data, type = "single", fragmentLen, trim, ...)
   ...)
 
 \S4method{processReads}{GRanges}(data, type = "single", fragmentLen, trim,
+  ...)
+
+\S4method{processReads}{RangedData}(data, type = "single", fragmentLen, trim,
   ...)
 }
 \arguments{

@@ -52,120 +52,150 @@
 #'
 #' plotPeaks(merged_calls, cover)
 #'
+#' @rdname mergeCalls
 #' @export mergeCalls
-#' @importMethodsFrom GenomeInfoDb seqnames
 #'
-mergeCalls <- function (calls, min.overlap=50, discard.low=0.2, mc.cores=1,
-                        verbose=TRUE)
-{
-    res <- .xlapply(
-        split(calls, seqnames(calls)),
-        .mergeSpace,
-        min.overlap = min.overlap,
-        discard.low = discard.low,
-        verbose     = verbose,
-        mc.cores    = mc.cores
-    )
-    return(do.call(c, unname(res)))
-}
+setGeneric(
+    "mergeCalls",
+    function (calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
+        standardGeneric("mergeCalls")
+)
 
-#' Space merger
-#'
+#' @rdname mergeCalls
+#' @importMethodsFrom GenomeInfoDb seqnames
+setMethod(
+    "mergeCalls",
+    signature(calls="GRanges"),
+    function (calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
+    {
+       res <- .xlapply(
+           split(calls, seqnames(calls)),
+           .mergeChrom,
+           min.overlap = min.overlap,
+           discard.low = discard.low,
+           verbose     = verbose,
+           mc.cores    = mc.cores
+       )
+       return(do.call(c, unname(res)))
+   }
+)
+
+#' @rdname mergeCalls
+setMethod(
+    "mergeCalls",
+    signature(calls="RangedData"),
+    function (calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
+    {
+       res <- .xlapply(
+           calls,
+           .mergeChrom,
+           min.overlap = min.overlap,
+           discard.low = discard.low,
+           verbose     = verbose,
+           mc.cores    = mc.cores
+       )
+       return(do.call(c, unname(res)))
+   }
+)
+
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
-#' @importFrom S4Vectors queryHits
-#' @importFrom plyr ldply
-#' @importMethodsFrom GenomeInfoDb seqnames
-#' @importMethodsFrom IRanges start width findOverlaps reduce
-#' @importMethodsFrom S4Vectors runValue
-.mergeSpace <- function (calls, min.overlap, discard.low, verbose)
+#' @importFrom plyr ddply
+#' @importMethodsFrom BiocGenerics as.data.frame
+.mergeChrom <- function (calls, min.overlap, discard.low, verbose)
 {
     if (verbose) {
-        message("* Starting space: ", runValue(seqnames(calls)))
-    }
-
-    if (verbose) {
+        message("* Starting space: ", .whichChr(calls))
         message(" - Finding overlapped reads")
     }
+
+    # we'll use data.frames to merge them more easily; remove unused
+    # columns so we can forget about them
+    merge.group <- .getMergeGroup(calls, min.overlap)
+    dfcalls <- BiocGenerics::as.data.frame(calls)
+    dfcalls[, "strand"] <- NULL
+    dfcalls[, "width"] <- NULL
+    dfcalls[, "merge.group"] <- merge.group
+
+    if (verbose) {
+        message(" - Merging calls")
+    }
+    resdf <- ddply(dfcalls, "merge.group", .joinNucs, discard.low)
+    resdf[, "merge.group"] <- NULL  # we don't need this column anymore
+    res <- makeGRangesFromDataFrame(resdf, keep.extra.columns=TRUE)
+
+    if (verbose) {
+        message(
+            " - Done (",
+            sum(merge.group == 0),
+            " non-overlapped | ",
+            sum(merge.group != 0),
+            " merged calls)"
+        )
+    }
+
+    return (sort(res))
+}
+
+#' @importFrom IRanges IRanges
+#' @importFrom S4Vectors queryHits
+#' @importMethodsFrom IRanges start end findOverlaps reduce
+.getMergeGroup <- function (calls, min.overlap)
+{
     ovlps <- findOverlaps(
         calls,
-        minoverlap      = min.overlap,
-        type            = "any",
-        select          = "all",
-        drop.self       = TRUE,
-        drop.redundant  = TRUE
+        minoverlap     = min.overlap,
+        type           = "any",
+        select         = "all",
+        drop.self      = TRUE,
+        drop.redundant = TRUE
     )
 
     # Select those reads wich are overlapped (by construction with the n+1
     # read)
     hits <- queryHits(ovlps)
-    # This is the rownumber of ALL the overlapped reads
-    selhits <- unique(sort(c(hits, hits+1)))
-
-    # No overlaped reads
-    if (length(selhits) == 0) {
-        return (calls)
-    }
 
     # Make a list of the id of those reads wich are overlapped and with
     # how many following reads they are overlapped
     red <- reduce(IRanges(start=hits, width=1))
 
-    # Make list of "grouping" calls
-    # So [[1]] = 23, 24   means that the first "merged" call is the overlap
-    # of rows (calls) 23 and 24
-    if (verbose) {
-        message(" - Constructing merge list")
+    # we give a value of 0 to nucleosomes that are not to be merged and a
+    # positive number to the ones that will be merged, giving the same
+    # number to the ones that are to be merged together
+    merge.group <- rep(0, .countRows(calls))
+    for (i in seq_along(red)) {
+        from <- start(red)[i]
+        to <- end(red)[i] + 1
+        merge.group[from:to] <- i
     }
 
-    xs <- mapply(
-        function (x, y) seq.int(from=x, length.out=y),
-        start(red),
-        width(red) + 1,
-        SIMPLIFY=FALSE
-    )
+    return (merge.group)
+}
 
-    if (verbose) {
-        message(" - Merging calls")
+.joinNucs <- function (x, discard.low)
+{
+    seqnames <- x[1, "seqnames"]
+    space <- x[1, "space"]
+    if (!is.null(seqnames)) {
+        chr <- seqnames
+    } else if (!is.null(space)) {  # in case we started with a RangedData
+        chr <- space
+        x[, "seqnames"] <- chr
+        x[, "space"] <- NULL
     }
-    # Join function
-    .join <- function (xi, dfcalls, discard.low) {
-        # This is the heigth selection, to avoid low nucleosomes be merged
-        # with big ones
-        x <- xi[which(dfcalls[xi, "score_h"] > discard.low)]
-        if (length(x) == 0) {
-            x <- xi
-        }
+
+    if (x[1, "merge.group"] == 0) {  # nucleosmes that won't be merged
+        x[, "nmerge"] <- 1
+        return(x)
+    } else {  # nucleosome that will be merged
+        x <- x[x[, "score_h"] > discard.low, ]
         return(data.frame(
-            start   = min(dfcalls[x, "start"]),
-            end     = max(dfcalls[x, "end"]),
-            score   = mean(dfcalls[x, "score"]),
-            score_w = mean(dfcalls[x, "score_w"]),
-            score_h = mean(dfcalls[x, "score_h"]),
-            nmerge  = length(x)
+            seqnames = x[1, "seqnames"],
+            start    = min(x[, "start"]),
+            end      = max(x[, "end"]),
+            score    = mean(x[, "score"]),
+            score_w  = mean(x[, "score_w"]),
+            score_h  = mean(x[, "score_h"]),
+            nmerge   = nrow(x)
         ))
     }
-    # calculating it on a data.frame is faster than on a GRanges
-    dfcalls <- as.data.frame(calls)
-    resdf <- ldply(xs, .join, dfcalls, discard.low)
-    resdf$seqnames <- runValue(seqnames(calls))
-    fuz <- makeGRangesFromDataFrame(resdf, keep.extra.columns=TRUE)
-
-    # Select WP nucleosomes
-    wp <- calls[-selhits, ]
-    wp$nmerge <- 1
-
-    # Join and order (the last maybe is not needed, but it is nicer)
-    all <- sort(c(wp, fuz))
-
-    # Return all of them
-    if (verbose) {
-        message(
-            " - Done (",
-            length(wp),
-            " non-overlapped | ",
-            length(fuz),
-            " merged calls)"
-        )
-    }
-    return (all)
 }

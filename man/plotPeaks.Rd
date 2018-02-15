@@ -6,6 +6,7 @@
 \alias{plotPeaks,numeric-method}
 \alias{plotPeaks,data.frame-method}
 \alias{plotPeaks,GRanges-method}
+\alias{plotPeaks,RangedData-method}
 \alias{plotPeaks,IRanges-method}
 \title{Nucleosome calling plot function}
 \usage{
@@ -20,6 +21,8 @@ plotPeaks(peaks, data, ...)
 \S4method{plotPeaks}{data.frame}(peaks, data, ...)
 
 \S4method{plotPeaks}{GRanges}(peaks, data, ...)
+
+\S4method{plotPeaks}{RangedData}(peaks, data, ...)
 
 \S4method{plotPeaks}{IRanges}(peaks, data, threshold = 0, scores = NULL,
   start = 1, end = length(data), dyn.pos = TRUE, xlab = "position",

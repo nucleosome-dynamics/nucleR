@@ -155,7 +155,7 @@ the missed values from the neighboring probes. This is done by the function
 `processTilingArray`:
 
 ```{r processtilling, eval=FALSE}
-processTilingArray(data, exprName, chrPattern, inferLen=50)`
+processTilingArray(data, exprName, chrPattern, inferLen=50)
 ```
 
 An example of a processed dataset is provided in this package. See the help

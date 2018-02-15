@@ -6,6 +6,7 @@
 \alias{export.bed,IRanges-method}
 \alias{export.bed,CompressedIRangesList-method}
 \alias{export.bed,GRanges-method}
+\alias{export.bed,RangedData-method}
 \title{Export ranges in BED format}
 \usage{
 export.bed(ranges, score = NULL, chrom, name, desc = name,
@@ -18,6 +19,9 @@ export.bed(ranges, score = NULL, chrom, name, desc = name,
   desc = name, filepath = name, splitByChrom = TRUE)
 
 \S4method{export.bed}{GRanges}(ranges, score = NULL, name, desc = name,
+  filepath = name, splitByChrom = TRUE)
+
+\S4method{export.bed}{RangedData}(ranges, score = NULL, name, desc = name,
   filepath = name, splitByChrom = TRUE)
 }
 \arguments{

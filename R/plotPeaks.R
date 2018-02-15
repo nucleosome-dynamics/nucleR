@@ -142,6 +142,24 @@ setMethod(
 )
 
 #' @rdname plotPeaks
+#' @importFrom IRanges IRanges
+#' @importMethodsFrom S4Vectors space values
+setMethod(
+    "plotPeaks",
+    signature(peaks="RangedData"),
+    function(peaks, data, ...) {
+        if (length(unique(space(peaks))) > 1) {
+            stop("Only uni-spatial RangedData is supported")
+        }
+        scoreMatrix <- as.data.frame(values(peaks)[[1]])
+        if (ncol(scoreMatrix) == 0) {
+            scoreMatrix <- NULL
+        }
+        plotPeaks(peaks=ranges(peaks)[[1]], data=data, scores=scoreMatrix, ...)
+    }
+)
+
+#' @rdname plotPeaks
 #' @importFrom graphics plot rect abline text
 #' @importFrom stats quantile
 #' @importMethodsFrom IRanges start end width disjointBins
