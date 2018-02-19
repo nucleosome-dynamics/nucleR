@@ -401,7 +401,7 @@ drops as the frequency increases.
 We can look at the power spectrum of the example dataset with the following
 command:
 
-```{r figfft, fig.cap=getCaps(), fig.width=5, set.par=TRUE, eval=FALSE}
+```{r figfft, fig.cap=getCaps(), fig.width=5, set.par=TRUE}
 fft_ta <- filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
 ```
 
