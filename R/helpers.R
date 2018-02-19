@@ -49,6 +49,17 @@ setMethod(
         runValue(seqnames(x))
 )
 
+.lapplyIRange <- function (x, fun, ...)
+    lapply(seq_along(x), function (i) fun(x[i], ...))
+
+#' @importMethodsFrom IRanges start end
+.iran2vect <- function (ran)
+{
+    from <- .lapplyIRange(ran, start)
+    to <- .lapplyIRange(ran, end)
+    unlist(mapply(`:`, from, to))
+}
+
 setMethod(
     ".whichChr",
     signature(x="RangedData"),

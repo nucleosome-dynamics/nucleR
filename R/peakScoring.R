@@ -205,11 +205,21 @@ setMethod(
         dyad.end <- dyad.start + (dyad.length - 1)
         dyads <- IRanges(start=dyad.start, end=dyad.end)
 
-        sums.range <- lapply(peaks, function(x) mean(data[x], na.rm=TRUE))
-        sums.dyad  <- lapply(dyads, function(x) mean(data[x], na.rm=TRUE))
+        sums.range <- .lapplyIRange(
+            peaks,
+            function (x)
+                mean(data[.iran2vect(x)], na.rm=TRUE)
+        )
+        sums.dyad <- .lapplyIRange(
+            dyads,
+            function (x)
+                mean(data[.iran2vect(x)], na.rm=TRUE)
+        )
 
         # Score the heigh of the peak
-        scor.heigh <- pnorm(data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE)
+        scor.heigh <- pnorm(
+            data[dyad.middl], mean=mean, sd=sd, lower.tail=TRUE
+        )
 
         # Score the width (dispersion) of the peak
         scor.width <- unlist(sums.dyad) / unlist(sums.range)
