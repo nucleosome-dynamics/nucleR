@@ -9,8 +9,7 @@ Description: Nucleosome positioning for Tiling Arrays and NGS experiments.
 License: LGPL (>= 3)
 Depends: methods
 Imports: Biobase, BiocGenerics, Biostrings, GenomeInfoDb, GenomicRanges,
-    IRanges, Rsamtools, S4Vectors, ShortRead, ggplot2, graphics, parallel,
-    plyr, stats
+    IRanges, Rsamtools, S4Vectors, ShortRead, ggplot2, parallel, plyr, stats
 Suggests: Starr, BiocStyle, knitr, rmarkdown, testthat
 LazyLoad: yes
 biocViews: NucleosomePositioning, Coverage, ChIPSeq, Microarray, Sequencing,
