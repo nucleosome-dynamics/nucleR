@@ -21,22 +21,22 @@
 #' @param dyn.pos If peaks are ranges, should they be positioned dynamicaly on
 #'   top of the peaks or staticaly at `threshold` baseline. Spacing of
 #'   overlapping ranges is automatically applied if `FALSE`.
-#' @param xlab,type,col.points Default values to be passed to `plot` and
-#'   `points`
-#' @param thr.lty,thr.lwd,thr.col Default values to be passed to `abline`
-#'   for threshold representation
-#' @param rect.thick,rect.lwd,rect.border Default values for `rect`
-#'   representation or ranges. `rect.thick` indicates the thickness (in
-#'   percentage relative to y-axis range) of the rectangles.
-#' @param scor.col,scor.nudge,scor.cex,scor.digits Default values for `text`
-#'   representation for score numbers, if available.
+#' @param xlab,ylab,type,col.points Default values with general properties of
+#'   the plot
+#' @param thr.lty,thr.lwd,thr.col Default values with general properties for
+#'   threshold representation
+#' @param rect.thick,rect.lwd,rect.border Default values for
+#'   [ggplot2::geom_rect()] representation of ranges. `rect.thick` indicates
+#'   the thickness of the rectangles.
+#' @param scor.col,scor.nudge,scor.cex,scor.digits Default values for
+#'   [ggplot2::geom_text()] representation for score numbers, if available.
 #' @param indiv.scores Show or hide individual scores for width and height in
 #'   brakets besides the mixed score.
-#' @param \dots Other parameters passed to [ggplot2::ggplot()] function
+#' @param \dots Arguments to be passed to other methods.
 #'
 #' @return (none)
 #'
-#' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
+#' @author Ricard Illa \email{ricard.illa@@irbbarcelona.org}
 #' @seealso [peakDetection()], [peakScoring()], [ggplot2::ggplot()],
 #' @keywords hplot
 #' @rdname plotPeaks
@@ -60,7 +60,7 @@
 #'
 setGeneric(
     "plotPeaks",
-    function(peaks, data, ...)
+    function (peaks, data, ...)
         standardGeneric("plotPeaks")
 )
 
@@ -72,7 +72,7 @@ setMethod(
     function (peaks, data, threshold=0, scores=NULL, start=1, end=length(data),
               xlab="position", ylab="coverage", type=1, col.points="red",
               thr.lty=1, thr.lwd=1, thr.col="darkred", scor.col=col.points,
-              scor.cex=2.5, scor.digits=2, scor.nudge=2000, ...)
+              scor.cex=2.5, scor.digits=2, scor.nudge=2000)
     {
         threshold <- .getThreshold(threshold, data)
         covdf <- .makeDataDf(data, start, end)
@@ -150,7 +150,7 @@ setMethod(
               col.points="red", thr.lty=1, thr.lwd=1, thr.col="darkred",
               rect.thick=2, rect.lwd=0.5, rect.border="black",
               scor.col=col.points, scor.cex=2.5, scor.digits=2,
-              indiv.scores=FALSE, scor.nudge=2000, ...)
+              indiv.scores=FALSE, scor.nudge=2000)
     {
         threshold <- .getThreshold(threshold, data)
 
@@ -170,7 +170,7 @@ setMethod(
             df[, "type"] <- ifelse(df[, "nmerge"] > 1, "fuz", "wp")
         }
 
-        ggplot(...) +
+        ggplot() +
             .plotCov(covdf, linetype=type) +
             .plotPeakRects(df,
                            color = rect.border,

@@ -16,7 +16,7 @@ plotPeaks(peaks, data, ...)
   start = 1, end = length(data), xlab = "position", ylab = "coverage",
   type = 1, col.points = "red", thr.lty = 1, thr.lwd = 1,
   thr.col = "darkred", scor.col = col.points, scor.cex = 2.5,
-  scor.digits = 2, scor.nudge = 2000, ...)
+  scor.digits = 2, scor.nudge = 2000)
 
 \S4method{plotPeaks}{data.frame}(peaks, data, ...)
 
@@ -29,7 +29,7 @@ plotPeaks(peaks, data, ...)
   ylab = "coverage", type = 1, col.points = "red", thr.lty = 1,
   thr.lwd = 1, thr.col = "darkred", rect.thick = 2, rect.lwd = 0.5,
   rect.border = "black", scor.col = col.points, scor.cex = 2.5,
-  scor.digits = 2, indiv.scores = FALSE, scor.nudge = 2000, ...)
+  scor.digits = 2, indiv.scores = FALSE, scor.nudge = 2000)
 }
 \arguments{
 \item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or \code{GRanges} object
@@ -38,7 +38,7 @@ or \code{\link[=peakScoring]{peakScoring()}} for more details.}
 
 \item{data}{Coverage or Tiling Array intensities}
 
-\item{\dots}{Other parameters passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} function}
+\item{\dots}{Arguments to be passed to other methods.}
 
 \item{threshold}{Threshold applied in \code{peakDetection}}
 
@@ -50,22 +50,22 @@ vector.}
 \code{data}. This is a convenient way to plot only a small region of data,
 without dealing with subsetting of range or score objects.}
 
-\item{xlab, type, col.points}{Default values to be passed to \code{plot} and
-\code{points}}
+\item{xlab, ylab, type, col.points}{Default values with general properties of
+the plot}
 
-\item{thr.lty, thr.lwd, thr.col}{Default values to be passed to \code{abline}
-for threshold representation}
+\item{thr.lty, thr.lwd, thr.col}{Default values with general properties for
+threshold representation}
 
-\item{scor.col, scor.nudge, scor.cex, scor.digits}{Default values for \code{text}
-representation for score numbers, if available.}
+\item{scor.col, scor.nudge, scor.cex, scor.digits}{Default values for
+\code{\link[ggplot2:geom_text]{ggplot2::geom_text()}} representation for score numbers, if available.}
 
 \item{dyn.pos}{If peaks are ranges, should they be positioned dynamicaly on
 top of the peaks or staticaly at \code{threshold} baseline. Spacing of
 overlapping ranges is automatically applied if \code{FALSE}.}
 
-\item{rect.thick, rect.lwd, rect.border}{Default values for \code{rect}
-representation or ranges. \code{rect.thick} indicates the thickness (in
-percentage relative to y-axis range) of the rectangles.}
+\item{rect.thick, rect.lwd, rect.border}{Default values for
+\code{\link[ggplot2:geom_rect]{ggplot2::geom_rect()}} representation of ranges. \code{rect.thick} indicates
+the thickness of the rectangles.}
 
 \item{indiv.scores}{Show or hide individual scores for width and height in
 brakets besides the mixed score.}
@@ -102,6 +102,6 @@ plotPeaks(peaks, cover_fft, threshold="40\%", start=1000, end=6000)
 \code{\link[=peakDetection]{peakDetection()}}, \code{\link[=peakScoring]{peakScoring()}}, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}},
 }
 \author{
-Oscar Flores \email{oflores@mmb.pcb.ub.es}
+Ricard Illa \email{ricard.illa@irbbarcelona.org}
 }
 \keyword{hplot}

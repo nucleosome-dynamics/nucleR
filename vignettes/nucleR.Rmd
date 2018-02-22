@@ -520,7 +520,7 @@ function and results can be represented with the function `plotPeaks`:
 peaks <- peakDetection(htseq_fft, threshold="25%", score=FALSE)
 peaks
 
-plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%", ylab="coverage")
 ```
 
 All the peaks above a threshold value are identified. Threshold can be set to
