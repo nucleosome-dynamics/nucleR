@@ -28,16 +28,16 @@
 #' @param rect.thick,rect.lwd,rect.border Default values for `rect`
 #'   representation or ranges. `rect.thick` indicates the thickness (in
 #'   percentage relative to y-axis range) of the rectangles.
-#' @param scor.col,scor.font,scor.adj,scor.cex,scor.digits Default values for
-#'   `text` representation for score numbers, if available.
+#' @param scor.col,scor.nudge,scor.cex,scor.digits Default values for `text`
+#'   representation for score numbers, if available.
 #' @param indiv.scores Show or hide individual scores for width and height in
 #'   brakets besides the mixed score.
-#' @param \dots Other parameters passed to [graphics::plot()] function
+#' @param \dots Other parameters passed to [ggplot2::ggplot()] function
 #'
 #' @return (none)
 #'
 #' @author Oscar Flores \email{oflores@@mmb.pcb.ub.es}
-#' @seealso [peakDetection()], [peakScoring()], [graphics::plot()],
+#' @seealso [peakDetection()], [peakScoring()], [ggplot2::ggplot()],
 #' @keywords hplot
 #' @rdname plotPeaks
 #'
@@ -65,53 +65,32 @@ setGeneric(
 )
 
 #' @rdname plotPeaks
-#' @importFrom graphics plot points abline text
-#' @importFrom stats quantile
+#' @importFrom ggplot2 ggplot xlim xlab ylab theme
 setMethod(
     "plotPeaks",
     signature(peaks="numeric"),
     function (peaks, data, threshold=0, scores=NULL, start=1, end=length(data),
-              xlab="position", type="l", col.points="red", thr.lty=1,
-              thr.lwd=1, thr.col="darkred", scor.col=col.points, scor.font=2,
-              scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2, ...) {
+              xlab="position", ylab="coverage", type=1, col.points="red",
+              thr.lty=1, thr.lwd=1, thr.col="darkred", scor.col=col.points,
+              scor.cex=2.5, scor.digits=2, scor.nudge=2000, ...)
+    {
+        threshold <- .getThreshold(threshold, data)
+        covdf <- .makeDataDf(data, start, end)
+        peakdf <- .makePeakDf(peaks, scores, data, start, end)
 
-        # Calculate the ranges in threshold and get the coverage
-        # If threshold is given as a string with percentage, convert it
-        if (!is.numeric(threshold)) {
-            if (grep("%", threshold) == 1) {
-                threshold <- quantile(
-                    data,
-                    as.numeric(sub("%","", threshold)) / 100,
-                    na.rm=TRUE
-                )
-            }
-        }
-
-        data <- data[start:end]
-        names(data) <- start:end
-
-        subset <- which(peaks >= start & peaks <= end)
-        peaks <- peaks[subset]
-
-        if (!is.null(scores)) {
-            scores <- scores[subset]
-        }
-
-        plot(start:end, data, type=type, xlab=xlab, ...)
-        if (is.null(scores)) {
-            points(peaks, data[as.character(peaks)], col=col.points)
-        }
-        if (threshold != 0) {
-            abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
-        }
-
-        if (!is.null(scores))
-            text(
-                peaks, data[as.character(peaks)],
-                labels=format(scores, digits=scor.digits),
-                cex=scor.cex, adj=scor.adj, col=scor.col,
-                font=scor.font
-            )
+        ggplot() +
+            .plotCov(covdf, linetype=type) +
+            .plotScoreOrDots(df=peakdf,
+                             col.points=col.points,
+                             scor.col=scor.col,
+                             scor.digits=scor.digits,
+                             scor.nudge=scor.nudge,
+                             scor.cex=scor.cex) +
+            .plotThresh(threshold, color=thr.col, lty=thr.lty, lwd=thr.lwd) +
+            xlim(start, end) +
+            xlab(xlab) +
+            ylab(ylab) +
+            theme(legend.position="none")
     }
 )
 
@@ -129,7 +108,8 @@ setMethod(
 setMethod(
     "plotPeaks",
     signature(peaks="GRanges"),
-    function(peaks, data, ...) {
+    function (peaks, data, ...)
+    {
         if (sum(runLength(seqnames(peaks)) > 0) > 1) {
             stop("Only GRanges with a single seqname are supported")
         }
@@ -147,7 +127,8 @@ setMethod(
 setMethod(
     "plotPeaks",
     signature(peaks="RangedData"),
-    function(peaks, data, ...) {
+    function (peaks, data, ...)
+    {
         if (length(unique(space(peaks))) > 1) {
             stop("Only uni-spatial RangedData is supported")
         }
@@ -160,148 +141,206 @@ setMethod(
 )
 
 #' @rdname plotPeaks
-#' @importFrom graphics plot rect abline text
-#' @importFrom stats quantile
-#' @importMethodsFrom IRanges start end width disjointBins
+#' @importFrom ggplot2 ggplot scale_alpha_manual xlim xlab ylab theme
 setMethod(
     "plotPeaks",
     signature(peaks="IRanges"),
     function (peaks, data, threshold=0, scores=NULL, start=1, end=length(data),
-              dyn.pos=TRUE, xlab="position", type="l", col.points="red",
-              thr.lty=1, thr.lwd=1, thr.col="darkred", rect.thick=2,
-              rect.lwd=1, rect.border="black", scor.col=col.points,
-              scor.font=2, scor.adj=c(0.5,0), scor.cex=0.75, scor.digits=2,
-              indiv.scores=TRUE, ...) {
+              dyn.pos=TRUE, xlab="position", ylab="coverage", type=1,
+              col.points="red", thr.lty=1, thr.lwd=1, thr.col="darkred",
+              rect.thick=2, rect.lwd=0.5, rect.border="black",
+              scor.col=col.points, scor.cex=2.5, scor.digits=2,
+              indiv.scores=FALSE, scor.nudge=2000, ...)
+    {
+        threshold <- .getThreshold(threshold, data)
 
-        if (!is.null(scores) & is.numeric(scores)) {
-            scores <- data.frame(score=scores)
+        covdf <- .makeDataDf(data, start, end)
+        df <- .initPeaksDf(peaks, scores, start, end)
+
+        pc <- .getPc(covdf)
+        df[, "bottom"] <- .getYBottom(df,
+                                      covdf,
+                                      pc,
+                                      dyn.pos=dyn.pos,
+                                      threshold=threshold)
+
+        df[, "ymin"] <- df[, "bottom"] + pc
+        df[, "ymax"] <- df[, "bottom"] + pc * rect.thick
+        if ("nmerge" %in% names(df)) {
+            df[, "type"] <- ifelse(df[, "nmerge"] > 1, "fuz", "wp")
         }
 
-        # Calculate the ranges in threshold and get the coverage
-        # If threshold is given as a string with percentage, convert it
-        if (!is.numeric(threshold)) {
-            if (grep("%", threshold) == 1) {
-                threshold <- quantile(
-                    data,
-                    as.numeric(sub("%","", threshold)) / 100,
-                    na.rm=TRUE)
-            }
-        }
-
-        # Subset data
-        subset <- which(end(peaks) >= start & start(peaks) <= end)
-        data_full <- data
-        data <- data[start:end]
-        names(data) <- start:end
-        peaks <- peaks[subset]
-
-        if (!is.null(scores)) {
-            scores <- scores[subset,]
-        }
-
-        # One percentile for vertical measures
-        pc <- (0.01 * max(data))
-
-        # Dynamic positioning (on top of the peaks) or all the same
-        win_m <- round(min(width(peaks)) / 2) / 2  # This takes a widow |half|
-        midpoints <- .mid(peaks)
-
-        if (dyn.pos) {
-            ybottom <- sapply(
-                midpoints,
-                function(x)
-                    max(data_full[(x - win_m):(x + win_m)])
-            )
-        } else {
-            ybottom <- quantile(data, threshold, na.rm=TRUE)
-        }
-
-        # Overlap correction
-        if (!dyn.pos) {
-            bins <- disjointBins(IRanges(start(peaks), end(peaks) + 10))
-            ybottom <- ((bins - 1) * pc * 2) + ybottom
-        }
-
-        # Plot coverage
-        plot(start:end, data, type=type, xlab=xlab, ...)
-
-        # We have information about merged calls
-        if (!is.null(scores) & "nmerge" %in% names(scores)) {
-            # Plot WP nucleosomes
-            p1 <- peaks[scores$nmerge == 1, ]
-            ybot <- ybottom[scores$nmerge == 1]
-
-            if (length(p1) > 0) {
-                rect(
-                    start(p1),
-                    ybot + pc,
-                    end(p1),
-                    ybot + pc * rect.thick,
-                    lwd=rect.lwd,
-                    col=col.points,
-                    border=rect.border
-                )
-            }
-
-            # Plot fuzzy nucleosomes
-            p2 <- peaks[scores$nmerge > 1, ]
-            ybot <- ybottom[scores$nmerge > 1]
-            if (length(p2) > 0) {
-                rect(
-                    start(p2),
-                    ybot + pc,
-                    end(p2),
-                    ybot + pc * rect.thick,
-                    lwd=rect.lwd,
-                    col=col.points,
-                    border=rect.border,
-                    density=30
-                )
-            }
-
-        } else {  # All are normal calls
-            rect(
-                start(peaks),
-                ybottom + pc,
-                end(peaks),
-                ybottom + pc * rect.thick,
-                lwd=rect.lwd,
-                col=col.points,
-                border=rect.border
-            )
-        }
-
-        if (threshold != 0) {
-            abline(h=threshold, col=thr.col, lty=thr.lty, lwd=thr.lwd)
-        }
-
-        # Add text
-        if (!is.null(scores)) {
-            .f <- function(x) format(x, digits=scor.digits)
-
-            # Composite or simple score
-            if ("score_w" %in% names(scores) &
-                "score_h" %in% names(scores) &
-                indiv.scores) {
-                scores <- paste(
-                    .f(scores$score), " (",
-                    .f(scores$score_h), "h | ",
-                    .f(scores$score_w), "w)",
-                    sep=""
-                )
-            } else {
-                scores <- .f(scores$score)
-            }
-
-            text(
-                midpoints,
-                ybottom + pc * rect.thick + pc * 3,
-                labels=scores,
-                cex=scor.cex,
-                adj=scor.adj,
-                col=scor.col,
-                font=scor.font
-            )
-        }
+        ggplot(...) +
+            .plotCov(covdf, linetype=type) +
+            .plotPeakRects(df,
+                           color = rect.border,
+                           fill  = scor.col,
+                           size  = rect.lwd) +
+            scale_alpha_manual(values=c(wp=1, fuz=0.2)) +
+            .plotScores(df,
+                        scor.digits  = scor.digits,
+                        indiv.scores = indiv.scores,
+                        pc           = pc,
+                        size         = scor.cex,
+                        color        = scor.col,
+                        nudge_y      = scor.nudge) +
+            .plotThresh(threshold, color=thr.col, lty=thr.lty, lwd=thr.lwd) +
+            xlim(start, end) +
+            xlab(xlab) +
+            ylab(ylab) +
+            theme(legend.position="none")
     }
 )
+
+.makeDataDf <- function (data, start, end)
+{
+    covdf <- data.frame(x=seq_along(data), y=data)
+    if (!missing(start) && !is.null(start)) {
+        covdf <- covdf[covdf[, "x"] > start, ]
+    }
+    if (!missing(end) && !is.null(end)) {
+        covdf <- covdf[covdf[, "x"] < end, ]
+    }
+    covdf
+}
+
+.initPeaksDf <- function (peaks, scores, start, end)
+{
+    df <- as.data.frame(peaks)
+    if (!missing(scores) && !is.null(scores)) {
+        df <- cbind(df, scores)
+    }
+    df$mid <- .mid(peaks)
+    if (!missing(start) && !is.null(start)) {
+        df <- df[df[, "start"] > start, ]
+    }
+    if (!missing(end) && !is.null(end)) {
+        df <- df[df[, "end"] < end, ]
+    }
+    df
+}
+
+#' @importFrom ggplot2 geom_line aes_string
+.plotCov <- function (covdf, ...)
+    geom_line(data=covdf, mapping=aes_string(x="x", y="y"), ...)
+
+.getPc <- function (data)
+    0.01 * max(data[, "y"])
+
+#' @importFrom stats quantile
+#' @importMethodsFrom IRanges disjointBins
+.getYBottom <- function (df, data, pc, dyn.pos=TRUE, threshold=0)
+{
+    if (dyn.pos) {
+        win_m <- round(min(df$width) / 2) / 2  # This takes a widow |half|
+        return(sapply(
+            df$mid,
+            function(x)  {
+                i <- data[, "x"] %in% ((x-win_m):(x+win_m))
+                max(data[i, "y"])
+            }
+        ))
+    } else {
+        ran <- IRanges(start=df[, "start"], end=df[, "end"]+10)
+        bins <- disjointBins(ran)
+        bottom <- quantile(data[, "y"], threshold, na.rm=TRUE)
+        return((bins-1) * pc*2 + bottom)
+    }
+}
+
+#' @importFrom ggplot2 geom_rect aes_string
+.plotPeakRects <- function (df, ...)
+{
+    if ("type" %in% names(df)) {
+        geom_rect(data=df,
+                  mapping=aes_string(xmin  = "start",
+                                     xmax  = "end",
+                                     ymin  = "ymin",
+                                     ymax  = "ymax",
+                                     alpha = "type"),
+                  ...)
+    } else {
+        geom_rect(data=df,
+                  mapping=aes_string(xmin = "start",
+                                     xmax = "end",
+                                     ymin = "ymin",
+                                     ymax = "ymax"),
+                  ...)
+    }
+}
+
+.getScoreTxt <- function (df, scor.digits, indiv.scores)
+{
+    .f <- function(x) format(x, digits=scor.digits)
+    info.avail <-  "score_w" %in% names(df) & "score_h" %in% names(df)
+    if (info.avail && indiv.scores) {
+        paste0(
+            .f(df[, "score"]), " (",
+            .f(df[, "score_h"]), "h | ",
+            .f(df[, "score_w"]), "w)"
+        )
+    } else {
+        .f(df[, "score"])
+    }
+}
+
+#' @importFrom ggplot2 geom_text geom_blank aes_string
+.plotScores <- function (df, scor.digits, indiv.scores, pc, ...)
+{
+    if ("score" %in% names(df)) {
+        df[, "txt"] <- .getScoreTxt(df, scor.digits, indiv.scores)
+        df[, "txt_pos"] <- df[, "ymax"] + pc*3
+        geom_text(data=df,
+                  mapping=aes_string(x="mid", y="txt_pos", label="txt"),
+                  ...)
+    } else {
+        geom_blank()
+    }
+}
+
+#' @importFrom ggplot2 geom_hline geom_blank
+.plotThresh <- function (threshold, ...)
+{
+    if (threshold != 0) {
+        geom_hline(yintercept=threshold, ...)
+    } else {
+        geom_blank()
+    }
+}
+
+.makePeakDf <- function (peaks, scores, data, start, end)
+{
+    peakdf <- data.frame(x=peaks, y=data[peaks])
+    if (!is.null(scores)) {
+        peakdf[, "scores"] <- scores
+    }
+    if (!missing(start) && !is.null(start)) {
+        peakdf <- peakdf[peakdf[, "x"] > start, ]
+    }
+    if (!missing(end) && !is.null(end)) {
+        peakdf <- peakdf[peakdf[, "x"] < end, ]
+    }
+    peakdf
+}
+
+#' @importFrom ggplot2 geom_text geom_point aes_string
+.plotScoreOrDots <- function (df, col.points, scor.col, scor.digits,
+                              scor.nudge, scor.cex, ...)
+{
+    if ("scores" %in% names(df)) {
+        df[, "scores"] <- format(df[, "scores"], digits=scor.digits)
+        geom_text(data    = df,
+                  mapping = aes_string(x="x", y="y", label="scores"),
+                  nudge_y = scor.nudge,
+                  color   = scor.col,
+                  size    = scor.cex,
+                  ...)
+    } else {
+        geom_point(data    = df,
+                   mapping = aes_string(x="x", y="y"),
+                   shape   = 1,
+                   color   = col.points,
+                   size    = 3,
+                   ...)
+    }
+}

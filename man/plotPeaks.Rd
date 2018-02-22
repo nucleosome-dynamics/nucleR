@@ -13,10 +13,10 @@
 plotPeaks(peaks, data, ...)
 
 \S4method{plotPeaks}{numeric}(peaks, data, threshold = 0, scores = NULL,
-  start = 1, end = length(data), xlab = "position", type = "l",
-  col.points = "red", thr.lty = 1, thr.lwd = 1, thr.col = "darkred",
-  scor.col = col.points, scor.font = 2, scor.adj = c(0.5, 0),
-  scor.cex = 0.75, scor.digits = 2, ...)
+  start = 1, end = length(data), xlab = "position", ylab = "coverage",
+  type = 1, col.points = "red", thr.lty = 1, thr.lwd = 1,
+  thr.col = "darkred", scor.col = col.points, scor.cex = 2.5,
+  scor.digits = 2, scor.nudge = 2000, ...)
 
 \S4method{plotPeaks}{data.frame}(peaks, data, ...)
 
@@ -26,11 +26,10 @@ plotPeaks(peaks, data, ...)
 
 \S4method{plotPeaks}{IRanges}(peaks, data, threshold = 0, scores = NULL,
   start = 1, end = length(data), dyn.pos = TRUE, xlab = "position",
-  type = "l", col.points = "red", thr.lty = 1, thr.lwd = 1,
-  thr.col = "darkred", rect.thick = 2, rect.lwd = 1,
-  rect.border = "black", scor.col = col.points, scor.font = 2,
-  scor.adj = c(0.5, 0), scor.cex = 0.75, scor.digits = 2,
-  indiv.scores = TRUE, ...)
+  ylab = "coverage", type = 1, col.points = "red", thr.lty = 1,
+  thr.lwd = 1, thr.col = "darkred", rect.thick = 2, rect.lwd = 0.5,
+  rect.border = "black", scor.col = col.points, scor.cex = 2.5,
+  scor.digits = 2, indiv.scores = FALSE, scor.nudge = 2000, ...)
 }
 \arguments{
 \item{peaks}{\code{numeric}, \code{data.frame}, \code{IRanges} or \code{GRanges} object
@@ -39,7 +38,7 @@ or \code{\link[=peakScoring]{peakScoring()}} for more details.}
 
 \item{data}{Coverage or Tiling Array intensities}
 
-\item{\dots}{Other parameters passed to \code{\link[graphics:plot]{graphics::plot()}} function}
+\item{\dots}{Other parameters passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} function}
 
 \item{threshold}{Threshold applied in \code{peakDetection}}
 
@@ -57,8 +56,8 @@ without dealing with subsetting of range or score objects.}
 \item{thr.lty, thr.lwd, thr.col}{Default values to be passed to \code{abline}
 for threshold representation}
 
-\item{scor.col, scor.font, scor.adj, scor.cex, scor.digits}{Default values for
-\code{text} representation for score numbers, if available.}
+\item{scor.col, scor.nudge, scor.cex, scor.digits}{Default values for \code{text}
+representation for score numbers, if available.}
 
 \item{dyn.pos}{If peaks are ranges, should they be positioned dynamicaly on
 top of the peaks or staticaly at \code{threshold} baseline. Spacing of
@@ -100,7 +99,7 @@ plotPeaks(peaks, cover_fft, threshold="40\%", start=1000, end=6000)
 
 }
 \seealso{
-\code{\link[=peakDetection]{peakDetection()}}, \code{\link[=peakScoring]{peakScoring()}}, \code{\link[graphics:plot]{graphics::plot()}},
+\code{\link[=peakDetection]{peakDetection()}}, \code{\link[=peakScoring]{peakScoring()}}, \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}},
 }
 \author{
 Oscar Flores \email{oflores@mmb.pcb.ub.es}

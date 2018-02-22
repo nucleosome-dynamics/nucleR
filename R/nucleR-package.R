@@ -29,6 +29,7 @@
 #' @import methods
 #'
 #' @examples
+#' library(ggplot2)
 #' # Load example dataset:
 #' # some NGS paired-end reads, mapped with Bowtie and processed with R
 #' # it is a GRanges object with the start/end coordinates for each read.
@@ -49,14 +50,21 @@
 #' t2 <- as.vector(cover_trim[[1]])[1:2000]
 #' t1 <- (t1-min(t1)) / max(t1-min(t1))  # Normalization
 #' t2 <- (t2-min(t2)) / max(t2-min(t2))  # Normalization
-#' plot(
-#'     t1, type="l", lwd="2", col="blue", main="Original vs Trimmed coverage"
+#'
+#' plot_data <- rbind(
+#'     data.frame(
+#'         x=seq_along(t1),
+#'         y=t1,
+#'         coverage="original"
+#'     ),
+#'     data.frame(
+#'         x=seq_along(t2),
+#'         y=t2,
+#'         coverage="trimmed"
+#'     )
 #' )
-#' lines(t2, lwd="2", col="red")
-#' legend(
-#'     "bottomright", c("Original coverage", "Trimmed coverage"), lwd=2,
-#'     col=c("blue","red"), bty="n"
-#' )
+#' qplot(x=x, y=y, color=coverage, data=plot_data, geom="line",
+#'   xlab="position", ylab="coverage")
 #'
 #' # Let's try to call nucleosomes from the trimmed version
 #' # First of all, let's remove some noise with FFT
@@ -65,15 +73,20 @@
 #' cover_clean <- filterFFT(cover_trim, pcKeepComp=0.02, showPowerSpec=TRUE)
 #'
 #' # How clean is it now?
-#' plot(
-#'     as.vector(cover_trim[[1]])[1:4000], t="l", lwd=2, col="red",
-#'     main="Noisy vs Filtered coverage"
+#' plot_data <- rbind(
+#'     data.frame(
+#'         x=1:4000,
+#'         y=as.vector(cover_trim[[1]])[1:4000],
+#'         coverage="noisy"
+#'     ),
+#'     data.frame(
+#'         x=1:4000,
+#'         y=as.vector(cover_clean[[1]])[1:4000],
+#'         coverage="filtered"
+#'     )
 #' )
-#' lines(cover_clean[[1]][1:4000], lwd=2, col="darkgreen")
-#' legend(
-#'     "bottomright", c("Input coverage", "Filtered coverage"), lwd=2,
-#'     col=c("red","darkgreen"), bty="n"
-#' )
+#' qplot(x=x, y=y, color=coverage, data=plot_data, geom="line",
+#'   xlab="position", ylab="coverage")
 #'
 #' # And how similar? Let's see the correlation
 #' cor(cover_clean[[1]], as.vector(cover_trim[[1]]))

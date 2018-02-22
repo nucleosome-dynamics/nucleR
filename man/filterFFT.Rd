@@ -114,15 +114,19 @@ can be still applyied in this case.
 # Load example data, raw hybridization values for Tiling Array
 raw_data <- get(data(nucleosome_tiling))
 
-#Filter data
+# Filter data
 fft_data <- filterFFT(raw_data, pcKeepComp=0.01)
 
 # See both profiles
-par(mfrow=c(2,1), mar=c(3, 4, 1, 1))
-plot(raw_data, type="l", xlab="position", ylab="Raw intensities")
-plot(fft_data, type="l", xlab="position", ylab="Filtered intensities")
+library(ggplot2)
+plot_data <- rbind(
+    data.frame(x=seq_along(raw_data), y=raw_data, intensities="raw"),
+    data.frame(x=seq_along(fft_data), y=fft_data, intensities="filtered")
+)
+qplot(x=x, y=y, data=plot_data, geom="line", xlab="position",
+  ylab="intensities") + facet_grid(intensities~.)
 
-#The power spectrum shows a visual representation of the components
+# The power spectrum shows a visual representation of the components
 fft_data <- filterFFT(raw_data, pcKeepComp=0.01, showPowerSpec=TRUE)
 
 }

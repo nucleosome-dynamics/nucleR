@@ -6,7 +6,7 @@
 \usage{
 syntheticNucMap(wp.num = 100, wp.del = 10, wp.var = 20, fuz.num = 50,
   fuz.var = 50, max.cover = 20, nuc.len = 147, lin.len = 20,
-  rnd.seed = NULL, as.ratio = FALSE, show.plot = FALSE, ...)
+  rnd.seed = NULL, as.ratio = FALSE, show.plot = FALSE)
 }
 \arguments{
 \item{wp.num}{Number of well-positioned (non overlapped) nucleosomes. They
@@ -48,9 +48,6 @@ one in Tiling Arrays.}
 
 \item{show.plot}{If \code{TRUE}, will plot the output coverage map, with the
 nucleosome calls and optionally the calculated ratio.}
-
-\item{\dots}{Additional parameters to be passed to \code{plot} if
-\code{show.plot=TRUE}}
 }
 \value{
 A list with the following elements:
@@ -100,18 +97,17 @@ print(res)
 
 # Different reads can be accessed separately from results
 # Let's use this to plot the nucleosomal + the random map
-par(mfrow=c(3,1), mar=c(3,4,1,1))
-plot(
-    as.vector(coverage.rpm(res$syn.reads)), type="h", col="red",
-    ylab="nucleosomal", ylim=c(0,35)
+library(ggplot2)
+as <- as.vector(coverage.rpm(res$syn.reads))
+bs <- as.vector(coverage.rpm(res$ctr.reads))
+cs <- as.vector(res$syn.ratio)
+plot_data <- rbind(
+    data.frame(x=seq_along(as), y=as, lab="nucleosomal"),
+    data.frame(x=seq_along(bs), y=bs, lab="random"),
+    data.frame(x=seq_along(cs), y=cs, lab="ratio")
 )
-plot(
-    as.vector(coverage.rpm(res$ctr.reads)), type="h", col="blue",
-    ylab="random", ylim=c(0,35)
-)
-plot(
-    as.vector(res$syn.ratio), type="h", col="orange", ylab="ratio"
-)
+qplot(x=x, y=y, data=plot_data, geom="area", xlab="position", ylab="") +
+    facet_grid(lab~., scales="free_y")
 
 }
 \author{

@@ -67,13 +67,15 @@
 #' f2 <- filterFFT(data, pcKeepComp="auto", cor.target=0.99)
 #'
 #' # Plot
-#' plot(data[1:2000], col="black", type="l", lwd=2)
-#' lines(f1[1:2000], col="red", lwd=2)
-#' lines(f2[1:2000], col="blue", lwd=2, lty=2)
-#' legend(
-#'     "bottom", c("original", "two calls", "one call"),
-#'     col=c("black", "red", "blue"), lty=c(1,1,2), horiz=TRUE, bty="n"
+#' library(ggplot2)
+#' i <- 1:2000
+#' plot_data <- rbind(
+#'     data.frame(x=i, y=data[i], coverage="original"),
+#'     data.frame(x=i, y=f1[i], coverage="two calls"),
+#'     data.frame(x=i, y=f2[i], coverage="one call")
 #' )
+#' qplot(x=x, y=y, color=coverage, data=plot_data, geom="line",
+#'   xlab="position", ylab="coverage")
 #'
 #' @export pcKeepCompDetect
 #'
