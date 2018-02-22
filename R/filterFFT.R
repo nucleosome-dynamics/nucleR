@@ -94,9 +94,13 @@
 #' fft_data <- filterFFT(raw_data, pcKeepComp=0.01)
 #'
 #' # See both profiles
-#' par(mfrow=c(2,1), mar=c(3, 4, 1, 1))
-#' plot(raw_data, type="l", xlab="position", ylab="Raw intensities")
-#' plot(fft_data, type="l", xlab="position", ylab="Filtered intensities")
+#' library(ggplot2)
+#' plot_data <- rbind(
+#'     data.frame(x=seq_along(raw_data), y=raw_data, intensities="raw"),
+#'     data.frame(x=seq_along(fft_data), y=fft_data, intensities="filtered")
+#' )
+#' qplot(x=x, y=y, data=plot_data, geom="line", xlab="position",
+#'   ylab="intensities") + facet_grid(intensities~.)
 #'
 #' # The power spectrum shows a visual representation of the components
 #' fft_data <- filterFFT(raw_data, pcKeepComp=0.01, showPowerSpec=TRUE)
@@ -114,16 +118,15 @@ setMethod(
     "filterFFT",
     signature(data="SimpleRleList"),
     function (data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE,
-            mc.cores=1, ...) {
-        return (filterFFT(
+              mc.cores=1, ...)
+        filterFFT(
             lapply(data, as.vector),
             pcKeepComp,
             showPowerSpec,
             useOptim,
             mc.cores,
             ...
-        ))
-    }
+        )
 )
 
 #' @rdname filterFFT
@@ -139,7 +142,8 @@ setMethod(
     "filterFFT",
     signature(data="list"),
     function (data, pcKeepComp="auto", showPowerSpec=FALSE, useOptim=TRUE,
-            mc.cores=1, ...) {
+            mc.cores=1, ...)
+    {
 
         if (length(data) > 1 & showPowerSpec) {
             stop("showPowerSpec only can be applyied to lists of length = 1")
@@ -305,7 +309,8 @@ setMethod(
     return (res)
 }
 
-.pad2power2 <- function(x) {
+.pad2power2 <- function(x)
+{
     pow <-ceiling(log2(length(x)))
     pad <- rep(0, 2^pow - length(x))
     return (c(x, pad))
@@ -321,7 +326,7 @@ setMethod(
     return (Re(fft(temp, inverse=TRUE)) / length(temp))
 }
 
-#' @importFrom ggplot2 ggplot aes geom_line geom_vline labs
+#' @importFrom ggplot2 ggplot aes_string geom_line geom_vline labs
 .plotFFT <- function (data, pcKeepComp, upper=250000)
 {
     if (length(data) > upper) {
@@ -340,10 +345,10 @@ setMethod(
     y <- Re(freqs[x])
     df <- data.frame(x=x, y=y)
 
-    ggplot(df, aes(x=x, y=y)) +
+    ggplot(df, aes_string(x="x", y="y")) +
         geom_line() +
         geom_vline(xintercept=keep, color="red", lty=2) +
-        labs(subtitle="Selected components threshold marked as red line",
-             x="components",
-             y="power")
+        labs(subtitle = "Selected components threshold marked as red line",
+             x        = "components",
+             y        = "power")
 }

@@ -34,8 +34,6 @@
 #'   one in Tiling Arrays.
 #' @param show.plot If `TRUE`, will plot the output coverage map, with the
 #'   nucleosome calls and optionally the calculated ratio.
-#' @param \dots  Additional parameters to be passed to `plot` if
-#'   `show.plot=TRUE`
 #'
 #' @return A list with the following elements:
 #'   * wp.starts Start points of well-positioned nucleosomes
@@ -77,31 +75,27 @@
 #'
 #' # Different reads can be accessed separately from results
 #' # Let's use this to plot the nucleosomal + the random map
-#' par(mfrow=c(3,1), mar=c(3,4,1,1))
-#' plot(
-#'     as.vector(coverage.rpm(res$syn.reads)), type="h", col="red",
-#'     ylab="nucleosomal", ylim=c(0,35)
+#' library(ggplot2)
+#' as <- as.vector(coverage.rpm(res$syn.reads))
+#' bs <- as.vector(coverage.rpm(res$ctr.reads))
+#' cs <- as.vector(res$syn.ratio)
+#' plot_data <- rbind(
+#'     data.frame(x=seq_along(as), y=as, lab="nucleosomal"),
+#'     data.frame(x=seq_along(bs), y=bs, lab="random"),
+#'     data.frame(x=seq_along(cs), y=cs, lab="ratio")
 #' )
-#' plot(
-#'     as.vector(coverage.rpm(res$ctr.reads)), type="h", col="blue",
-#'     ylab="random", ylim=c(0,35)
-#' )
-#' plot(
-#'     as.vector(res$syn.ratio), type="h", col="orange", ylab="ratio"
-#' )
+#' qplot(x=x, y=y, data=plot_data, geom="area", xlab="position", ylab="") +
+#'     facet_grid(lab~., scales="free_y")
 #'
 #' @export syntheticNucMap
 #'
 #' @importFrom stats runif
 #' @importFrom IRanges IRanges
-#' @importFrom graphics plot lines abline points legend
 #' @importMethodsFrom IRanges start coverage
-#' @importMethodsFrom S4Vectors Rle
 #'
-syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
-                            fuz.num = 50, fuz.var = 50, max.cover = 20,
-                            nuc.len = 147, lin.len = 20, rnd.seed = NULL,
-                            as.ratio = FALSE, show.plot = FALSE, ...)
+syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
+                             fuz.var=50, max.cover=20, nuc.len=147, lin.len=20,
+                             rnd.seed=NULL, as.ratio=FALSE, show.plot=FALSE)
 {
     # Set random seed if given
     if (!is.null(rnd.seed)) {
@@ -175,7 +169,8 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
 
         # Some lost bases... as reality
         syn.ratio[abs(syn.ratio) == Inf] <- NA
-        Rle(syn.ratio)
+    } else {
+        syn.ratio <- NULL
     }
 
     result <- list()
@@ -196,47 +191,81 @@ syntheticNucMap <- function (wp.num = 100, wp.del = 10, wp.var = 20,
     }
 
     if (show.plot) {
-        # Y-lim range
-        max <- max(coverage(syn.reads), na.rm=TRUE)
-        min <- 0
-        if (as.ratio) {
-            min <- min(syn.ratio, na.rm=TRUE)
-        }
-
-        plot(
-            as.vector(coverage(syn.reads)), type="h", col="#AADDAA",
-            ylim=c(min,max),
-            ...
-        )
-
-        # Plot ratio, if asked for
-        if (as.ratio) {
-            lines(as.vector(syn.ratio), type="l", col="darkorange", lwd=2)
-        }
-        if (as.ratio) {
-            abline(h=0, col="darkorange4")
-        }
-
-        # Plot nucleosome positions (dyad)
-        points(wp.starts + 74, wp.nreads, col="red", pch=19)
-        points(fuz.starts + 74, fuz.nreads, col="blue", pch=20)
-
-        # Plot legend
-        if (as.ratio) {
-            legend(
-                "top",
-                c("Coverage", "Ratio", "Well-pos", "Fuzzy"),
-                fill=c("#AADDAA", "darkorange", "red", "blue"), bty="n",
-                horiz=TRUE
-            )
-        } else {
-            legend(
-                "top",
-                c("Coverage", "Well-pos", "Fuzzy"),
-                fill=c("#AADDAA", "red", "blue"), bty="n", horiz=TRUE
-            )
-        }
+        print(.synthPlot(
+            syn.reads,
+            wp.starts,
+            wp.nreads,
+            fuz.starts,
+            fuz.nreads,
+            syn.ratio=syn.ratio
+        ))
     }
 
     return (result)
+}
+
+.synthPlot <- function (..., syn.ratio=NULL)
+{
+    if (is.null(syn.ratio)) {
+        .synthPlotNoRatio(...)
+    } else {
+        .synthPlotRatio(..., syn.ratio)
+    }
+}
+
+#' @importFrom ggplot2 ggplot geom_area geom_point scale_fill_manual
+#'   scale_color_manual theme xlab ylab aes_string element_blank
+.synthPlotNoRatio <- function (syn.reads, wp.starts, wp.nreads, fuz.starts,
+                               fuz.nreads)
+{
+    cov <- as.vector(coverage(syn.reads))
+    covdf <- data.frame(y=cov, x=seq_along(cov), fill="coverage")
+    nucdf <- rbind(data.frame(x=wp.starts+74, y=wp.nreads, type="well-pos"),
+                   data.frame(x=fuz.starts+74, y=fuz.nreads, type="fuzzy"))
+    ggplot() +
+        geom_area(data=covdf,
+                  mapping=aes_string(x="x", y="y", fill="fill")) +
+        geom_point(data=nucdf,
+                   mapping=aes_string(x="x", y="y", color="type")) +
+        scale_fill_manual(values=c(coverage="#AADDAA")) +
+        scale_color_manual(values=c("well-pos"="red", "fuzzy"="blue")) +
+        theme(legend.title=element_blank()) +
+        xlab("position") +
+        ylab("number of reads")
+}
+
+#' @importFrom ggplot2 ggplot geom_area geom_point xlab ylab scale_fill_manual
+#'   scale_color_manual facet_grid theme aes_string element_blank as_labeller
+.synthPlotRatio <- function (syn.reads, wp.starts, wp.nreads, fuz.starts,
+                             fuz.nreads, syn.ratio)
+{
+    cov <- as.vector(coverage(syn.reads))
+    covdf <- data.frame(x=seq_along(cov), y=cov, facet="coverage")
+    ratiodf <- data.frame(x=seq_along(syn.ratio), y=syn.ratio, facet="ratio")
+    df <- rbind(covdf, ratiodf)
+
+    nucdf <- rbind(data.frame(x=wp.starts+74, y=wp.nreads, type="well-pos"),
+                   data.frame(x=fuz.starts+74, y=fuz.nreads, type="fuzzy"))
+    nucdf$facet <- "coverage"
+    syn.ratio[is.na(syn.ratio)] <- 0
+
+    ggplot() +
+        geom_area(data    = df,
+                  mapping = aes_string(x="x", y="y", fill="facet")) +
+        geom_point(data    = nucdf,
+                   mapping = aes_string(x="x", y="y", color="type")) +
+        xlab("position") +
+        ylab(NULL) +
+        scale_fill_manual(values=c("coverage" = "#AADDAA",
+                                   "ratio"    = "darkorange")) +
+        scale_color_manual(values=c("well-pos" = "red",
+                                    "fuzzy"    = "blue")) +
+        facet_grid(facet~.,
+                   switch="both",
+                   scales = "free_y", space = "free_y",
+                   labeller       = as_labeller(c(coverage = "number of reads",
+                                                  ratio    = "log2 ratio"))) +
+        theme(strip.placement  = "outside",
+              legend.title     = element_blank(),
+              strip.background = element_blank())
 }

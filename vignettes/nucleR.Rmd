@@ -22,8 +22,7 @@ getCaps <- function ()
     txts <- list(
         figcover=c(
             "Variation in the sharpness of the peaks using \\texttt{trim}",
-            "attribute. In blue, the original coverage; in orange the ",
-            "trimmed version."
+            "attribute."
         ),
         figmnase=c(
             "Toy example of MNase biase correction. Random nucleosomal and",
@@ -65,20 +64,14 @@ getCaps <- function ()
 }
 
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>",
-    message = FALSE,
-    warning = FALSE,
-    fig.width = 6,
+    collapse   = TRUE,
+    comment    = "#>",
+    message    = FALSE,
+    warning    = FALSE,
+    fig.width  = 6,
     fig.height = 2,
-    fig.wide = TRUE
+    fig.wide   = TRUE
 )
-
-knitr::knit_hooks$set(set.par=function(before, options, envir) {
-    if (before) {
-        par(mar=c(5, 4, 1, 1), cex=0.7)
-    }
-})
 
 ```
 
@@ -165,8 +158,9 @@ This object is a numeric vector covering the 8000 first positions of chromosome
 
 ```{r loadTA}
 library(nucleR)
-require(GenomicRanges)
-require(IRanges)
+library(ggplot2)
+library(IRanges)
+library(GenomicRanges)
 data(nucleosome_tiling)
 head(nucleosome_tiling, n=25)
 ```
@@ -279,14 +273,28 @@ plotting both coverages. Note that the coverages are normalized in the range
 
 ## MNase bias correction
 
-```{r figcover, echo=FALSE, fig.cap=getCaps(), set.par=TRUE, fig.width=5}
+```{r figcover, echo=FALSE, fig.cap=getCaps(), fig.width=5}
 # Compare both coverages
 t1 <- as.vector(cover_pair[[1]])[1:2000]
 t2 <- as.vector(cover_trim[[1]])[1:2000]
 t1 <- (t1 - min(t1)) / max(t1 - min(t1)) # Normalization
 t2 <- (t2 - min(t2)) / max(t2 - min(t2)) # Normalization
-plot(t1, type="l", lwd="1", col="blue", ylab="norm. coverage", xlab="position")
-lines(t2, lwd="1", col="orange")
+plot_data <- rbind(
+    data.frame(
+        x=seq_along(t1),
+        y=t1,
+        coverage="original"
+    ),
+    data.frame(
+        x=seq_along(t1),
+        y=t2,
+        coverage="trimmed"
+    )
+)
+ggplot(plot_data, aes(x=x, y=y)) +
+    geom_line(aes(color=coverage)) +
+    xlab("position") +
+    ylab("norm coverage")
 ```
 
 The Microccocal Nuclease is a widely used enzyme that has been proved to have
@@ -298,19 +306,29 @@ The use of this function requires a paired-end control sample and a paired end
 or extended single-read nucleosomal DNA sample. A toy example generated using
 synthetic data can be found in Figure \@ref(fig:figmnase).
 
-```{r figmnase, echo=c(1:5), fig.cap=getCaps(), set.par=TRUE, fig.width=5}
+```{r figmnase, echo=c(1:5), fig.cap=getCaps(), fig.width=5}
 # Toy example
 map <- syntheticNucMap(as.ratio=TRUE, wp.num=50, fuz.num=25)
 exp <- coverage(map$syn.reads)
 ctr <- coverage(map$ctr.reads)
 corrected <- controlCorrection(exp, ctr)
 
-plot(exp, col="darkgrey", type="l", ylab="coverage", xlab="position")
-lines(corrected, col="darkblue", lty=2)
-legend(
-    "top", c("normal", "corrected"), hor=TRUE, bty="n",
-    fill=c("darkgrey", "blue")
+plot_data <- rbind(
+    data.frame(
+        x=seq_along(exp),
+        y=as.vector(exp),
+        coverage="normal"
+    ),
+    data.frame(
+        x=seq_along(corrected),
+        y=as.vector(corrected),
+        coverage="corrected"
+    )
 )
+ggplot(plot_data, aes(x=x, y=y)) +
+    geom_line(aes(color=coverage)) +
+    xlab("position") +
+    ylab("coverage")
 ```
 
 
@@ -358,23 +376,36 @@ window average and then use a Hidden Markov Model to calculate the
 probabilities of having one or another state.
 
 ```{r fignoise, echo=FALSE, fig.cap=getCaps(), fig.height=1.5}
-par(mar=c(5, 4, 1, 1), mfcol=c(1, 4), cex=0.5)
-plot(
-    nucleosome_tiling[1:2000], type="l", main="original", ylim=c(-3,2),
-    xlab="position", ylab="intensity"
+windowFilter <- function (x, w) {
+    if (missing(w)) {
+        return(x)
+    } else {
+        y <- filter(x, rep(1, w)/w)
+        return(as.vector(y))
+    }
+}
+
+mkEntry <- function (x, i, w, lab) {
+    if (missing(lab)) {
+        lab <- sprintf("slinding w. %i bp", w)
+    }
+    df <- data.frame(x=i, y=windowFilter(x[i], w), lab=lab)
+    df[!is.na(df[, "y"]), ]
+}
+
+i <- 1:2000
+plot_data <- rbind(
+    mkEntry(nucleosome_tiling, i, 1, "original"),
+    mkEntry(nucleosome_tiling, i, 20),
+    mkEntry(nucleosome_tiling, i, 50),
+    mkEntry(nucleosome_tiling, i, 100)
 )
-plot(
-    filter(nucleosome_tiling[1:2000], c(rep(1,20))/20), type="l",
-    main="sliding w. 20bp", ylim=c(-3,2), xlab="position", ylab=""
-)
-plot(
-    filter(nucleosome_tiling[1:2000], c(rep(1,50))/50), type="l",
-    main="sliding w. 50bp", ylim=c(-3,2), xlab="position", ylab=""
-)
-plot(
-    filter(nucleosome_tiling[1:2000], c(rep(1,100))/100), type="l",
-    main="sliding w. 100bp", ylim=c(-3,2), xlab="position", ylab=""
-)
+
+ggplot(plot_data, aes(x=x, y=y)) +
+    geom_line() +
+    facet_grid(.~lab) +
+    xlab("position") +
+    ylab("intensity")
 ```
 
 As can be seen in Figure \@ref(fig:fignoise), data needs some smoothing to be
@@ -401,7 +432,7 @@ drops as the frequency increases.
 We can look at the power spectrum of the example dataset with the following
 command:
 
-```{r figfft, fig.cap=getCaps(), fig.width=5, set.par=TRUE}
+```{r figfft, fig.cap=getCaps(), fig.width=5}
 fft_ta <- filterFFT(nucleosome_tiling, pcKeepComp=0.01, showPowerSpec=TRUE)
 ```
 
@@ -443,17 +474,24 @@ the peaks, mantaining a high correlation with the original signal but allowing
 achieve a great performance with a simple peak detection algorithm:
 
 ```{r figfft2, echo=FALSE, fig.cap=getCaps(), fig.width=5, fig.height=4}
-par(mar=c(5, 4, 1, 1), mfcol=c(2, 1), cex=0.7)
-tiling_raw <- nucleosome_tiling[1:3000]
+i <- 1:3000
+tiling_raw <- nucleosome_tiling[i]
 tiling_fft <- filterFFT(tiling_raw, pcKeepComp=0.01)
-htseq_raw <- as.vector(cover_trim[[1]])[1:3000]
+htseq_raw <- as.vector(cover_trim[[1]])[i]
 htseq_fft <- filterFFT(htseq_raw, pcKeepComp=0.02)
-plot(tiling_raw, type="l", col="darkblue", lwd=3, ylab="intensity", xlab="")
-lines(tiling_fft, type="l", col="cyan")
-plot(
-    htseq_raw, type="l", col="darkred", lwd=3, ylab="coverage", xlab="position"
+
+plot_data <- rbind(
+    data.frame(x=i, y=tiling_raw, lab="intensity", treatment="raw"),
+    data.frame(x=i, y=tiling_fft, lab="intensity", treatment="filtered"),
+    data.frame(x=i, y=htseq_raw,  lab="coverage",  treatment="raw"),
+    data.frame(x=i, y=htseq_fft,  lab="coverage",  treatment="filtered")
 )
-lines(htseq_fft, type="l", col="pink")
+
+ggplot(plot_data, aes(x=x, y=y)) +
+    geom_line(aes(color=treatment)) +
+    facet_grid(lab~., scales="free_y") +
+    ylab("") +
+    xlab("position")
 ```
 
 ```{r corfft}
@@ -478,7 +516,7 @@ allowing the detection of peaks in a simple but efficient way just looking for
 changes in the trend of the profile. This is implemented in the `peakDetection`
 function and results can be represented with the function `plotPeaks`:
 
-```{r figpeak, fig.cap=getCaps(), set.par=TRUE}
+```{r figpeak, fig.cap=getCaps()}
 peaks <- peakDetection(htseq_fft, threshold="25%", score=FALSE)
 peaks
 
@@ -503,12 +541,11 @@ region).
 Scores can be calculated with the `peakScoring` function or directly with the
 argument `score=TRUE` in `peakDetection`.
 
-```{r figpeak2, fig.cap=getCaps(), set.par=TRUE}
+```{r figpeak2, fig.cap=getCaps()}
 peaks <- peakDetection(htseq_fft, threshold="25%", score=TRUE)
 head(peaks)
 
-plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000),
-    ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%")
 ```
 
 The scores in Figure \@ref(fig:figpeak2) only account for the punctual height
@@ -518,12 +555,11 @@ a way to account for longer range peaks, which can be obtained with the
 `width` argument. In this way one can convert the identified nucleosome dyads
 to whole nucleosome length ranges and account for its degree of fuzzyness:
 
-```{r figpeak3, fig.cap=getCaps(), set.par=TRUE}
+```{r figpeak3, fig.cap=getCaps()}
 peaks <- peakDetection(htseq_fft, threshold="25%", score=TRUE, width=140)
 peaks
 
-plotPeaks(peaks, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000),
-    rect.lwd=0.5, rect.thick=2.5, ylab="coverage")
+plotPeaks(peaks, htseq_fft, threshold="25%")
 ```
 
 Note than in Figure \@ref(fig:figpeak3) overlapped peaks in a width and tall
@@ -538,14 +574,13 @@ standard Biocpkg{IRanges} functions, shuch as `reduce`, `findOverlaps` or
 The next example shows a simple way to merge those nucleosomes which are
 overlap accounting them as a fuzzy regions:
 
-```{r figranges, echo=-6, fig.cap=getCaps(), set.par=TRUE}
+```{r figranges, echo=-6, fig.cap=getCaps()}
 nuc_calls <- ranges(peaks[peaks$score > 0.1, ])
 red_calls <- reduce(nuc_calls)
 red_class <- RangedData(red_calls, isFuzzy=width(red_calls) > 140)
 red_class
 
-plotPeaks(red_calls, htseq_fft, threshold="25%", yaxt="n", xlim=c(1,4000),
-    rect.lwd=0.5, rect.thick=3, ylab="coverage")
+plotPeaks(red_calls, htseq_fft, threshold="25%")
 ```
 
 
@@ -580,10 +615,10 @@ function, together with the coverage or ratio profiles.
 See the man page of this function for detailed information about the different
 parameters and options.
 
-```{r figsyn, fig.cap=getCaps(), set.par=TRUE}
+```{r figsyn, fig.cap=getCaps(), fig.height=3}
 syn <- syntheticNucMap(wp.num=100, wp.del=10, wp.var=30, fuz.num=20,
     fuz.var=50, max.cover=20, nuc.len=147, lin.len=20, rnd.seed=1,
-    as.ratio=TRUE, show.plot=TRUE, ylab="", xlab="position")
+    as.ratio=TRUE, show.plot=TRUE)
 ```
 
 

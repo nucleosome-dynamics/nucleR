@@ -75,3 +75,26 @@ setMethod(
     function (x)
         nrow(x)
 )
+
+#' Threshold getter
+#'
+#' If threshold is given as a string with percentage, convert it
+#'
+#' @param threshold threshold given as an absolute value or as a string
+#'   percentage
+#' @param data vector with values from which to derive the threshold if it's
+#'   relative
+#'
+#' @return a numeric vector
+#'
+#' @importFrom stats quantile
+#
+.getThreshold <- function (threshold, data)
+{
+    if (!is.numeric(threshold) && grepl("%$", threshold)) {
+        percent <- as.numeric(sub("%","", threshold))
+        quantile(data, percent/100, na.rm=TRUE)
+    } else {
+        threshold
+    }
+}

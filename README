@@ -1,8 +1,14 @@
 This builds on the original nucleR package, written by Oscar Flores.
 
-New features (TODO):
-    Update to use newer bioconductor functions
-    Add functions to process BAM files
-    Merge with the NucleosomeDynamics library to analyze nucleosome profiles comparatively
+TODO
+    * IRanges:::unlist_as_integer()
+    * GenomicAlignments instead of ShortRead
+    * ggplot2
+    * Import Bowtie function
+    * Add other old functions
+    * Add tests
 
-nucleR is a R/Bioconductor package for working with tiling arrays and next generation sequencing. It uses a novel aproach in this field which comprises a deep profile cleaning using Fourier Transform and peak scoring for a quick and flexible nucleosome calling.
+nucleR is a R/Bioconductor package for working with tiling arrays and next
+generation sequencing. It uses a novel aproach in this field which comprises a
+deep profile cleaning using Fourier Transform and peak scoring for a quick and
+flexible nucleosome calling.

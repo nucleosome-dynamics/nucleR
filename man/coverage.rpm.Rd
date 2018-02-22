@@ -39,7 +39,10 @@ data(nucleosome_htseq)
 cov <- coverage.rpm(nucleosome_htseq)
 print(cov)
 # Plot it
-plot(as.vector(cov[["chr1"]]), type="l", ylab="coverage", xlab="position")
+library(ggplot2)
+cover <- as.vector(cov[["chr1"]])
+qplot(seq_along(cover), cover, geom="line", ylab="coverage",
+  xlab="position")
 
 }
 \seealso{

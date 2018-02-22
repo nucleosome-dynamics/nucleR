@@ -72,15 +72,15 @@
 #' pr2 <- processReads(nucleosome_htseq, fragmentLen=200, trim=40)
 #'
 #' # Compare the results:
-#' par(mfrow=c(2,1), mar=c(3,4,1,1))
-#' plot(
-#'     as.vector(coverage.rpm(pr1)[["chr1"]]), type="l",
-#'     ylab="coverage (original)"
+#' library(ggplot2)
+#' cov1 <- as.vector(coverage.rpm(pr1)[["chr1"]])
+#' cov2 <- as.vector(coverage.rpm(pr2)[["chr1"]])
+#' plot_data <- rbind(
+#'     data.frame(x=seq_along(cov1), y=cov1, coverage="original"),
+#'     data.frame(x=seq_along(cov2), y=cov2, coverage="trimmed")
 #' )
-#' plot(
-#'     as.vector(coverage.rpm(pr2)[["chr1"]]), type="l",
-#'     ylab="coverage (trimmed)"
-#' )
+#' qplot(x=x, y=y, geom="line", data=plot_data, xlab="position",
+#'   ylab="coverage") + facet_grid(coverage~.)
 #'
 #' @export
 #'
