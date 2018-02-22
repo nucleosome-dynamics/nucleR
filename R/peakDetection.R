@@ -147,7 +147,10 @@ setMethod(
             return(NULL)
         }
 
-        covers <- .lapplyIRange(ranges, function (x) data[.iran2vect(x)])
+        covers <- .lapplyIRange(
+            ranges,
+            function (x) data[unlist_as_integer(x)]
+        )
 
         # For each range, look for changes of trend and keep the starting
         # position of trend change

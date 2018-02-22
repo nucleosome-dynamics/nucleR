@@ -211,15 +211,15 @@ setMethod(
 
     fft_ranges <- lapply(
         seq_along(ranges),
-        function (i) {
-            .fftRegion(data[.iran2vect(ranges[i])], pcKeepComp)
-        }
+        function (i)
+            .fftRegion(data[unlist_as_integer(ranges[i])],
+                       pcKeepComp)
     )
 
     # Create a vector of default values and fill it
     res <- rep(defVal, length(data))
     for (i in seq_along(ranges)) {
-        res[.iran2vect(ranges[i])] <- fft_ranges[[i]]
+        res[unlist_as_integer(ranges[i])] <- fft_ranges[[i]]
     }
 
     # Set to default values the positions that have them in the input
@@ -229,7 +229,7 @@ setMethod(
         rtmp <- rtmp[width(rtmp) > 15]
         if (length(rtmp) > 0) {
             for (i in 1:length(rtmp)) {
-                res[.iran2vect(rtmp[i])] <- NA
+                res[unlist_as_integer(rtmp[i])] <- NA
             }
         }
     } else if (defVal == 0) {
@@ -237,7 +237,7 @@ setMethod(
         rtmp <- rtmp[width(rtmp) > 15]
         if (length(rtmp) > 0) {
             for (i in 1:length(rtmp)) {
-                res[.iran2vect(rtmp[i])] <- 0
+                res[unlist_as_integer(rtmp[i])] <- 0
             }
         }
         res[res < 0] <- 0
@@ -354,9 +354,3 @@ setMethod(
              x        = "components",
              y        = "power")
 }
-
-
-
-
-
-

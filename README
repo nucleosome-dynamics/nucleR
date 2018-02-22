@@ -1,9 +1,7 @@
 This builds on the original nucleR package, written by Oscar Flores.
 
 TODO
-    * IRanges:::unlist_as_integer()
     * GenomicAlignments instead of ShortRead
-    * ggplot2
     * Import Bowtie function
     * Add other old functions
     * Add tests

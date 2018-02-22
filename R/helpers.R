@@ -52,13 +52,13 @@ setMethod(
 .lapplyIRange <- function (x, fun, ...)
     lapply(seq_along(x), function (i) fun(x[i], ...))
 
-#' @importMethodsFrom IRanges start end
-.iran2vect <- function (ran)
-{
-    from <- .lapplyIRange(ran, start)
-    to <- .lapplyIRange(ran, end)
-    unlist(mapply(`:`, from, to))
-}
+##' @importMethodsFrom IRanges start end
+#.iran2vect <- function (ran)
+#{
+#    from <- .lapplyIRange(ran, start)
+#    to <- .lapplyIRange(ran, end)
+#    unlist(mapply(`:`, from, to))
+#}
 
 setMethod(
     ".whichChr",
@@ -109,3 +109,6 @@ setMethod(
         threshold
     }
 }
+
+#' @importFrom utils getFromNamespace
+unlist_as_integer <- getFromNamespace("unlist_as_integer", "IRanges")
