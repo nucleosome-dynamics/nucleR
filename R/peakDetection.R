@@ -149,7 +149,7 @@ setMethod(
 
         covers <- .lapplyIRange(
             ranges,
-            function (x) data[unlist_as_integer(x)]
+            function (x) data[.unlist_as_integer(x)]
         )
 
         # For each range, look for changes of trend and keep the starting

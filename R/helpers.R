@@ -34,6 +34,9 @@
 .mid <- function(x)
     floor((start(x) + end(x)) / 2)
 
+.lapplyIRange <- function (x, fun, ...)
+    lapply(seq_along(x), function (i) fun(x[i], ...))
+
 setGeneric(
     ".whichChr",
     function (x)
@@ -48,17 +51,6 @@ setMethod(
     function (x)
         runValue(seqnames(x))
 )
-
-.lapplyIRange <- function (x, fun, ...)
-    lapply(seq_along(x), function (i) fun(x[i], ...))
-
-##' @importMethodsFrom IRanges start end
-#.iran2vect <- function (ran)
-#{
-#    from <- .lapplyIRange(ran, start)
-#    to <- .lapplyIRange(ran, end)
-#    unlist(mapply(`:`, from, to))
-#}
 
 setMethod(
     ".whichChr",
@@ -103,12 +95,29 @@ setMethod(
 .getThreshold <- function (threshold, data)
 {
     if (!is.numeric(threshold) && grepl("%$", threshold)) {
-        percent <- as.numeric(sub("%","", threshold))
+        percent <- as.numeric(sub("%", "", threshold))
         quantile(data, percent/100, na.rm=TRUE)
     } else {
         threshold
     }
 }
 
+#' Unlist an IRanges object into a vector
+#'
+#' Internal function from the IRanges package, lifted and slightly modified to
+#' prevent a NOTE warning about the use of a non-exported function
+#'
+#' @author  H. Pagès, P. Aboyoun and M. Lawrence
 #' @importFrom utils getFromNamespace
-unlist_as_integer <- getFromNamespace("unlist_as_integer", "IRanges")
+#' @importMethodsFrom BiocGenerics pos
+#'
+.unlist_as_integer <- function (x)
+{
+    stopifnot(is(x, "Ranges"))
+    if (is(x, "Pos")) {
+        return(pos(x))
+    } else {
+        fancy_mseq <- getFromNamespace("fancy_mseq", "S4Vectors")
+        return(fancy_mseq(width(x), offset=start(x)-1L))
+    }
+}

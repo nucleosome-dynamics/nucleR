@@ -5,6 +5,7 @@ TODO
     * Import Bowtie function
     * Add other old functions
     * Add tests
+    * Test on windows
 
 nucleR is a R/Bioconductor package for working with tiling arrays and next
 generation sequencing. It uses a novel aproach in this field which comprises a

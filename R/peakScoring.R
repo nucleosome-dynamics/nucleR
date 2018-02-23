@@ -208,12 +208,12 @@ setMethod(
         sums.range <- .lapplyIRange(
             peaks,
             function (x)
-                mean(data[unlist_as_integer(x)], na.rm=TRUE)
+                mean(data[.unlist_as_integer(x)], na.rm=TRUE)
         )
         sums.dyad <- .lapplyIRange(
             dyads,
             function (x)
-                mean(data[unlist_as_integer(x)], na.rm=TRUE)
+                mean(data[.unlist_as_integer(x)], na.rm=TRUE)
         )
 
         # Score the heigh of the peak
