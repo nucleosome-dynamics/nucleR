@@ -109,7 +109,7 @@ setMethod(
 #'
 #' @author  H. Pagès, P. Aboyoun and M. Lawrence
 #' @importFrom utils getFromNamespace
-#' @importMethodsFrom BiocGenerics pos
+#' @importMethodsFrom IRanges pos
 #'
 .unlist_as_integer <- function (x)
 {
