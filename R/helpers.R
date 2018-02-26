@@ -121,3 +121,43 @@ setMethod(
         return(fancy_mseq(width(x), offset=start(x)-1L))
     }
 }
+
+#' Vectorized version of `all`
+#'
+#' Helper function that behaves as a vectorized version of the function `all`
+#'
+#' @param ... arbitraty amount of `logical` vectors, expected to have the same
+#'   length
+#' @return `logical` vector
+#'
+.vectorizedAll <- function(...)
+    Reduce(`&`, list(...))
+
+#' File loader
+#
+#' Higher order function to import BAM or Bowtie files.
+#' Deals with wether type is `single` or `paired` and with the number of input
+#' files
+#'
+#' @importFrom GenomicRanges GRanges GRangesList
+.loadFiles <- function (singleLoad, pairedLoad)
+{
+    function (files, type="paired") {
+        if (type == "single") {
+            f <- .loadSingleBam
+        } else if (type == "paired") {
+            f <- .loadPairedBam
+        } else {
+            stop("type must be `single` or `paired`")
+        }
+
+        len <- length(files)
+        if (len == 0) {
+            GRanges()
+        } else if (len == 1) {
+            f(files[[1]])
+        } else {
+            GRangesList(lapply(files, f))
+        }
+    }
+}

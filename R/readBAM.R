@@ -24,28 +24,7 @@
 #'
 #' @export readBAM
 #'
-readBAM <- function (files, type="paired")
-{
-    if (type == "single") {
-        f <- .loadSingleBam
-    } else if (type == "paired") {
-        f <- .loadPairedBam
-    } else {
-        stop("type must be `single` or `paired`")
-    }
-    GRangesList(lapply(files, f))
-}
-
-#' Vectorized version of `all`
-#'
-#' Helper function that behaves as a vectorized version of the function `all`
-#'
-#' @param ... arbitraty amount of `logical` vectors, expected to have the same
-#'   length
-#' @return `logical` vector
-#'
-.vectorizedAll <- function(...)
-    Reduce(`&`, list(...))
+readBAM <- .loadFiles(.loadSingleBam, .loadPairedBam)
 
 #' Load a single-end BAM
 #'

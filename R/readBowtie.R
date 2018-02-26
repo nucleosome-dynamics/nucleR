@@ -19,7 +19,10 @@
 #' @export readBowtie
 #'
 readBowtie <- function (files, type="paired")
-    GRangesList(lapply(strsplit(unlist(files), "/"), .readBowtieFile, type))
+{
+    splts <- strsplit(unlist(files), "/")
+    .loadFiles(.loadSingleBowtie, .loadPairedBowtie)(files, type)
+}
 
 #' @importFrom IRanges IRanges
 #' @importMethodsFrom ShortRead position chromosome
@@ -33,6 +36,12 @@ readBowtie <- function (files, type="paired")
             end   = position(sxminus) + width(sxminus))
 }
 
+.loadSingleBowtie <- function (x)
+    .readBowtieFile(x, type="single")
+
+.loadPairedBowtie <- function (x)
+    .readBowtieFile(x, type="paired")
+
 #' @importFrom GenomicRanges GRanges
 #' @importFrom IRanges IRanges IRangesList
 #' @importMethodsFrom BiocGenerics width strand
@@ -40,7 +49,6 @@ readBowtie <- function (files, type="paired")
 #' @importMethodsFrom ShortRead readAligned
 .readBowtieFile <- function (splt, type)
 {
-
     message("Reading ", splt[length(splt)])
     dirPath <- paste(splt[-length(splt)], collapse="/")
     pattern <- sprintf("^%s$", splt[length(splt)])
