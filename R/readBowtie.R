@@ -8,7 +8,8 @@
 #' @param type Describes the type of reads. Values allowed are `single` for
 #'   single-ended reads and `paired` for pair-ended.
 #'
-#' @return List of `GRanges` containing the reads of each input BAM file.
+#' @return [GenomicRanges::GRangesList] containing the reads of each input BAM
+#'   file.
 #'
 #' @author Ricard Illa \email{ricard.illa@@irbbarcelona.org}
 #' @keywords file

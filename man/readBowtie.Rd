@@ -13,7 +13,8 @@ readBowtie(files, type = "paired")
 single-ended reads and \code{paired} for pair-ended.}
 }
 \value{
-List of \code{GRanges} containing the reads of each input BAM file.
+\link[GenomicRanges:GRangesList]{GenomicRanges::GRangesList} containing the reads of each input BAM
+file.
 }
 \description{
 This function allows to load reads from Bowtie files from both single and

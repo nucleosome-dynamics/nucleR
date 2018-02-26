@@ -4,11 +4,12 @@
 #' paired-end commming from Next Generation Sequencing nucleosome mapping
 #' experiments.
 #'
-#' @param file List of input BAM files.
+#' @param files List of input BAM files.
 #' @param type Describes the type of reads. Values allowed are `single` for
 #'   single-ended reads and `paired` for pair-ended.
 #'
-#' @return List of `GRanges` containing the reads of each input BAM file.
+#' @return [GenomicRanges::GRangesList] containing the reads of each input BAM
+#'   file.
 #'
 #' @author Ricard Illa \email{ricard.illa@@irbbarcelona.org}
 #' @keywords file
@@ -19,19 +20,21 @@
 #' )
 #' reads <- readBAM(infile, type="paired")
 #'
+#' @importFrom GenomicRanges GRangesList
+#'
 #' @export readBAM
 #'
-readBAM <- function (file, type="paired")
+readBAM <- function (files, type="paired")
 {
     if (type == "single") {
-        .loadSingleBam(file)
+        f <- .loadSingleBam
     } else if (type == "paired") {
-        .loadPairedBam(file)
+        f <- .loadPairedBam
     } else {
         stop("type must be `single` or `paired`")
     }
+    GRangesList(lapply(files, f))
 }
-
 
 #' Vectorized version of `all`
 #'
@@ -43,7 +46,6 @@ readBAM <- function (file, type="paired")
 #'
 .vectorizedAll <- function(...)
     Reduce(`&`, list(...))
-
 
 #' Load a single-end BAM
 #'
@@ -131,7 +133,7 @@ readBAM <- function (file, type="paired")
 #'
 .loadPairedBam <- function (file)
 {
-    message(sprintf("reading file %s", file))
+    message("reading file ", file)
 
     what <- c(
         "qname",

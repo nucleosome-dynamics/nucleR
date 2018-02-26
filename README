@@ -1,7 +1,6 @@
 This builds on the original nucleR package, written by Oscar Flores.
 
 TODO
-    * GenomicAlignments instead of Rsamtools
     * Add other old functions
     * Add tests
     * Test on windows

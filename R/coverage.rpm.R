@@ -42,7 +42,7 @@ setGeneric(
 setMethod(
     "coverage.rpm",
     signature(data="GRanges"),
-    function(data, scale=1e6, ...)
+    function (data, scale=1e6, ...)
         RleList(lapply(
             coverage(data, ...),
             function (x) x / length(data) * scale
@@ -50,11 +50,19 @@ setMethod(
 )
 
 #' @rdname coverage.rpm
+setMethod(
+    "coverage.rpm",
+    signature(data="CompressedGRangesList"),
+    function (data, scale=1e6, ...)
+        coverage.rpm(do.call(`c`, unname(data)), scale=scale, ...)
+)
+
+#' @rdname coverage.rpm
 #' @importMethodsFrom IRanges coverage
 setMethod(
     "coverage.rpm",
     signature(data="IRanges"),
-    function(data, scale=1e6, ...)
+    function (data, scale=1e6, ...)
         coverage(data) / length(data) * scale
 )
 
@@ -64,7 +72,7 @@ setMethod(
 setMethod(
     "coverage.rpm",
     signature(data="RangedData"),
-    function(data, scale=1e6, ...)
+    function (data, scale=1e6, ...)
         RleList(lapply(
             coverage(data, ...),
             function (x) x / nrow(data) * scale

@@ -4,16 +4,17 @@
 \alias{readBAM}
 \title{Import reads from a list of BAM files.}
 \usage{
-readBAM(file, type = "paired")
+readBAM(files, type = "paired")
 }
 \arguments{
-\item{file}{List of input BAM files.}
+\item{files}{List of input BAM files.}
 
 \item{type}{Describes the type of reads. Values allowed are \code{single} for
 single-ended reads and \code{paired} for pair-ended.}
 }
 \value{
-List of \code{GRanges} containing the reads of each input BAM file.
+\link[GenomicRanges:GRangesList]{GenomicRanges::GRangesList} containing the reads of each input BAM
+file.
 }
 \description{
 This function allows to load reads from BAM files from both single and

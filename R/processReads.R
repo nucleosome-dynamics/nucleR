@@ -196,6 +196,20 @@ setMethod(
 )
 
 #' @rdname processReads
+#' @importFrom GenomicRanges GRangesList
+setMethod(
+    "processReads",
+    signature(data="CompressedGRangesList"),
+    function (data, type="single", fragmentLen, trim, ...)
+        GRangesList(lapply(data,
+                           processReads,
+                           type=type,
+                           fragmentLen=fragmentLen,
+                           trim=trim,
+                           ...))
+)
+
+#' @rdname processReads
 #' @importFrom GenomicRanges GRanges
 #' @importMethodsFrom IRanges end
 #' @importMethodsFrom S4Vectors space
@@ -211,7 +225,7 @@ setMethod(
                     " * fragmentLen not provided for strand correction, ",
                     "infering automatically..."
                 )
-                fragmentLen <- fragmentLenDetect(data,...)
+                fragmentLen <- fragmentLenDetect(data, ...)
                 message(paste(" * fragmentLen =", fragmentLen))
             } else {
                 fragmentLen <- Inf  # Don't remove anything

@@ -4,6 +4,7 @@
 \name{coverage.rpm}
 \alias{coverage.rpm}
 \alias{coverage.rpm,GRanges-method}
+\alias{coverage.rpm,CompressedGRangesList-method}
 \alias{coverage.rpm,IRanges-method}
 \alias{coverage.rpm,RangedData-method}
 \title{Coverage calculation and normalization to reads per million (rpm)}
@@ -11,6 +12,8 @@
 coverage.rpm(data, scale = 1e+06, ...)
 
 \S4method{coverage.rpm}{GRanges}(data, scale = 1e+06, ...)
+
+\S4method{coverage.rpm}{CompressedGRangesList}(data, scale = 1e+06, ...)
 
 \S4method{coverage.rpm}{IRanges}(data, scale = 1e+06, ...)
 
