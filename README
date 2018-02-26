@@ -1,8 +1,7 @@
 This builds on the original nucleR package, written by Oscar Flores.
 
 TODO
-    * GenomicAlignments instead of ShortRead
-    * Import Bowtie function
+    * GenomicAlignments instead of Rsamtools
     * Add other old functions
     * Add tests
     * Test on windows
