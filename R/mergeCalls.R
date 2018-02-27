@@ -138,7 +138,8 @@ setMethod(
 
 #' @importFrom IRanges IRanges
 #' @importFrom S4Vectors queryHits
-#' @importMethodsFrom IRanges start end findOverlaps reduce
+#' @importMethodsFrom BiocGenerics start end
+#' @importMethodsFrom IRanges findOverlaps reduce
 .getMergeGroup <- function (calls, min.overlap)
 {
     ovlps <- findOverlaps(

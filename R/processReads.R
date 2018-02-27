@@ -211,9 +211,9 @@ setMethod(
 
 #' @rdname processReads
 #' @importFrom GenomicRanges GRanges
-#' @importMethodsFrom IRanges end
-#' @importMethodsFrom S4Vectors space
+#' @importMethodsFrom BiocGenerics end
 #' @importMethodsFrom GenomeInfoDb seqnames
+#' @importMethodsFrom S4Vectors space
 setMethod(
     "processReads",
     signature(data="GRanges"),
@@ -309,7 +309,7 @@ setMethod(
 
 #' @rdname processReads
 #' @importFrom IRanges IRanges RangedData
-#' @importMethodsFrom IRanges end
+#' @importMethodsFrom BiocGenerics end
 #' @importMethodsFrom S4Vectors space
 setMethod(
     "processReads",

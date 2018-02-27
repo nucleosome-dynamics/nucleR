@@ -89,9 +89,10 @@
 #'
 #' @export syntheticNucMap
 #'
-#' @importFrom stats runif
 #' @importFrom IRanges IRanges
-#' @importMethodsFrom IRanges start coverage
+#' @importFrom stats runif
+#' @importMethodsFrom BiocGenerics start
+#' @importMethodsFrom IRanges coverage
 #'
 syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
                              fuz.var=50, max.cover=20, nuc.len=147, lin.len=20,

@@ -119,7 +119,7 @@ setMethod(
 #' @rdname peakDetection
 #' @importFrom IRanges IRanges
 #' @importFrom stats quantile
-#' @importMethodsFrom IRanges start end
+#' @importMethodsFrom BiocGenerics start end
 setMethod(
     "peakDetection",
     signature(data="numeric"),

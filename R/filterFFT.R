@@ -191,8 +191,8 @@ setMethod(
 )
 
 #' @importFrom IRanges IRanges
+#' @importMethodsFrom BiocGenerics width
 #' @importMethodsFrom S4Vectors Rle
-#' @importMethodsFrom IRanges width
 .optimFFT <- function (data, pcKeepComp)
 {
     # Partition the data for available values
@@ -252,7 +252,7 @@ setMethod(
 #' performance
 #'
 #' @importFrom IRanges IRanges
-#' @importMethodsFrom IRanges start end width end<-
+#' @importMethodsFrom BiocGenerics start end width end<-
 #'
 .fftRegion <- function (data2, pcKeepComp)
 {

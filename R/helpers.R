@@ -30,7 +30,7 @@
 #'
 #' Simple function for returning the middle point of a of a GRanges (normal mid
 #' doesn't work there)
-#' @importMethodsFrom IRanges start end
+#' @importMethodsFrom BiocGenerics start end
 .mid <- function(x)
     floor((start(x) + end(x)) / 2)
 

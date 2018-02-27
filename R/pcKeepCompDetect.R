@@ -82,7 +82,7 @@
 #' @importFrom stats runif
 #' @importFrom IRanges IRanges
 #' @importFrom stats cor
-#' @importMethodsFrom IRanges width start
+#' @importMethodsFrom BiocGenerics width start
 pcKeepCompDetect <- function (data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
                             verbose = FALSE, cor.target = 0.98, cor.tol = 1e-3,
                             smpl.num = 25, smpl.min.size = 2 ^ 10,

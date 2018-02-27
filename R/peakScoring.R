@@ -172,7 +172,7 @@ setMethod(
 #' @importFrom IRanges IRanges
 #' @importFrom stats quantile
 #' @importFrom GenomicRanges GRanges
-#' @importMethodsFrom IRanges start end width
+#' @importMethodsFrom BiocGenerics start end width
 setMethod(
     "peakScoring",
     signature(peaks="IRanges"),

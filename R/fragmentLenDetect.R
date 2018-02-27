@@ -72,8 +72,8 @@ setGeneric(
 
 #' @rdname fragmentLenDetect
 #' @importFrom stats runif cor
-#' @importMethodsFrom BiocGenerics strand
-#' @importMethodsFrom IRanges coverage width
+#' @importMethodsFrom BiocGenerics strand width
+#' @importMethodsFrom IRanges coverage
 #' @importMethodsFrom ShortRead chromosome
 setMethod(
     "fragmentLenDetect",
@@ -169,8 +169,7 @@ setMethod(
 
 #' @rdname fragmentLenDetect
 #' @importFrom stats runif cor
-#' @importMethodsFrom IRanges width
-#' @importMethodsFrom BiocGenerics strand
+#' @importMethodsFrom BiocGenerics strand width
 #' @importMethodsFrom GenomeInfoDb seqnames
 setMethod(
     "fragmentLenDetect",
@@ -264,8 +263,8 @@ setMethod(
 
 #' @rdname fragmentLenDetect
 #' @importFrom IRanges IRanges
-#' @importMethodsFrom IRanges width
 #' @importFrom stats runif cor
+#' @importMethodsFrom BiocGenerics width
 setMethod(
     "fragmentLenDetect",
     signature(reads="RangedData"),
