@@ -4,17 +4,13 @@
 \name{mergeCalls}
 \alias{mergeCalls}
 \alias{mergeCalls,GRanges-method}
-\alias{mergeCalls,RangedData-method}
 \title{Automatic merging of overlapped nucleosome calls}
 \usage{
 mergeCalls(calls, min.overlap = 50, discard.low = 0.2, mc.cores = 1,
   verbose = TRUE)
 
 \S4method{mergeCalls}{GRanges}(calls, min.overlap = 50, discard.low = 0.2,
-  mc.cores = 1, verbose = TRUE)
-
-\S4method{mergeCalls}{RangedData}(calls, min.overlap = 50,
-  discard.low = 0.2, mc.cores = 1, verbose = TRUE)
+  verbose = TRUE)
 }
 \arguments{
 \item{calls}{\link[GenomicRanges:GRanges]{GenomicRanges::GRanges} with scored and ranged nucleosome

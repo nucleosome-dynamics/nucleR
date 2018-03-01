@@ -61,89 +61,84 @@ setGeneric(
         standardGeneric("mergeCalls")
 )
 
+
 #' @rdname mergeCalls
-#' @importMethodsFrom GenomeInfoDb seqnames
+#' @importFrom GenomicRanges GRanges
+#' @importFrom dplyr group_by do arrange
+#' @importFrom magrittr %>%
 setMethod(
     "mergeCalls",
     signature(calls="GRanges"),
-    function (calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
+    function (calls, min.overlap=50, discard.low=0.2, verbose=TRUE)
     {
-       res <- .xlapply(
-           split(calls, seqnames(calls)),
-           .mergeChrom,
-           min.overlap = min.overlap,
-           discard.low = discard.low,
-           verbose     = verbose,
-           mc.cores    = mc.cores
-       )
-       return(do.call(c, unname(res)))
+        calls %>%
+            data.frame %>%
+            group_by(seqnames) %>%
+            do(.mergeChrom(., min.overlap, discard.low, verbose)) %>%
+            arrange(seqnames, start, end) %>%
+            GRanges
    }
 )
+globalVariables(c(".", "seqnames"))
 
-#' @rdname mergeCalls
-setMethod(
-    "mergeCalls",
-    signature(calls="RangedData"),
-    function (calls, min.overlap=50, discard.low=0.2, mc.cores=1, verbose=TRUE)
-    {
-       res <- .xlapply(
-           calls,
-           .mergeChrom,
-           min.overlap = min.overlap,
-           discard.low = discard.low,
-           verbose     = verbose,
-           mc.cores    = mc.cores
-       )
-       return(do.call(c, unname(res)))
-   }
-)
-
-#' @importFrom GenomicRanges makeGRangesFromDataFrame
-#' @importFrom plyr ddply
-#' @importMethodsFrom BiocGenerics as.data.frame
+#' @importFrom dplyr mutate filter group_by ungroup do bind_rows select
+#' @importFrom magrittr %>%
 .mergeChrom <- function (calls, min.overlap, discard.low, verbose)
 {
     if (verbose) {
-        message("* Starting space: ", .whichChr(calls))
+        chr <- unlist(calls[1, "seqnames"])
+        message("* Starting space: ", chr)
         message(" - Finding overlapped reads")
     }
 
-    # we'll use data.frames to merge them more easily; remove unused
-    # columns so we can forget about them
-    merge.group <- .getMergeGroup(calls, min.overlap)
-    dfcalls <- BiocGenerics::as.data.frame(calls)
-    dfcalls[, "strand"] <- NULL
-    dfcalls[, "width"] <- NULL
-    dfcalls[, "merge.group"] <- merge.group
+    dfcalls <- mutate(calls,
+                      merge.group=.getMergeGroup(start,
+                                                 end,
+                                                 min.overlap))
 
-    if (verbose) {
-        message(" - Merging calls")
-    }
-    resdf <- ddply(dfcalls, "merge.group", .joinNucs, discard.low)
-    resdf[, "merge.group"] <- NULL  # we don't need this column anymore
-    res <- makeGRangesFromDataFrame(resdf, keep.extra.columns=TRUE)
+    dfcalls %>% filter(merge.group == 0)
+
+    dfcalls %>%
+        filter(merge.group == 0) %>%
+        mutate(nmerge=1) -> unmerged
+
+    dfcalls %>%
+        filter(merge.group != 0, score_h > discard.low) %>%
+        group_by(merge.group) %>%
+        mutate(start   = min(start),
+               end     = max(end),
+               score   = mean(score),
+               score_w = mean(score_w),
+               score_h = mean(score_h)) %>%
+        do(mutate(., nmerge=nrow(.))) %>%
+        do(.[1, ]) %>%
+        ungroup %>%
+        bind_rows(unmerged) %>%
+        select(-merge.group) -> res
 
     if (verbose) {
         message(
             " - Done (",
-            sum(merge.group == 0),
+            sum(dfcalls$merge.group == 0),
             " non-overlapped | ",
-            sum(merge.group != 0),
+            sum(dfcalls$merge.group != 0),
             " merged calls)"
         )
     }
 
-    return (sort(res))
+    return(res)
 }
+globalVariables(c(".", "merge.group", "nmerge", "start", "end", "score",
+                  "score_w", "score_h"))
 
 #' @importFrom IRanges IRanges
 #' @importFrom S4Vectors queryHits
 #' @importMethodsFrom BiocGenerics start end
 #' @importMethodsFrom IRanges findOverlaps reduce
-.getMergeGroup <- function (calls, min.overlap)
+.getMergeGroup <- function (start, end, min.overlap)
 {
     ovlps <- findOverlaps(
-        calls,
+        IRanges(start=start, end=end),
         minoverlap     = min.overlap,
         type           = "any",
         select         = "all",
@@ -162,7 +157,7 @@ setMethod(
     # we give a value of 0 to nucleosomes that are not to be merged and a
     # positive number to the ones that will be merged, giving the same
     # number to the ones that are to be merged together
-    merge.group <- rep(0, .countRows(calls))
+    merge.group <- rep(0, length(start))
     for (i in seq_along(red)) {
         from <- start(red)[i]
         to <- end(red)[i] + 1
@@ -170,33 +165,4 @@ setMethod(
     }
 
     return (merge.group)
-}
-
-.joinNucs <- function (x, discard.low)
-{
-    seqnames <- x[1, "seqnames"]
-    space <- x[1, "space"]
-    if (!is.null(seqnames)) {
-        chr <- seqnames
-    } else if (!is.null(space)) {  # in case we started with a RangedData
-        chr <- space
-        x[, "seqnames"] <- chr
-        x[, "space"] <- NULL
-    }
-
-    if (x[1, "merge.group"] == 0) {  # nucleosmes that won't be merged
-        x[, "nmerge"] <- 1
-        return(x)
-    } else {  # nucleosome that will be merged
-        x <- x[x[, "score_h"] > discard.low, ]
-        return(data.frame(
-            seqnames = x[1, "seqnames"],
-            start    = min(x[, "start"]),
-            end      = max(x[, "end"]),
-            score    = mean(x[, "score"]),
-            score_w  = mean(x[, "score_w"]),
-            score_h  = mean(x[, "score_h"]),
-            nmerge   = nrow(x)
-        ))
-    }
 }
