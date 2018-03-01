@@ -215,7 +215,7 @@ syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
 }
 
 #' @importFrom ggplot2 ggplot geom_area geom_point scale_fill_manual
-#'   scale_color_manual theme xlab ylab aes_string element_blank
+#'   scale_color_manual theme xlab ylab aes element_blank
 .synthPlotNoRatio <- function (syn.reads, wp.starts, wp.nreads, fuz.starts,
                                fuz.nreads)
 {
@@ -225,18 +225,19 @@ syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
                    data.frame(x=fuz.starts+74, y=fuz.nreads, type="fuzzy"))
     ggplot() +
         geom_area(data=covdf,
-                  mapping=aes_string(x="x", y="y", fill="fill")) +
+                  mapping=aes(x=x, y=y, fill=fill)) +
         geom_point(data=nucdf,
-                   mapping=aes_string(x="x", y="y", color="type")) +
+                   mapping=aes(x=x, y=y, color=type)) +
         scale_fill_manual(values=c(coverage="#AADDAA")) +
         scale_color_manual(values=c("well-pos"="red", "fuzzy"="blue")) +
         theme(legend.title=element_blank()) +
         xlab("position") +
         ylab("number of reads")
 }
+globalVariables(c("x", "y", "fill", "type"))
 
 #' @importFrom ggplot2 ggplot geom_area geom_point xlab ylab scale_fill_manual
-#'   scale_color_manual facet_grid theme aes_string element_blank as_labeller
+#'   scale_color_manual facet_grid theme aes element_blank as_labeller
 .synthPlotRatio <- function (syn.reads, wp.starts, wp.nreads, fuz.starts,
                              fuz.nreads, syn.ratio)
 {
@@ -252,9 +253,9 @@ syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
 
     ggplot() +
         geom_area(data    = df,
-                  mapping = aes_string(x="x", y="y", fill="facet")) +
+                  mapping = aes(x=x, y=y, fill=facet)) +
         geom_point(data    = nucdf,
-                   mapping = aes_string(x="x", y="y", color="type")) +
+                   mapping = aes(x=x, y=y, color=type)) +
         xlab("position") +
         ylab(NULL) +
         scale_fill_manual(values=c("coverage" = "#AADDAA",
@@ -270,3 +271,4 @@ syntheticNucMap <- function (wp.num=100, wp.del=10, wp.var=20, fuz.num=50,
               legend.title     = element_blank(),
               strip.background = element_blank())
 }
+globalVariables(c("x", "y", "facet", "tyoe"))

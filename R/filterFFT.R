@@ -328,7 +328,7 @@ setMethod(
     return (Re(fft(temp, inverse=TRUE)) / length(temp))
 }
 
-#' @importFrom ggplot2 ggplot aes_string geom_line geom_vline labs
+#' @importFrom ggplot2 ggplot aes geom_line geom_vline labs
 .plotFFT <- function (data, pcKeepComp, upper=250000)
 {
     if (length(data) > upper) {
@@ -347,10 +347,11 @@ setMethod(
     y <- Re(freqs[x])
     df <- data.frame(x=x, y=y)
 
-    ggplot(df, aes_string(x="x", y="y")) +
+    ggplot(df, aes(x=x, y=y)) +
         geom_line() +
         geom_vline(xintercept=keep, color="red", lty=2) +
         labs(subtitle = "Selected components threshold marked as red line",
              x        = "components",
              y        = "power")
 }
+globalVariables(c("x", "y"))

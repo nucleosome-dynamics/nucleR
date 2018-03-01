@@ -220,9 +220,10 @@ setMethod(
     df
 }
 
-#' @importFrom ggplot2 geom_line aes_string
+#' @importFrom ggplot2 geom_line aes
 .plotCov <- function (covdf, ...)
-    geom_line(data=covdf, mapping=aes_string(x="x", y="y"), ...)
+    geom_line(data=covdf, mapping=aes(x=x, y=y), ...)
+globalVariables(c("x", "y"))
 
 .getPc <- function (data)
     0.01 * max(data[, "y"])
@@ -248,26 +249,28 @@ setMethod(
     }
 }
 
-#' @importFrom ggplot2 geom_rect aes_string
+
+#' @importFrom ggplot2 geom_rect aes
 .plotPeakRects <- function (df, ...)
 {
     if ("type" %in% names(df)) {
         geom_rect(data=df,
-                  mapping=aes_string(xmin  = "start",
-                                     xmax  = "end",
-                                     ymin  = "ymin",
-                                     ymax  = "ymax",
-                                     alpha = "type"),
+                  mapping=aes(xmin  = start,
+                              xmax  = end,
+                              ymin  = ymin,
+                              ymax  = ymax,
+                              alpha = type),
                   ...)
     } else {
         geom_rect(data=df,
-                  mapping=aes_string(xmin = "start",
-                                     xmax = "end",
-                                     ymin = "ymin",
-                                     ymax = "ymax"),
+                  mapping=aes(xmin = start,
+                              xmax = end,
+                              ymin = ymin,
+                              ymax = ymax),
                   ...)
     }
 }
+globalVariables(c("start", "end", "ymin", "ymax", "type"))
 
 .getScoreTxt <- function (df, scor.digits, indiv.scores)
 {
@@ -284,19 +287,20 @@ setMethod(
     }
 }
 
-#' @importFrom ggplot2 geom_text geom_blank aes_string
+#' @importFrom ggplot2 geom_text geom_blank aes
 .plotScores <- function (df, scor.digits, indiv.scores, pc, ...)
 {
     if ("score" %in% names(df)) {
         df[, "txt"] <- .getScoreTxt(df, scor.digits, indiv.scores)
         df[, "txt_pos"] <- df[, "ymax"] + pc*3
         geom_text(data=df,
-                  mapping=aes_string(x="mid", y="txt_pos", label="txt"),
+                  mapping=aes(x=mid, y=txt_pos, label=txt),
                   ...)
     } else {
         geom_blank()
     }
 }
+globalVariables(c("mid", "txt_pos", "txt"))
 
 #' @importFrom ggplot2 geom_hline geom_blank
 .plotThresh <- function (threshold, ...)
@@ -323,24 +327,25 @@ setMethod(
     peakdf
 }
 
-#' @importFrom ggplot2 geom_text geom_point aes_string
+#' @importFrom ggplot2 geom_text geom_point aes
 .plotScoreOrDots <- function (df, col.points, scor.col, scor.digits,
                               scor.nudge, scor.cex, ...)
 {
     if ("scores" %in% names(df)) {
         df[, "scores"] <- format(df[, "scores"], digits=scor.digits)
         geom_text(data    = df,
-                  mapping = aes_string(x="x", y="y", label="scores"),
+                  mapping = aes(x=x, y=y, label=scores),
                   nudge_y = scor.nudge,
                   color   = scor.col,
                   size    = scor.cex,
                   ...)
     } else {
         geom_point(data    = df,
-                   mapping = aes_string(x="x", y="y"),
+                   mapping = aes(x=x, y=y),
                    shape   = 1,
                    color   = col.points,
                    size    = 3,
                    ...)
     }
 }
+globalVariables(c("x", "y", "scores"))

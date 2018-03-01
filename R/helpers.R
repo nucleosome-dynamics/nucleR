@@ -37,48 +37,6 @@
 .lapplyIRange <- function (x, fun, ...)
     lapply(seq_along(x), function (i) fun(x[i], ...))
 
-setGeneric(
-    ".whichChr",
-    function (x)
-        setGeneric(".whichChr")
-)
-
-#' @importMethodsFrom GenomeInfoDb seqnames
-#' @importMethodsFrom S4Vectors runValue
-setMethod(
-    ".whichChr",
-    signature(x="GRanges"),
-    function (x)
-        runValue(seqnames(x))
-)
-
-setMethod(
-    ".whichChr",
-    signature(x="RangedData"),
-    function (x)
-        names(x)
-)
-
-setGeneric(
-    ".countRows",
-    function (x)
-        setGeneric(".countRows")
-)
-
-setMethod(
-    ".countRows",
-    signature(x="GRanges"),
-    function (x)
-        length(x)
-)
-
-setMethod(
-    ".countRows",
-    signature(x="RangedData"),
-    function (x)
-        nrow(x)
-)
-
 #' Threshold getter
 #'
 #' If threshold is given as a string with percentage, convert it
