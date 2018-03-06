@@ -8,9 +8,9 @@ Maintainer: Ricard Illa <ricard.illa@irbbarcelona.org>
 Description: Nucleosome positioning for Tiling Arrays and NGS experiments.
 License: LGPL (>= 3)
 Depends: methods
-Imports: Biobase, BiocGenerics, Biostrings, GenomeInfoDb, GenomicRanges,
-    IRanges, Rsamtools, S4Vectors, ShortRead, ggplot2, parallel, plyr, stats,
-    utils
+Imports: Biobase, BiocGenerics, Biostrings, GenomeInfoDb, GenomicFeatures,
+    GenomicRanges, IRanges, Rsamtools, S4Vectors, ShortRead, dplyr, ggplot2,
+    magrittr, parallel, plyr, purrr, stats, tidyr, utils
 Suggests: Starr, BiocStyle, knitr, rmarkdown, testthat
 LazyLoad: yes
 biocViews: NucleosomePositioning, Coverage, ChIPSeq, Microarray, Sequencing,

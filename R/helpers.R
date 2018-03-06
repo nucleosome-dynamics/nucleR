@@ -28,11 +28,28 @@
 
 #' Find midpoints
 #'
-#' Simple function for returning the middle point of a of a GRanges (normal mid
-#' doesn't work there)
+#' Simple function for returning the middle point of a of a GRanges or a
+#' data.frame (normal mid doesn't work there)
+setGeneric(
+    ".mid",
+    function (x)
+        setGeneric(".mid")
+)
+
 #' @importMethodsFrom BiocGenerics start end
-.mid <- function(x)
-    floor((start(x) + end(x)) / 2)
+setMethod(
+    ".mid",
+    signature(x="GRanges"),
+    function (x)
+        floor((start(x) + end(x)) / 2)
+)
+
+setMethod(
+    ".mid",
+    signature(x="data.frame"),
+    function (x)
+        floor((x$start + x$end) / 2)
+)
 
 .lapplyIRange <- function (x, fun, ...)
     lapply(seq_along(x), function (i) fun(x[i], ...))
