@@ -39,6 +39,14 @@ setGeneric(
 #' @importMethodsFrom BiocGenerics start end
 setMethod(
     ".mid",
+    signature(x="IRanges"),
+    function (x)
+        floor((start(x) + end(x)) / 2)
+)
+
+#' @importMethodsFrom BiocGenerics start end
+setMethod(
+    ".mid",
     signature(x="GRanges"),
     function (x)
         floor((start(x) + end(x)) / 2)
