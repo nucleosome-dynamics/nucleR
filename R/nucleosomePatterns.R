@@ -91,8 +91,6 @@ setMethod(
                               col.pos    = col.pos)
 )
 
-
-
 #' @rdname nucleosomePatterns
 #' @importFrom dplyr rename mutate
 #' @importFrom magrittr %>%
