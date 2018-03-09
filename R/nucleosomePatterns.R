@@ -73,7 +73,7 @@ setMethod(
         nucleosomePatterns(transcripts(genes), calls, col.id="tx_name", ...)
 )
 
-#' @importFrom dplyr group_by group_by_ arrange_ filter mutate
+#' @importFrom dplyr group_by group_by_ arrange arrange_ filter mutate
 #' @importFrom magrittr %>%
 #' @importFrom purrr pmap
 #' @importFrom tidyr nest unnest
