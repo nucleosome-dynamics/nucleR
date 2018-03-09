@@ -9,16 +9,22 @@
 \title{Nucleosome patterns arround transcription start sites}
 \usage{
 nucleosomePatterns(genes, calls, window = 3000, p1.max.downstream = 20,
-  open.thresh = 215, position = "tss", ...)
+  open.thresh = 215, position = "tss", col.id, col.chrom, col.strand,
+  col.pos)
 
 \S4method{nucleosomePatterns}{data.frame}(genes, calls, window = 3000,
-  p1.max.downstream = 20, open.thresh = 215, position = "tss", ...)
+  p1.max.downstream = 20, open.thresh = 215, position = "tss",
+  col.id = "name", col.chrom = "chrom", col.strand = "strand",
+  col.pos = "start")
 
 \S4method{nucleosomePatterns}{GRanges}(genes, calls, window = 3000,
-  p1.max.downstream = 20, open.thresh = 215, position = "tss", ...)
+  p1.max.downstream = 20, open.thresh = 215, position = "tss",
+  col.id = "name", col.chrom = "seqnames", col.strand = "strand", col.pos)
 
 \S4method{nucleosomePatterns}{TxDb}(genes, calls, window = 3000,
-  p1.max.downstream = 20, open.thresh = 215, position = "tss", ...)
+  p1.max.downstream = 20, open.thresh = 215, position = "tss",
+  col.id = "tx_name", col.chrom = "seqnames", col.strand = "strand",
+  col.pos)
 }
 \arguments{
 \item{genes}{a \code{data.frame}, a \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} or a
@@ -37,13 +43,13 @@ transcription start site, but only this amount of base pairs.}
 than this will be classified as \emph{close conformation}, while distances
 bigger than this will be classified as \emph{open conformation}.}
 
-\item{tss}{whether our we are computing transcription start sites (\code{tss}) or
-transcription termination sites (\code{tts}).}
+\item{position}{whether our we are computing transcription start sites
+(\code{tss}) or transcription termination sites (\code{tts}).}
 
-\item{col.id, col.pos.col.strand, col.chrom}{names of the columns in the genes
+\item{col.id, col.pos, col.strand, col.chrom}{names of the columns in the genes
 \code{data.frame} containing the information corresponding to the gene id, the
-position to compute (usually the transcription start site), the strand
-and the chromosome for each gene.}
+position to compute (usually the transcription start site), the strand and
+the chromosome for each gene.}
 }
 \value{
 a \code{data.frame} with the following columns:

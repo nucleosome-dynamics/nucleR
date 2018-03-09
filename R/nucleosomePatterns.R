@@ -18,12 +18,12 @@
 #' @param open.thresh open/closed conformation threshold. Distances smaller
 #'   than this will be classified as _close conformation_, while distances
 #'   bigger than this will be classified as _open conformation_.
-#' @param tss whether our we are computing transcription start sites (`tss`) or
-#'   transcription termination sites (`tts`).
-#' @param col.id,col.pos.col.strand,col.chrom names of the columns in the genes
+#' @param position whether our we are computing transcription start sites
+#'   (`tss`) or transcription termination sites (`tts`).
+#' @param col.id,col.pos,col.strand,col.chrom names of the columns in the genes
 #'   `data.frame` containing the information corresponding to the gene id, the
-#'    position to compute (usually the transcription start site), the strand
-#'    and the chromosome for each gene.
+#'   position to compute (usually the transcription start site), the strand and
+#'   the chromosome for each gene.
 #'
 #' @return a `data.frame` with the following columns:
 #'   * seqnames Name of the chromosome of the gene
@@ -43,7 +43,7 @@
 setGeneric(
     "nucleosomePatterns",
     function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
-              position="tss", ...)
+              position="tss", col.id, col.chrom, col.strand, col.pos)
         standardGeneric("nucleosomePatterns")
 )
 
@@ -51,16 +51,52 @@ setGeneric(
 setMethod(
     "nucleosomePatterns",
     signature(genes="data.frame"),
-    function (genes, calls, ...)
-        .nucleosomePatternsDF(genes, calls, ...)
+    function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
+              position="tss", col.id="name", col.chrom="chrom",
+              col.strand="strand", col.pos="start")
+        .nucleosomePatternsDF(genes = genes,
+                              calls = calls,
+
+                              window            = window,
+                              p1.max.downstream = p1.max.downstream,
+                              open.thresh       = open.thresh,
+                              position          = position,
+
+                              col.id     = col.id,
+                              col.chrom  = col.chrom,
+                              col.strand = col.strand,
+                              col.pos    = col.pos)
 )
 
 #' @rdname nucleosomePatterns
 setMethod(
     "nucleosomePatterns",
     signature(genes="GRanges"),
-    function (genes, calls, ...)
-        nucleosomePatterns(data.frame(genes), calls, col.chrom="seqnames", ...)
+    function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
+              position="tss", col.id="name", col.chrom="seqnames",
+              col.strand="strand", col.pos)
+    {
+        df <- data.frame(genes)
+        if (missing(col.pos)) {
+            df$pos <- ifelse(df$strand == "+", df$start,
+                      ifelse(df$strand == "-", df$end,
+                                               NA))
+            col.pos <- "pos"
+        }
+        # call the data.frame method
+        nucleosomePatterns(genes = df,
+                           calls = calls,
+
+                           window            = window,
+                           p1.max.downstream = p1.max.downstream,
+                           open.thresh       = open.thresh,
+                           position          = position,
+
+                           col.id     = col.id,
+                           col.chrom  = col.chrom,
+                           col.strand = col.strand,
+                           col.pos    = col.pos)
+    }
 )
 
 #' @rdname nucleosomePatterns
@@ -69,8 +105,22 @@ setMethod(
 setMethod(
     "nucleosomePatterns",
     signature(genes="TxDb"),
-    function (genes, calls, ...)
-        nucleosomePatterns(transcripts(genes), calls, col.id="tx_name", ...)
+    function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
+              position="tss", col.id="tx_name", col.chrom="seqnames",
+              col.strand="strand", col.pos)
+        # Call the GRanges method
+        nucleosomePatterns(genes = transcripts(genes),
+                           calls = calls,
+
+                           window            = window,
+                           p1.max.downstream = p1.max.downstream,
+                           open.thresh       = open.thresh,
+                           position          = position,
+
+                           col.id     = col.id,
+                           col.chrom  = col.chrom,
+                           col.strand = col.strand,
+                           col.pos    = col.pos)
 )
 
 #' @importFrom dplyr group_by group_by_ arrange arrange_ filter mutate
