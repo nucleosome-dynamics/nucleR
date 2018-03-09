@@ -3,28 +3,41 @@
 \docType{methods}
 \name{nucleosomePatterns}
 \alias{nucleosomePatterns}
-\alias{nucleosomePatterns,data.frame-method}
-\alias{nucleosomePatterns,GRanges-method}
-\alias{nucleosomePatterns,TxDb-method}
+\alias{nucleosomePatterns,data.frame,data.frame-method}
+\alias{nucleosomePatterns,data.frame,list-method}
+\alias{nucleosomePatterns,data.frame,GRanges-method}
+\alias{nucleosomePatterns,GRanges,ANY-method}
+\alias{nucleosomePatterns,TxDb,ANY-method}
 \title{Nucleosome patterns arround transcription start sites}
 \usage{
 nucleosomePatterns(genes, calls, window = 3000, p1.max.downstream = 20,
-  open.thresh = 215, position = "tss", col.id, col.chrom, col.strand,
-  col.pos)
+  open.thresh = 215, position = "tss", col.id = NULL, col.chrom = NULL,
+  col.strand = NULL, col.pos = NULL)
 
-\S4method{nucleosomePatterns}{data.frame}(genes, calls, window = 3000,
+\S4method{nucleosomePatterns}{data.frame,data.frame}(genes, calls,
+  window = 3000, p1.max.downstream = 20, open.thresh = 215,
+  position = "tss", col.id = "name", col.chrom = "chrom",
+  col.strand = "strand", col.pos = "start")
+
+\S4method{nucleosomePatterns}{data.frame,list}(genes, calls, window = 3000,
   p1.max.downstream = 20, open.thresh = 215, position = "tss",
   col.id = "name", col.chrom = "chrom", col.strand = "strand",
   col.pos = "start")
 
-\S4method{nucleosomePatterns}{GRanges}(genes, calls, window = 3000,
+\S4method{nucleosomePatterns}{data.frame,GRanges}(genes, calls, window = 3000,
   p1.max.downstream = 20, open.thresh = 215, position = "tss",
-  col.id = "name", col.chrom = "seqnames", col.strand = "strand", col.pos)
+  col.id = "name", col.chrom = "chrom", col.strand = "strand",
+  col.pos = "start")
 
-\S4method{nucleosomePatterns}{TxDb}(genes, calls, window = 3000,
+\S4method{nucleosomePatterns}{GRanges,ANY}(genes, calls, window = 3000,
+  p1.max.downstream = 20, open.thresh = 215, position = "tss",
+  col.id = "name", col.chrom = "seqnames", col.strand = "strand",
+  col.pos = NULL)
+
+\S4method{nucleosomePatterns}{TxDb,ANY}(genes, calls, window = 3000,
   p1.max.downstream = 20, open.thresh = 215, position = "tss",
   col.id = "tx_name", col.chrom = "seqnames", col.strand = "strand",
-  col.pos)
+  col.pos = NULL)
 }
 \arguments{
 \item{genes}{a \code{data.frame}, a \link[GenomicRanges:GRanges]{GenomicRanges::GRanges} or a

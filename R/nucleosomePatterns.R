@@ -43,14 +43,15 @@
 setGeneric(
     "nucleosomePatterns",
     function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
-              position="tss", col.id, col.chrom, col.strand, col.pos)
+              position="tss", col.id=NULL, col.chrom=NULL, col.strand=NULL,
+              col.pos=NULL)
         standardGeneric("nucleosomePatterns")
 )
 
 #' @rdname nucleosomePatterns
 setMethod(
     "nucleosomePatterns",
-    signature(genes="data.frame"),
+    signature(genes="data.frame", calls="data.frame"),
     function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
               position="tss", col.id="name", col.chrom="chrom",
               col.strand="strand", col.pos="start")
@@ -69,15 +70,70 @@ setMethod(
 )
 
 #' @rdname nucleosomePatterns
+#' @importFrom dplyr bind_rows
+setMethod(
+    "nucleosomePatterns",
+    signature(genes="data.frame", calls="list"),
+    function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
+              position="tss", col.id="name", col.chrom="chrom",
+              col.strand="strand", col.pos="start")
+        .nucleosomePatternsDF(genes = genes,
+                              calls = bind_rows(calls),
+
+                              window            = window,
+                              p1.max.downstream = p1.max.downstream,
+                              open.thresh       = open.thresh,
+                              position          = position,
+
+                              col.id     = col.id,
+                              col.chrom  = col.chrom,
+                              col.strand = col.strand,
+                              col.pos    = col.pos)
+)
+
+
+
+#' @rdname nucleosomePatterns
+#' @importFrom dplyr rename mutate
+#' @importFrom magrittr %>%
+setMethod(
+    "nucleosomePatterns",
+    signature(genes="data.frame", calls="GRanges"),
+    function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
+              position="tss", col.id="name", col.chrom="chrom",
+              col.strand="strand", col.pos="start")
+    {
+        calls %>%
+            data.frame %>%
+            rename(chromosome=seqnames) %>%
+            mutate(peak=.mid(.)) -> df
+
+        nucleosomePatterns(genes = genes,
+                           calls = df,
+
+                           window            = window,
+                           p1.max.downstream = p1.max.downstream,
+                           open.thresh       = open.thresh,
+                           position          = position,
+
+                           col.id     = col.id,
+                           col.chrom  = col.chrom,
+                           col.strand = col.strand,
+                           col.pos    = col.pos)
+    }
+)
+globalVariables(c(".", "seqnames"))
+
+#' @rdname nucleosomePatterns
 setMethod(
     "nucleosomePatterns",
     signature(genes="GRanges"),
     function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
               position="tss", col.id="name", col.chrom="seqnames",
-              col.strand="strand", col.pos)
+              col.strand="strand", col.pos=NULL)
     {
         df <- data.frame(genes)
-        if (missing(col.pos)) {
+        if (is.null(col.pos)) {
             df$pos <- ifelse(df$strand == "+", df$start,
                       ifelse(df$strand == "-", df$end,
                                                NA))
@@ -107,7 +163,7 @@ setMethod(
     signature(genes="TxDb"),
     function (genes, calls, window=3000, p1.max.downstream=20, open.thresh=215,
               position="tss", col.id="tx_name", col.chrom="seqnames",
-              col.strand="strand", col.pos)
+              col.strand="strand", col.pos=NULL)
         # Call the GRanges method
         nucleosomePatterns(genes = transcripts(genes),
                            calls = calls,
@@ -140,13 +196,16 @@ setMethod(
 
     calls %>%
         data.frame %>%
-        group_by(seqnames) %>%
+        group_by(chromosome) %>%
         nest %>%
-        arrange(seqnames) -> calls.t
+        arrange(chromosome) -> calls.t
 
-    chrs <- intersect(genes.t[[col.chrom]], calls.t$seqnames)
+    chrs <- intersect(genes.t[[col.chrom]], calls.t$chromosome)
+    if (length(chrs) == 0) {
+        warning("no chromosome name in common between the genes and the calls")
+    }
     genes.t %>% filter(.[[col.chrom]] %in% chrs) -> genes.t
-    calls.t %>% filter(.$seqnames %in% chrs) -> calls.t
+    calls.t %>% filter(.$chromosome %in% chrs) -> calls.t
 
     genes.t %>%
         mutate(data=pmap(list(.$data, calls.t$data, .[[col.chrom]]),
@@ -160,7 +219,7 @@ setMethod(
         unnest %>%
         data.frame
 }
-globalVariables(c(".", "seqnames"))
+globalVariables(c(".", "chromosome"))
 
 #' @importFrom dplyr rowwise do
 #' @importFrom magrittr %>%
@@ -192,12 +251,12 @@ globalVariables(".")
     if (no.p1s) {
         p1.pos <- pos
     } else {
-        p1.pos <- .mid(p1)
+        p1.pos <- p1$peak
     }
 
     if (!no.p1s && .checkPos(p1.pos, pos, window)) {
         # there's a nucleosome upstream and within the window
-        p1.nuc <- .mid(p1)
+        p1.nuc <- p1$peak
         p1.class <- p1$class
 
         # look for m1 relative to p1
@@ -207,13 +266,13 @@ globalVariables(".")
         if (no.m1s) {
             m1.pos <- pos
         } else {
-            m1.pos <- .mid(m1)
+            m1.pos <- m1$peak
         }
 
         if (!no.m1s && .checkPos(m1.pos, pos, window)) {
             # and there's also one downstream
             m1.class <- m1$class
-            m1.nuc <- .mid(m1)
+            m1.nuc <- m1$peak
         } else {
             m1.nuc <- NA
             m1.class <- NULL
@@ -242,7 +301,7 @@ globalVariables(".")
                stringsAsFactors=FALSE)
 }
 
-.detectNuc <- function (xs, pos, margin, strand, nucpos, position="tss")
+.detectNuc <- function (calls, pos, margin, strand, nucpos, position="tss")
 {
     a <- strand == "+" && nucpos == "p1"
     b <- strand == "-" && nucpos == "m1"
@@ -264,8 +323,8 @@ globalVariables(".")
         closest <- which.max
     }
 
-    subxs <- xs[comp(.mid(xs), shift(pos, margin)), ]
-    return(subxs[closest(.mid(subxs)), ])
+    subxs <- calls[comp(calls$peak, shift(pos, margin)), ]
+    return(subxs[closest(subxs$peak), ])
 }
 
 .gimmeDist <- function(x, open.thresh)
