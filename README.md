@@ -29,6 +29,8 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 ## Usage 
 ---------------
 
+This is an example of the main steps followed to analyse nuclesome positioning data with [nucleR](http://bioconductor.org/packages/nucleR/). For more details about the functions, description of the example data, how to upload your data and additional analyses refer to nucleR [manual](https://bioconductor.org/packages/release/bioc/manuals/nucleR/man/nucleR.pdf) and [vignette](https://bioconductor.org/packages/release/bioc/vignettes/nucleR/inst/doc/nucleR.pdf).
+
 
 1- Load the package in R
 &nbsp;
@@ -46,7 +48,7 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 
 &nbsp;
   
-   reads_trim <- processReads(nucleosome_htseq, type="paired", fragmentLen=200, trim=50)
+    reads_trim <- processReads(nucleosome_htseq, type="paired", fragmentLen=200, trim=50)
 
 4- Obtain the normalized coverage (the count of how many reads are mapped to each position, divided by the total number of reads and multiplied by one milion)  
 
@@ -64,10 +66,9 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 
 &nbsp;
 
-   peaks <- peakDetection(fft_ta, threshold="25%", score=TRUE, width=147)
+    peaks <- peakDetection(fft_ta, threshold="25%", score=TRUE, width=147)
 
 
-For more details about the functions and additional analyses refer to nucleR [manual](https://bioconductor.org/packages/release/bioc/manuals/nucleR/man/nucleR.pdf) and [vignette](https://bioconductor.org/packages/release/bioc/vignettes/nucleR/inst/doc/nucleR.pdf).
 
 
 
