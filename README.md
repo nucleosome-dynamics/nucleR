@@ -2,9 +2,9 @@
 
 [NucleR](http://bioconductor.org/packages/nucleR/) is an R/Bioconductor package for working with next generation sequencing and tilling arrays. It uses a novel aproach in this field which comprises a deep profile cleaning using Fourier Transform and peak scoring for a quick and flexible nucleosome calling.
 
-The aim of this package is not providing an all-in-one data analysis pipeline but complement those existing specialized libraries for low-level data importation and pre-processment into \R{}/\Bioconductor{} framework.
+The aim of this package is not providing an all-in-one data analysis pipeline but complement those existing specialized libraries for low-level data importation and pre-processment into R/Bioconductor framework.
 
-\Biocpkg{nucleR} works with data from high-troughput technologies MNase-seq and ChIP-seq, and Tiling Microarrays (ChIP-on-Chip).
+[NucleR](http://bioconductor.org/packages/nucleR/) works with data from high-troughput technologies MNase-seq and ChIP-seq, and Tiling Microarrays (ChIP-on-Chip).
 
 This is a brief summary of the main functions:
 
@@ -21,9 +21,9 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 ---------------
 &nbsp;
 
-   if (!requireNamespace("BiocManager", quietly = TRUE))
-       install.packages("BiocManager")
-   BiocManager::install("nucleR", version = "3.8")
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("nucleR", version = "3.8")
 
 
 ## Usage 
