@@ -1,6 +1,6 @@
 # nucleR
 
-\Biocpkg{nucleR} is an R/Bioconductor package for working with next generation sequencing and tilling arrays. It uses a novel aproach in this field which comprises a deep profile cleaning using Fourier Transform and peak scoring for a quick and flexible nucleosome calling.
+[NucleR](http://bioconductor.org/packages/nucleR/) is an R/Bioconductor package for working with next generation sequencing and tilling arrays. It uses a novel aproach in this field which comprises a deep profile cleaning using Fourier Transform and peak scoring for a quick and flexible nucleosome calling.
 
 The aim of this package is not providing an all-in-one data analysis pipeline but complement those existing specialized libraries for low-level data importation and pre-processment into \R{}/\Bioconductor{} framework.
 
@@ -21,9 +21,9 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 ---------------
 &nbsp;
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("nucleR", version = "3.8")
+   if (!requireNamespace("BiocManager", quietly = TRUE))
+       install.packages("BiocManager")
+   BiocManager::install("nucleR", version = "3.8")
 
 
 ## Usage 
@@ -67,7 +67,7 @@ BiocManager::install("nucleR", version = "3.8")
    peaks <- peakDetection(fft_ta, threshold="25%", score=TRUE, width=147)
 
 
-For more details about the functions and additional analyses refer to the \Biocpkg{nucleR} manual and vignette.
+For more details about the functions and additional analyses refer to nucleR [manual](https://bioconductor.org/packages/release/bioc/manuals/nucleR/man/nucleR.pdf) and [vignette](https://bioconductor.org/packages/release/bioc/vignettes/nucleR/inst/doc/nucleR.pdf).
 
 
 
