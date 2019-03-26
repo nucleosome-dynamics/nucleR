@@ -19,11 +19,52 @@ This software was published in Bioinformatics Journal: Flores, O., and Orozco, M
 
 ## Installation
 ---------------
-&nbsp;
+Follow these instructions to install 'nucleR' from Bioconductor repository in a linux system:
 
-    if (!requireNamespace("BiocManager", quietly = TRUE))
+1. Install curl-devel system library (required for Rcurl).
+
+```sh
+    # i.e., for Ubuntu distributions:
+    apt-get install libcurl4-gnutls-dev
+```
+```sh
+    # i.e., for openSuse distributions:
+    yast2 -i libcurl-devel
+```
+
+2. Make sure in the R shell you have an updated BiocManager manager:
+```sh
+    (!requireNamespace("BiocManager", quietly = TRUE))
         install.packages("BiocManager")
-    BiocManager::install("nucleR", version = "3.8")
+```
+
+3. nucleR depends on several R packages. To install them run:
+&nbsp;
+```sh
+    BiocManager::install('dplyr')
+    BiocManager::install('IRanges')
+    BiocManager::install('GenomicRanges')
+    BiocManager::install('ShortRead',ask = FALSE)
+    BiocManager::install('doParallel')
+    BiocManager::install('ggplot2')
+    BiocManager::install('magrittr')
+```
+
+4. Install nucleR in R:
+&nbsp;
+```sh
+    BiocManager::install('nucleR')
+```
+
+Alternatively, build the R package from the source code deposited in this repository:
+
+```sh
+git clone https://github.com/nucleosome-dynamics/nucleR.git
+tar -czvf  nucleR.tar.gz nucleR
+```
+```
+install.packages("nucleR.tar.gz", repos = NULL)
+```
 
 
 ## Usage 
