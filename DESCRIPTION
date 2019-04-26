@@ -4,7 +4,7 @@ Title: Nucleosome positioning package for R
 Version: 2.15.0
 Date: 2018-01-22
 Author: Oscar Flores, Ricard Illa
-Maintainer: Ricard Illa <r.illa.pujagut@gmail.com>
+Maintainer: Diego Gallego <diego.gallego@irbbarcelona.org>
 Description: Nucleosome positioning for Tiling Arrays and NGS experiments.
 License: LGPL (>= 3)
 Depends: methods

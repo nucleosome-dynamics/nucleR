@@ -111,5 +111,15 @@ This is an example of the main steps followed to analyse nuclesome positioning d
 
 
 
+## Additional notes
+---------------
+
+This repository builds on the original nucleR package, written by Oscar Flores.
+
+TODO
+    * Add other old functions
+    * Add tests
+    * Test on windows
+
 
 
