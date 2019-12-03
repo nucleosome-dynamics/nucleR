@@ -4,9 +4,19 @@
 \alias{syntheticNucMap}
 \title{Generates a synthetic nucleosome map}
 \usage{
-syntheticNucMap(wp.num = 100, wp.del = 10, wp.var = 20, fuz.num = 50,
-  fuz.var = 50, max.cover = 20, nuc.len = 147, lin.len = 20,
-  rnd.seed = NULL, as.ratio = FALSE, show.plot = FALSE)
+syntheticNucMap(
+  wp.num = 100,
+  wp.del = 10,
+  wp.var = 20,
+  fuz.num = 50,
+  fuz.var = 50,
+  max.cover = 20,
+  nuc.len = 147,
+  lin.len = 20,
+  rnd.seed = NULL,
+  as.ratio = FALSE,
+  show.plot = FALSE
+)
 }
 \arguments{
 \item{wp.num}{Number of well-positioned (non overlapped) nucleosomes. They

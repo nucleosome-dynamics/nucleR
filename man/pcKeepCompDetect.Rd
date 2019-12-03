@@ -4,9 +4,18 @@
 \alias{pcKeepCompDetect}
 \title{Auto detection of a fitted \code{pcKeepComp} param for filterFFT function}
 \usage{
-pcKeepCompDetect(data, pc.min = 0.01, pc.max = 0.1, max.iter = 20,
-  verbose = FALSE, cor.target = 0.98, cor.tol = 0.001, smpl.num = 25,
-  smpl.min.size = 2^10, smpl.max.size = 2^14)
+pcKeepCompDetect(
+  data,
+  pc.min = 0.01,
+  pc.max = 0.1,
+  max.iter = 20,
+  verbose = FALSE,
+  cor.target = 0.98,
+  cor.tol = 0.001,
+  smpl.num = 25,
+  smpl.min.size = 2^10,
+  smpl.max.size = 2^14
+)
 }
 \arguments{
 \item{data}{Numeric vector to be filtered}

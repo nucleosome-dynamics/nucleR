@@ -10,11 +10,12 @@ License: LGPL (>= 3)
 Depends: methods
 Imports: Biobase, BiocGenerics, Biostrings, GenomeInfoDb, GenomicRanges,
     IRanges, Rsamtools, S4Vectors, ShortRead, dplyr, ggplot2, magrittr,
-    parallel, stats, utils
+    parallel, stats, utils, grDevices
 Suggests: Starr, BiocStyle, knitr, rmarkdown, testthat
 LazyLoad: yes
 biocViews: NucleosomePositioning, Coverage, ChIPSeq, Microarray, Sequencing,
     Genetics, QualityControl, DataImport
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 Roxygen: list(markdown = TRUE)
+Encoding: UTF-8

@@ -65,7 +65,7 @@
 #' Internal function from the IRanges package, lifted and slightly modified to
 #' prevent a NOTE warning about the use of a non-exported function
 #'
-#' @author  H. Pagès, P. Aboyoun and M. Lawrence
+#' @author  H. Pages, P. Aboyoun and M. Lawrence
 #' @importFrom utils getFromNamespace
 #' @importMethodsFrom IRanges pos
 #'

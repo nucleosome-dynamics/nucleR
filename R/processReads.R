@@ -92,6 +92,7 @@ setGeneric(
 
 #' @rdname processReads
 #' @importMethodsFrom BiocGenerics strand
+#' @importFrom grDevices rgb
 #' @importMethodsFrom Biostrings nchar
 #' @importMethodsFrom ShortRead position sread chromosome
 setMethod(

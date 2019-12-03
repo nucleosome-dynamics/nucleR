@@ -4,8 +4,14 @@
 \alias{processTilingArray}
 \title{Obtain and clean nucleosome positioning data from tiling array}
 \usage{
-processTilingArray(data, exprName, chrPattern, inferLen = 50, mc.cores = 1,
-  quiet = FALSE)
+processTilingArray(
+  data,
+  exprName,
+  chrPattern,
+  inferLen = 50,
+  mc.cores = 1,
+  quiet = FALSE
+)
 }
 \arguments{
 \item{data}{\code{ExpressionSet} object wich contains the data of the tiling
