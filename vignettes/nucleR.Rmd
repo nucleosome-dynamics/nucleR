@@ -7,7 +7,7 @@ author:
     - Institute for Research in Biomedicine
     - Barcelona Supercomputing Center
 date: "`r Sys.Date()`"
-output: BiocStyle::pdf_document
+output: BiocStyle::pdf_document_old
 bibliography: references.bib
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
