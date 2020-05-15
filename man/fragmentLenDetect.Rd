@@ -4,7 +4,6 @@
 \alias{fragmentLenDetect}
 \alias{fragmentLenDetect,AlignedRead-method}
 \alias{fragmentLenDetect,GRanges-method}
-\alias{fragmentLenDetect,RangedData-method}
 \title{Fragments length detection from single-end sequencing samples}
 \usage{
 fragmentLenDetect(
@@ -28,16 +27,6 @@ fragmentLenDetect(
 )
 
 \S4method{fragmentLenDetect}{GRanges}(
-  reads,
-  samples = 1000,
-  window = 1000,
-  min.shift = 1,
-  max.shift = 100,
-  mc.cores = 1,
-  as.shift = FALSE
-)
-
-\S4method{fragmentLenDetect}{RangedData}(
   reads,
   samples = 1000,
   window = 1000,

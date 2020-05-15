@@ -65,16 +65,3 @@ setMethod(
     function (data, scale=1e6, ...)
         coverage(data) / length(data) * scale
 )
-
-#' @rdname coverage.rpm
-#' @importFrom IRanges RleList
-#' @importMethodsFrom IRanges coverage
-setMethod(
-    "coverage.rpm",
-    signature(data="RangedData"),
-    function (data, scale=1e6, ...)
-        RleList(lapply(
-            coverage(data, ...),
-            function (x) x / nrow(data) * scale
-        ), compress=FALSE)
-)

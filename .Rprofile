@@ -22,7 +22,7 @@
 .First <- function(){
   library(devtools)
 #  library(grDevices)
-  library(Biostrings)
+#  library(Biostrings)
 #  library(Rsamtools)
 #  library(ShortRead)
 #  load_all()
