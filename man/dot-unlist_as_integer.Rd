@@ -7,8 +7,9 @@
 .unlist_as_integer(x)
 }
 \description{
-Internal function from the IRanges package, lifted and slightly modified to
-prevent a NOTE warning about the use of a non-exported function
+Wrapper to internal function from the IRanges package. Avoids use of
+\code{:::} and thus prevents a NOTE warning about the use of a non-exported
+function
 }
 \author{
 H. Pages, P. Aboyoun and M. Lawrence
