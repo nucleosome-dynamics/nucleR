@@ -11,7 +11,7 @@ Depends: methods
 Imports: Biobase, BiocGenerics, Biostrings, GenomeInfoDb, GenomicRanges,
     IRanges, Rsamtools, S4Vectors, ShortRead, dplyr, ggplot2, magrittr,
     parallel, stats, utils, grDevices
-Suggests: Starr, BiocStyle, knitr, rmarkdown, testthat
+Suggests: BiocStyle, knitr, rmarkdown, testthat
 LazyLoad: yes
 biocViews: NucleosomePositioning, Coverage, ChIPSeq, Microarray, Sequencing,
     Genetics, QualityControl, DataImport
